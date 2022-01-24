@@ -27,8 +27,7 @@ def generate(length: int = 5) -> str:
             if p < 0:
                 break
         right = challenge[i+1]
-        challenge = challenge[:p+1]+right+'*'+left+challenge[i+2:]
-        return challenge
+        return challenge[:p+1]+right+'*'+left+challenge[i+2:]
     # generate expression
     expression: List[Tuple[str, int]] = []
     expression.append(('', random.randint(1, 10)))
