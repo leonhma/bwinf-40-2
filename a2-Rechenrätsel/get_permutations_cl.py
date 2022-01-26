@@ -70,6 +70,3 @@ def get_permutations_cl(term: str) -> List[str]:
         maxindices = [len(summand_combinations[i]) - 1 for i in range(len(summand_combinations))]
         for indices in count_indices_up_to(maxindices):
             yield ''.join([column[indices[i]] for i, column in enumerate(summand_combinations)])
-
-
-[print(k) for k in get_permutations_cl('3 *4-5/6+5/7')]
