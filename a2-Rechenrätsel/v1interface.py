@@ -88,20 +88,3 @@ def solve(challenge: str, quiet: bool = True) -> str:
         raise ValueError('No solution!')
     return solutions
 
-
-print('A2 - Rechenrätsel\n--------------------------------------------------------------------------------')
-while(True):
-    choice = input(
-        'Geben sie "gen" ein, um ein neues Rätsel zu generieren oder "solve", um ein Rätsel zu lösen: ')
-    if choice == 'gen':
-        operators = int(input('Geben sie die Anzahl der Operatoren ein: '))
-        print(generate(operators))
-    elif choice == 'solve':
-        challenge = input('Geben sie das Rätsel ein: ')
-        try:
-            solved = solve(challenge, False)
-            print('Mögliche Lösung(en):')
-            print('\n'.join(solved))
-        except ValueError:
-            print('Das Rätsel kann nicht gelöst werden!')
-    print('--------------------------------------------------------------------------------')

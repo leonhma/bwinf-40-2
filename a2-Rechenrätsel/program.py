@@ -3,6 +3,7 @@ import re
 import timeit
 from itertools import combinations
 from typing import List
+from v1interface import solve
 
 from alive_progress import alive_it
 
@@ -26,12 +27,14 @@ def gen(length: int) -> str:
     str
         The generated challenge.
     """
+    print('starting challenge generation')
     # generate a random challenge
     # start with a plus sign and a number
     challenge = f'+{random.randint(1, 9)}'
-    for _ in range(length):
+    while len(re.findall(r'[*+-/]', challenge))-1 != length:
         # generate operator
         op = random.choice(OPERATORS)
+        print(f'{op=}')
         # generate number
         if op == '/':
             last = ''
@@ -45,12 +48,16 @@ def gen(length: int) -> str:
                 for number in NUMBERS
                 if (last >= number > 1) and (last % number == 0)
             ]
+            if not nums:
+                continue  # try again if no divisors found
         elif op == '*':
             nums = NUMBERS.copy()
             nums.remove(1)
         else:
-            nums = NUMBERS
+            nums = NUMBERS.copy()
+            nums.remove(0)
         # append to challenge
+        print(f'{nums=}')
         challenge += op + str(random.choice(nums))
     # check if the result is positive
     if not is_valid_challenge(challenge):
@@ -128,14 +135,17 @@ def is_valid_challenge(challenge: str) -> bool:
             to_check.remove(mul_div)
             for i in range(1, len(to_check)+1):
                 for mul_div_permutation in combinations(to_check, i):
-                    if eval(f'1{mul_div}') == eval(f'1/(1{"".join(mul_div_permutation)})'):
-                        print(
-                            f'{mul_div} can be cancelled out by {mul_div_permutation}')
-                        return False
+                    try:
+                        if eval(f'1{mul_div}') == eval(f'1/(1{"".join(mul_div_permutation)})'):
+                            print(
+                                f'{mul_div} can be cancelled out by {mul_div_permutation}')
+                            return False
+                    except ZeroDivisionError:
+                        pass
     print(f'{challenge} has no factors/divisors that cancel out')
     print('---')
     # check for the edgecase of '3+4*3'
-    for cl_permutation in alive_it(get_permutations_cl(challenge)):  # TODO predict length
+    for cl_permutation in get_permutations_cl(challenge):  # TODO predict length
         if get_skyline(challenge) == get_skyline(cl_permutation) and cl_permutation != challenge:
             print('case x*n+x detected')
             return False
@@ -143,5 +153,13 @@ def is_valid_challenge(challenge: str) -> bool:
 
     return True
 
-challenge = "4*3*2*6*3*9+7*8/2*9*4-4*6-4*4*5"
-print(timeit.timeit(lambda: print(f'{is_valid_challenge(challenge)=}'), number=1, globals=globals()))
+wrongs = []
+n = 100
+for _ in alive_it(range(n)):
+    challenge = gen(3)
+    if len(solve(re.sub(r'[\*\+\-\/]', '◦', challenge))) != 1:
+        wrongs.append(challenge)
+wrongsstring = '\n'.join(wrongs)
+print(f'{wrongsstring}\nfound {len(wrongs)} wrong challenges. (thats {len(wrongs)/n*100}%)')
+
+

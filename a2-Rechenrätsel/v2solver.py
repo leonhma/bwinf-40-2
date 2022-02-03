@@ -140,4 +140,4 @@ for i in alive_it(range(100)):
     solution = solve(test).replace(' ', '')
     assert solution == test, f'error in {i}: {solution} != {test}' """
 
-print(generate(8))
+print(solve('5 ◦ 8 ◦ 5 ◦ 5 ◦ 8 ◦ 2 = 45'))

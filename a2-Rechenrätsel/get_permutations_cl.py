@@ -33,7 +33,7 @@ def count_indices_up_to(maxindices: List[int]) -> Generator[List[int], None, Non
         count_up()
 
 
-def get_permutations_cl(term: str) -> List[str]:
+def get_permutations_cl(term: str) -> List[str]:  # TODO optimize
     """
     Generate all permutations of a term using the commutative law.
 
@@ -56,6 +56,8 @@ def get_permutations_cl(term: str) -> List[str]:
     # get all summands
     summands = re.findall(
         r'[+-].+?(?=[+-]|$)', term)
+
+    first, *summands = summands
     # create a big table of all permutations
     combinations = []
     for i, summand in enumerate(summands):
@@ -69,4 +71,4 @@ def get_permutations_cl(term: str) -> List[str]:
     for summand_combinations in itertools.permutations(combinations, len(combinations)):
         maxindices = [len(summand_combinations[i]) - 1 for i in range(len(summand_combinations))]
         for indices in count_indices_up_to(maxindices):
-            yield ''.join([column[indices[i]] for i, column in enumerate(summand_combinations)])
+            yield first+''.join([column[indices[i]] for i, column in enumerate(summand_combinations)])
