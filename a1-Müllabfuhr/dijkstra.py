@@ -47,10 +47,9 @@ class PathSolver:
                 distances[neighbour] = min(distances[neighbour], new_distance)
                 print(f'current: {current}, new distance for neightbour {neighbour} is {distances[neighbour]}')
             print(distances)
-            if current == str(end_id):
-                return min(distances.items(), key=lambda x: x[1])[1]
+            distances[current] = current_distance
             del distances[current]
-            
+
             if not distances:
-                return -1
+                break
             current, current_distance = min(distances.items(), key=lambda x: x[1])
