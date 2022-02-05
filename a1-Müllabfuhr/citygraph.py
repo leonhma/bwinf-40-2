@@ -2,8 +2,18 @@ from typing import List, Mapping
 
 
 class CityGraph:
+    """
+    Class representing a graph of a city with roads & nodes.
+    
+    Attributes
+    ----------
+    avg_daily_length : float
+        The average length of a daily journey
+
+    """
     _nodes: List['CityGraph.node'] = None
     _compiled = False
+    avg_daily_length = 0
 
     class node:
         """
@@ -11,9 +21,9 @@ class CityGraph:
 
         Attributes
         ----------
-        connections : Mapping['CityMap.edge', float]
+        connections : Mapping[CityMap.edge, float]
             The edges connected to the node and their length
-        distance_to : Mapping['CityMap.node', float]
+        distance_to : Mapping[CityMap.node, float]
             The distance from this node to `other_node` is `distance_to[other_node]`
 
         """
@@ -26,7 +36,8 @@ class CityGraph:
             # distance_to is initialized by CityGraph.compile()
 
     class edge:
-        """Nested class representing the connection between two nodes.
+        """
+        Nested class representing the connection between two nodes.
 
         Attributes
         ----------
@@ -38,22 +49,22 @@ class CityGraph:
         seen = False
 
         def __init__(self, a: 'CityGraph.node', b: 'CityGraph.node', len_: float):
-            self.nodes = [a, b]
+            self._nodes = [a, b]
             for n in self._nodes:
                 n.connections[self] = len_
 
         def get_other_node(self, current: 'CityGraph.node') -> 'CityGraph.node':
             """
-            Return the other conencted node.
+            Return the other connected node.
 
             Parameters
             ----------
-            current : 'CityMap.node'
+            current : CityMap.node
                 The currrent node
 
             Returns
             -------
-            'CityMap.node'
+            CityMap.node
                 The other node
 
             """
@@ -63,7 +74,7 @@ class CityGraph:
         self._nodes = []
 
     def add_node(self):
-        """Add a node to the CityGraph."""
+        """Add a node to the CityGraph.""" 
         assert not self._compiled, "CityGraph is already compiled!"
         self._nodes.append(self.node(len(self._nodes)))
 
@@ -81,6 +92,7 @@ class CityGraph:
         """
         assert not self._compiled, "CityGraph is already compiled!"
         self.edge(*[self._nodes[n] for n in [a, b]], len_)  # convert node indices into node objects and connect them
+        self.avg_daily_length += len_
 
     def _get_distances_dijkstra(self, start_node: 'CityGraph.node'):
         unvisited = {n: float('inf') for n in self._nodes}  # mapping of node -> temporary distance
@@ -89,7 +101,7 @@ class CityGraph:
         current_distance = 0.0
         unvisited[current] = current_distance
         while True:
-            for neighbour, distance in {edge.get_other_node(current): len_ for edge, len_ in current.connections.items()}:
+            for neighbour, distance in [(edge.get_other_node(current), len_) for edge, len_ in current.connections.items()]:
                 if neighbour not in unvisited:
                     continue
                 new_distance = current_distance + distance
@@ -99,13 +111,27 @@ class CityGraph:
             if not unvisited:
                 break
             current, current_distance = min(unvisited.items(), key=lambda x: x[1])
-        return {visited}
+        return visited
 
     def compile(self):
         """Calculate the distance between every node and freeze the CityGraph."""
         for node in self._nodes:
             node.distance_to = self._get_distances_dijkstra(node)
         self._compiled = True
+        self.avg_daily_length /= 5
+
+    # utility methods
+
+    def get_center_node(self) -> 'CityGraph.node':
+        """Get the center (home) node.
+
+        Returns
+        -------
+        CityGraph.node
+            The home node
+
+        """
+        return self._nodes[0]
 
     def get_unseen_nodes(self) -> List['CityGraph.node']:
         """
@@ -113,7 +139,7 @@ class CityGraph:
 
         Returns
         -------
-        List['CityGraph.node']
+        List[CityGraph.node]
             The list of unseen nodes
 
         """
@@ -129,14 +155,14 @@ class CityGraph:
 
         Parameters
         ----------
-        current : 'CityGraph.node'
+        current : CityGraph.node
             The current node
-        nodes : List['CityGraph.node']
+        nodes : List[CityGraph.node]
             The nodes to compare for distance
 
         Returns
         -------
-        'CityGraph.node'
+        CityGraph.node
             The node out of `nodes` that's closest to `current`
 
         """
