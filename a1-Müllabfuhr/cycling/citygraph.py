@@ -31,30 +31,41 @@ class CityGraph:
             self.vertices[v][u] = len_
             self.vertices[u][v] = len_
 
-    # TODO also consider staying at 0 a cycle
-    def find_cycles(self, v_start: int = 0, _current_path: List[int] = None, _traversed_edges: List[Set[int]] = None) -> List[List[int]]:
+    def _cycles_dfs(self, _current_path: List[int],
+                    _traversed_edges: List[Set[int]],
+                    _current_depth: int) -> set[tuple[tuple[int],
+                                                      float]]:
+        connected = self.vertices[_current_path[-1]]
+        cycles = set()
+        for v_next in connected:
+            if len(_current_path) > self._max_dfs_depth:
+                break
+            if (v_next == _current_path[-1] and len(connected) == 2) or (_traversed_edges.count({_current_path[-1], v_next}) == 2):
+                continue
+            if v_next == 0:
+                cycles.add((tuple(_current_path+[0]), _current_depth+connected[v_next]))
+            else:
+                cycles.update(
+                    self._cycles_dfs(
+                        _current_path + [v_next],
+                        _traversed_edges + [{_current_path[-1],
+                                            v_next}],
+                        _current_depth + connected[v_next]))
+        return cycles
+
+    def find_cycles(self) -> set[tuple[tuple[int], float]]:
         """
         Find all cycles starting at v_start, that
         - can use an edge up to two times
         - don't turn around when there's only two edges connected to a vertice
 
         """
-        print(f'find_cycles ({v_start=}, {_current_path=}, {_traversed_edges=})')
-        if not _current_path:
-            _current_path = [0]
-        if not _traversed_edges:
-            _traversed_edges = []
-        connected = self.vertices[v_start]
-        cycles = []
-        for v_next in connected:
-            if len(_current_path) > self._max_dfs_depth:
-                print('length axceeded')
-                break
-            if (v_next == _current_path[-1] and len(connected) == 2) or (_traversed_edges.count({v_start, v_next}) == 2):
-                continue
-            if v_next == 0:
-                cycles.append(_current_path+[0])
-                print('equals 0 adding')
-            else:
-                cycles += (self.find_cycles(v_next, _current_path + [v_next], _traversed_edges + [{v_start, v_next}]))
+        cycles = self._cycles_dfs([0], [], 0)
+        cycles.add(((0,), 0))  # also consider staying home possibility
+        # clean duplicates
+        to_check = cycles.copy()
+        while to_check:
+            cycle = to_check.pop()
+            if cycle[0] != cycle[0][::-1]:
+                cycles.discard((cycle[0][::-1], cycle[1]))
         return cycles
