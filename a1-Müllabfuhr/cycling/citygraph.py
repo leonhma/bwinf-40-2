@@ -40,7 +40,7 @@ class CityGraph:
         for v_next in connected:
             if len(_current_path) > self._max_dfs_depth:
                 break
-            if (v_next == _current_path[-1] and len(connected) == 2) or (_traversed_edges.count({_current_path[-1], v_next}) == 2):
+            if (v_next == (_current_path[-2] if len(_current_path) > 1 else 'asdafsdfsd') and len(connected) == 2) or (_traversed_edges.count({_current_path[-1], v_next}) == 2):
                 continue
             if v_next == 0:
                 cycles.add((tuple(_current_path+[0]), _current_depth+connected[v_next]))
@@ -66,6 +66,6 @@ class CityGraph:
         to_check = cycles.copy()
         while to_check:
             cycle = to_check.pop()
-            if cycle[0] != cycle[0][::-1]:
+            if cycle[0] != cycle[0][::-1] and (cycle[0][::-1], cycle[1]) in to_check:
                 cycles.discard((cycle[0][::-1], cycle[1]))
         return cycles
