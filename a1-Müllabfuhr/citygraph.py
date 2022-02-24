@@ -4,7 +4,7 @@ from typing import List, Mapping
 class CityGraph:
     """
     Class representing a graph of a city with roads & nodes.
-    
+
     Attributes
     ----------
     avg_daily_length : float
@@ -50,6 +50,7 @@ class CityGraph:
 
         def __init__(self, a: 'CityGraph.node', b: 'CityGraph.node', len_: float):
             self._nodes = [a, b]
+            self.length = len_
             for n in self._nodes:
                 n.connections[self] = len_
 
@@ -74,7 +75,7 @@ class CityGraph:
         self._nodes = []
 
     def add_node(self):
-        """Add a node to the CityGraph.""" 
+        """Add a node to the CityGraph."""
         assert not self._compiled, "CityGraph is already compiled!"
         self._nodes.append(self.node(len(self._nodes)))
 
@@ -101,7 +102,9 @@ class CityGraph:
         current_distance = 0.0
         unvisited[current] = current_distance
         while True:
-            for neighbour, distance in [(edge.get_other_node(current), len_) for edge, len_ in current.connections.items()]:
+            for neighbour, distance in [
+                (edge.get_other_node(current),
+                 len_) for edge, len_ in current.connections.items()]:
                 if neighbour not in unvisited:
                     continue
                 new_distance = current_distance + distance
@@ -143,12 +146,12 @@ class CityGraph:
             The list of unseen nodes
 
         """
-        unseen = []
-        for node in self._nodes:
-            if(sum([0 if edge.seen else 1 for edge in node.connections.keys()]) > 0):
-                unseen.append(node)
-        return unseen
-    
+        return [
+            node
+            for node in self._nodes
+            if sum(0 if edge.seen else 1 for edge in node.connections.keys()) > 0
+        ]
+
     def get_closest_node_list(self, current: 'CityGraph.node', nodes: List['CityGraph.node']) -> 'CityGraph.node':
         """
         Get the node out of `nodes`, that's closest to `current`
@@ -167,5 +170,6 @@ class CityGraph:
 
         """
         assert self._compiled, "CityGraph has to be compiled first!"
+        if not nodes:
+            raise ValueError("No nodes given!")
         return min(nodes, key=current.distance_to.get)
-
