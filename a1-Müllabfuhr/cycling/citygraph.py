@@ -3,7 +3,7 @@ from typing import List, Mapping, Set, Tuple
 
 class CityGraph:
     """A class representing the city graph."""
-    vertices: Mapping[int, Mapping[int, float]]     # {vertex_id: {connected_vertex_id: distance}}
+    vertices: Mapping[int, Mapping[int, float]]     # {vertex_id: {connected_vertex_id: distance}, ...}
     edgeset: List[Set[int]]                         # [{vertex_id, vertex_id}, {vertex_id, vertex_id}, ...]
     _max_dfs_depth: int
 
@@ -55,7 +55,7 @@ class CityGraph:
 
     def find_cycles(self) -> set[tuple[tuple[int], float]]:
         """
-        Find all cycles starting at v_start, that
+        Find all cycles, that
         - can use an edge up to two times
         - don't turn around when there's only two edges connected to a vertice
 
