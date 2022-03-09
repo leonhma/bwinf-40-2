@@ -1,0 +1,3 @@
+CCCCCCCC
+99999
+Eigenes Beipiel um eine direkte Umlegung von C -> F zu testen.
