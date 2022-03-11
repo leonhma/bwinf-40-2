@@ -85,6 +85,10 @@ def generate(length: int = 5) -> str:
     return challenge+'='+str(int(eval(challenge)))
 
 
+def find(s, ch):
+    return (i for i, ltr in enumerate(s) if ltr == ch)
+
+
 def solve(challenge: str, quiet: bool = True) -> str:
     """
     Solve the challenge given as string.
@@ -121,8 +125,7 @@ def solve(challenge: str, quiet: bool = True) -> str:
             else:
                 expression.append(operators[i//2])
         expression = ''.join(expression)
-        f_expression = ' '.join(expression) + ' = ' + str(result)
-        print('solver: '+f_expression)
+        f_expression = ''.join(expression) + '=' + str(result)
         exp_result = eval(expression)
         if exp_result % 1 != 0:
             continue
@@ -130,6 +133,10 @@ def solve(challenge: str, quiet: bool = True) -> str:
             solutions.append(f_expression)
     if not solutions:
         raise ValueError('No solution!')
+    # test solutions for invalid divisions
+    for solution in solutions:
+        if any([(int(solution[i-1])%int(solution[i+1]))!=0 for i in find(solution, '/')]):
+            solutions.remove(solution)
     return solutions
 
 """ 
