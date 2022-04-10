@@ -7,9 +7,8 @@ from typing import Iterable, Tuple
 
 from alive_progress import alive_bar
 
-path = os.path.dirname(os.path.realpath(__file__))+f'/beispieldaten/stapel{2}.txt'
+path = os.path.dirname(os.path.realpath(__file__))+f'/beispieldaten/stapel{4}.txt'
 
-splits = 16
 
 with open(path, 'r') as f:
     lines = f.read().split('\n')
@@ -23,10 +22,10 @@ for i, line in enumerate(lines[1:][:n]):
 
 cardstack.sort()
 
-def check(iterable: Iterable[Tuple[int]]):
+def check(iterable_: Iterable[Tuple[int]]):
     # time complexity: O(n^(k-1)), space complexity: O(n)
-    with alive_bar(int(factorial(n) / (factorial(n - (k-1)) * factorial(k-1))/splits)) as bar:
-        for ii in iterable:  # ii: list of indices
+    with alive_bar(int(factorial(n) / (factorial(n - (k-1)) * factorial(k-1)))) as bar:
+        for ii in iterable_:  # ii: list of indices
             bar()
             goal = reduce(xor, [cardstack[i] for i in ii])
             l, r = ii[-1]+1, len(cardstack)-1
@@ -42,3 +41,4 @@ def check(iterable: Iterable[Tuple[int]]):
             
 
 ii = combinations(range(len(cardstack))[:-2], k-1)
+check(ii)

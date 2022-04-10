@@ -1,4 +1,6 @@
 from collections import Counter
+from typing import Generator
+from secrets import choice
 from typing import Callable, List, Union
 
 import regex as re
@@ -44,27 +46,31 @@ def xnx_case(challenge):
             left = Counter(re.findall(r'\d', part[:i]))
             right = Counter(re.findall(r'\d', part[-i:]))
             left.subtract(right)
-            if not left.total():
+            if not left-Counter():
                 print(f'found x+n*x case: {part}')
                 return True
         elif i > (len(part)-1)/2:
             left = Counter(re.findall(r'\d', part[:len(part)-i]))
             right = Counter(re.findall(r'\d', part[i+1:]))
             left.subtract(right)
-            if not left.total():
+            if not left-Counter():
                 print(f'found x*n+x case: {part}')
                 return True
 
 
-def is_valid_challenge(challenge) -> Union[bool, str]:
-    # ---- invalid if result if division/multiplication by 1 ----
-    if re.match(r'[*/]1', challenge):
-        print('result under 0 or division/multiplication by 1')
+def is_valid_challenge(challenge: str) -> Union[bool, str]:
+    print('---------------------------------------')
+    print(f'checking challenge: {challenge}')
+    print('---------------------------------------')
+
+    # ---- invalid if division/multiplication by 1 ----
+    if re.search(r'[/*]1', challenge):
+        print('division/multiplication by 1')
         return False
 
     # ---- check that there's not one number followed by the same number again
-    if re.match(r'(\d)[*-+/]\1', challenge):
-        print('one number followed by the same number again')
+    if re.search(r'(\d)[*-+/]\1', challenge):
+        print('one number followed by the same number')
         return False
 
     # ---- check for 3*4+3 case ----
@@ -79,23 +85,27 @@ def is_valid_challenge(challenge) -> Union[bool, str]:
         return False
 
     # ---- calculate each summand's result while checking for non-int temporary results ----
-    pluses, minuses = [], []
+    pluses: list[int] = []
+    minuses: list[int] = []
 
     for summand in summands:
         sum_ = 0
         sum_ = int(summand[:2])
+        print
         if len(summand) > 2:
             for i in range(len(summand))[2::2]:
+                print(f'{summand[i]}{summand[i+1]}')
                 if summand[i] == '/':
                     sum_ /= int(summand[i+1])
                 elif summand[i] == '*':
                     sum_ *= int(summand[i+1])
+                print(f'{sum_=}')
                 if sum_ % 1:
                     print('non-int temporary result')
                     return False
 
         if sum_ < 0:
-            minuses.append(int(sum_))
+            minuses.append(-int(sum_))
         elif sum_ > 0:
             pluses.append(int(sum_))
 
@@ -109,6 +119,7 @@ def is_valid_challenge(challenge) -> Union[bool, str]:
             print('a minuend can be cancelled by one or more summands')
             return False
 
+    print(f'{pluses=}, {minuses=}')
     res = sum(pluses) - sum(minuses)
     print(res)
     if res < 0:
@@ -116,3 +127,27 @@ def is_valid_challenge(challenge) -> Union[bool, str]:
         return False
 
     return res
+
+def generate_challenge(length: int = 5) -> Generator[str, None, None]:
+    while True:
+        challenge = '+' + choice('123456789')
+        previous = challenge[-1]
+        for _ in range(length-1):
+            op = choice('*/-+')
+            challenge += op
+            if op == '*':
+                challenge += choice('23456789')
+            elif op == '/':
+                challenge += str(choice([s for s in [1,2,3,4,5,6,7,8,9] if int(previous) % s == 0]))
+            elif op in '+-':
+                challenge += choice('123456789')
+            previous = challenge[-1]
+        yield challenge
+
+def get_challenge(length: int = 5):
+    while True:
+        challenge = next(generate_challenge(length))
+        if is_valid_challenge(challenge):
+            return challenge
+
+print(get_challenge(7))

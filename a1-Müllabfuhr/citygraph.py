@@ -1,13 +1,13 @@
-from itertools import combinations
-from queue import PriorityQueue
-from typing import FrozenSet, Iterable, List, Mapping, Set, Tuple
+from typing import (FrozenSet, Iterable, List, Mapping, Set,
+                    Tuple)
+
+from utility import ilist, remove_by_exp
 
 
 class CityGraph:
     """A class representing the city graph."""
     vertices: Mapping[int, Mapping[int, float]]     # {vertex_id: {connected_vertex_id: distance}, ...}
     edgeset: Set[FrozenSet[int]]                    # {{vertex_id, vertex_id}, {vertex_id, vertex_id}, ...}
-    max_bfs_depth: int
 
     @classmethod
     def _from_bwinf_file(cls, path: str) -> 'CityGraph':
@@ -23,22 +23,19 @@ class CityGraph:
         with open(path, 'r') as f:
             lines = f.read().split('\n')
 
-        n, m = [int(s) for s in lines[0].split()]
+        n, m = map(int, lines[0].split())
         return cls(
             list(range(n)),
-            [(int(v),
-              int(u),
-              float(length)) for v, u, length in [line.split() for line in lines[1: m + 1]]])
+            [(int(v), int(u), float(length)) for v, u, length in
+             [line.split() for line in lines[1: m + 1]]])
 
     def __init__(self, vertices: List[int], edges: List[Tuple[int, int, float]]):
         self.max_bfs_depth = 0
 
         self.vertices = {v: {} for v in vertices}
         self.edgeset = set()
-        self._max_dfs_depth = 0
 
         for edge in edges:
-            self.max_bfs_depth += 1
             v, u, len_ = edge
             self.edgeset.add(frozenset((v, u)))
             self.vertices[v][u] = len_
@@ -54,46 +51,66 @@ class CityGraph:
                 return False
         return True
 
-    def get_trash_collection_paths(self, days=5) -> List[Tuple[float, Tuple[int, ...]]]:
-        """
-        Find the shortest `days` paths that cycle from the depot, so that every road is visited.
+    def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
+        print('getting cycles')
+        # get paths using bfs-type algorithm
+        visited: Mapping[int, Tuple[float, List[int]]] = {}  # {visited_node_id: (length, path)}
+        paths: List[Tuple[float, Tuple[int, ...]]] = []  # [(length, (path)), ...]
+        queue: List[Tuple[float, Tuple[int, ...]]] = [(0.0, [0])]  # [(distance, path), ...]
 
-        Parameters
-        ----------
-        days : int
-            The number of days to find the paths for.
+        try:
+            while not self._contains_all_edges(map(lambda x: x[1], paths)):
+                queue.sort()
+                current_length, current_path = queue.pop(0)
+                if current_path[-1] in visited:  # check if path meets another path TODO make path not meet with itself
+                    paths.append((current_length+visited[current_path[-1]][0],
+                                 (*visited[current_path[-1]][1], *reversed(current_path[:-1]))))
+                    visited[current_path[-1]] = (current_length, current_path)
 
-        Returns
-        -------
-        List[Tuple[float, Tuple[int, ...]]]
-            A list of tuples containing the length of the path and the path itself.
-
-        Raises
-        ------
-        queue.Empty
-            If no path was found.
-
-        """
-        paths: List[Tuple[float, Tuple[int, ...]]] = [(0.0, (0,))] * days  # [(distance, [path]), ...]
-        queue: PriorityQueue[Tuple[float, List[int]]] = PriorityQueue()   # [(length, [path]), ...]
-        queue.put((0.0, [0]))
-
-        while True:  # raises queue.Empty when queue is empty
-            current = queue.get()  # get node that is nearest to the 'flooded area'
-            if len(current[1]) > self.max_bfs_depth:  # stopping at max feasible bfs depth
-                continue
-            if current[1][-1] == 0 and len(current[1]) > 1:  # stopping back at the base
-                path = tuple(current[1])
-                # non-reversed duplicates are dealt with by the 'set' datastructure
-                if (current[0], path) not in paths and (current[0], tuple(reversed(path))) not in paths:
-                    paths.append((current[0], path))
-                    # check current path
-                    for comb in combinations(paths[:-1], days-1):
-                        comb = list(comb)+[(current[0], path)]
-                        if self._contains_all_edges(map(lambda x: x[1], comb)):
-                            return comb
-            if current[1][-1] != 0 or current[0] == 0:  # if not back at home or at start of path
-                for v_next in self.vertices[current[1][-1]]:
-                    if ((v_next == (current[1][-2] if len(current[1]) > 1 else 'a')) and (len(self.vertices[current[1][-1]]) > 1)):
+                    # remove the path merging into the current path
+                    remove_by_exp(lambda x: x[1][-1] == current_path[-2], queue)
+                    continue
+                if len(self.vertices[current_path[-1]]) == 1:  # check if it's a dead end
+                    paths.append((current_length*2, (*current_path, *reversed(current_path[:-1]))))
+                    continue
+                visited[current_path[-1]] = (current_length, current_path)
+                for next_node_id in self.vertices[current_path[-1]]:
+                    if next_node_id == (current_path[-2] if len(current_path) > 1 else None):  # skip going backwards
                         continue
-                    queue.put((self.vertices[current[1][-1]][v_next] + current[0], current[1]+[v_next]))
+                    queue.append((self.vertices[current_path[-1]][next_node_id] + current_length,
+                                  current_path + [next_node_id]))
+        except IndexError as e:
+            print(f'Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). ({e})')
+            return []
+
+        print(f'{paths=}')
+
+        # remove all paths that are subsets of other paths
+        paths.sort(key=lambda x: len(x[1]), reverse=True)
+        to_remove = []
+        edgesets: List[FrozenSet[FrozenSet[int]]] = ilist()
+        for i, path in enumerate(paths):
+            edgesets[i] = frozenset(tuple(frozenset((path[1][i], path[1][i+1])) for i in range(len(path[1])-1)))
+
+        for i, edgeset in enumerate(edgesets):
+            if any(edgeset.issubset(edgeset2) for edgeset2 in edgesets[:i]):
+                to_remove.append(i)
+
+        shift = 0
+        for i in to_remove:
+            del paths[i-shift]
+            shift += 1
+        
+        # merge paths while they are > target_n_days
+        while len(paths) > days:
+            paths.sort()
+            first = paths.pop(0)
+            second = paths[0]
+            paths[0] = (first[0] + second[0], (*first[1], *second[1]))
+
+        # pad to length of target_n_days
+        while len(paths) < days:
+            paths.append((0.0, (0,)))
+        
+        return paths
+
