@@ -1,7 +1,8 @@
+from os import path
 from typing import (FrozenSet, Iterable, List, Mapping, Set,
                     Tuple)
 
-from utility import ilist, remove_by_exp
+from utility import remove_by_exp
 
 
 class CityGraph:
@@ -85,16 +86,6 @@ class CityGraph:
 
         print(f'{paths=}')
 
-        # remove all paths that are subsets of other paths
-        paths.sort(key=lambda x: len(x[1]), reverse=True)
-        to_remove = []
-        edgesets: List[FrozenSet[FrozenSet[int]]] = ilist()
-        for i, path in enumerate(paths):
-            edgesets[i] = frozenset(tuple(frozenset((path[1][i], path[1][i+1])) for i in range(len(path[1])-1)))
-
-        for i, edgeset in enumerate(edgesets):
-            if any(edgeset.issubset(edgeset2) for edgeset2 in edgesets[:i]):
-                to_remove.append(i)
 
         shift = 0
         for i in to_remove:
@@ -106,7 +97,7 @@ class CityGraph:
             paths.sort()
             first = paths.pop(0)
             second = paths[0]
-            paths[0] = (first[0] + second[0], (*first[1], *second[1]))
+            paths[0] = (first[0] + second[0], (*first[1], *second[1][1:]))
 
         # pad to length of target_n_days
         while len(paths) < days:
@@ -114,3 +105,14 @@ class CityGraph:
         
         return paths
 
+
+# repl
+while True:
+    pth = path.join(path.dirname(__file__), f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
+    cg = citygraph._from_bwinf_file(pth)
+    n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
+    maxlen = 0
+    for i, (len_, p) in zip(range(1, n_days+1, cg.get_paths(n_days))):
+        print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
+        if len_ > maxlen: maxlen = len_
+    print(f'Maximale Lange einer Tagestour: {maxdistance}')
