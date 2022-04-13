@@ -72,10 +72,16 @@ D24
 3
 ```
 
-Ausgabe zu `hexmax0.txt`
+Umlegungen
 
 ```
 OUTPUT
+```
+
+Ausgabe zu `hexmax0.txt`
+
+```
+EE4
 ```
 
 ---
