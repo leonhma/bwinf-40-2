@@ -40,9 +40,6 @@ class Segment:
     def __repr__(self):
         return f'<Segment ({self.char or self.panels})>'
 
-    def _choose(self, seg: 'Segment'):
-        self.panels = seg.panels
-
     def ascii_art(self) -> List[str]:
         """
         Get an ascii art representation of this segment.
@@ -95,11 +92,9 @@ class Segment:
 
         return chars
 
-    def get_possibilites(self) -> Generator[Tuple[int, int, Callable[[], None]], None, None]:  # (takes, gives, choose())
-        for char in 'FEDCBA9876543210':
-            seg = Segment(char)
-            takes = sum(1 if self.panels[x] < seg.panels[x] else 0 for x in range(7))
+    def get_takes_gives(self, seg) -> Tuple[int, int]:  # (takes, gives, choose())
+            takes = sum(1 if self.panels[x] < seg.panels[x] else 0 for x in range(7))  # how many segments need to be added to make seg
             gives = sum(1 if self.panels[x] > seg.panels[x] else 0 for x in range(7))
-            yield takes, gives, lambda: self._choose(seg)
+            return takes, gives
 
 
