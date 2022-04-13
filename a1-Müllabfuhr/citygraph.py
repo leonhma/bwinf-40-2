@@ -31,8 +31,6 @@ class CityGraph:
              [line.split() for line in lines[1: m + 1]]])
 
     def __init__(self, vertices: List[int], edges: List[Tuple[int, int, float]]):
-        self.max_bfs_depth = 0
-
         self.vertices = {v: {} for v in vertices}
         self.edgeset = set()
 

@@ -19,8 +19,7 @@ class Segment:
         else:
             self.panels = [0] * 7  # 7 panels, ``, ^|, v|, _, |v, --, |^
             data = data.upper()
-            assert data in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                            'A', 'B', 'C', 'D', 'E', 'F'], "Invalid character for hex display"
+            assert data in '0123456789ABCDEF', "Invalid character for hex display"
             self.char = data
             if data not in '14BD':
                 self.panels[0] = 1
@@ -39,6 +38,9 @@ class Segment:
 
     def __repr__(self):
         return f'<Segment ({self.char or self.panels})>'
+
+    def __eq__(self, other):
+        return self.panels == other.panels
 
     def ascii_art(self) -> List[str]:
         """
@@ -92,8 +94,8 @@ class Segment:
 
         return chars
 
-    def get_takes_gives(self, seg) -> Tuple[int, int]:  # (takes, gives, choose())
-            takes = sum(1 if self.panels[x] < seg.panels[x] else 0 for x in range(7))  # how many segments need to be added to make seg
+    def get_takes_gives(self, seg) -> Tuple[int, int]:
+            takes = sum(1 if self.panels[x] < seg.panels[x] else 0 for x in range(7))
             gives = sum(1 if self.panels[x] > seg.panels[x] else 0 for x in range(7))
             return takes, gives
 
