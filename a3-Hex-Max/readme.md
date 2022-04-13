@@ -135,12 +135,6 @@ OUTPUT
 121
 ```
 
-Umlegungen
-
-```
-OUTPUT
-```
-
 Ausgabe zu `hexmax3.txt`
 
 ```
@@ -154,12 +148,6 @@ OUTPUT
 ```
 1A02B6B50D7489D7708A678593036FA265F2925B21C28B4724DD822038E3B4804192322F230AB7AF7BDA0A61BA7D4AD8F888
 87
-```
-
-Umlegungen
-
-```
-OUTPUT
 ```
 
 Ausgabe zu `hexmax4.txt`
