@@ -32,7 +32,6 @@ def get_max_swappable(m: int) -> str:
             if res:  # propagate result upwards
                 return res
             del result[-1]
-        raise ValueError('Keine Umlegung mit der gegebenen Zahl m möglich!')
 
     return dfs(m, m)
 
