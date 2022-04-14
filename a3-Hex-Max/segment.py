@@ -81,15 +81,11 @@ class Segment:
         chars[3] = '║' if self.panels[4] or self.panels[6] else chars[3]
         chars[3] = '╔' if self.panels[4] and (not self.panels[6]) else chars[3]
         chars[3] = '╚' if (not self.panels[4]) and self.panels[6] else chars[3]
-        chars[3] = '═' if (self.panels[5] and not (self.panels[4] or self.panels[6])
-                           and not (self.panels[0] and self.panels[3])) else chars[3]
         chars[3] = '╠' if self.panels[4] and self.panels[5] and self.panels[6] else chars[3]
 
         chars[5] = '║' if self.panels[1] or self.panels[2] else chars[5]
         chars[5] = '╝' if self.panels[1] and (not self.panels[2]) else chars[5]
         chars[5] = '╗' if (not self.panels[1]) and self.panels[2] else chars[5]
-        chars[5] = '═' if (self.panels[5] and not (self.panels[1] or self.panels[2])
-                           and not (self.panels[0] and self.panels[3])) else chars[5]
         chars[5] = '╣' if self.panels[1] and self.panels[5] and self.panels[2] else chars[5]
 
         return chars
