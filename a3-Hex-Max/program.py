@@ -2,16 +2,19 @@ import numpy as np
 from itertools import repeat
 from typing import List, Union, Tuple, Generator
 from segment import Segment
+from sys import setrecursionlimit
 from os.path import join, dirname
 
 display: List[Segment]
 costmap: List[List[Tuple[int, int]]] = []
 m: int
 
-choice = int(input("Welches Beispiel soll geöffnet werden?"))
+choice = int(input("Welches Beispiel soll geöffnet werden? "))
 with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
     display = [Segment(char) for char in f.readline().strip()]
     m = int(f.readline().strip())
+
+setrecursionlimit(m+1)  # at most m+1 depth
 
 # create costmap O(1)
 for x, from_ in enumerate('0123456789ABCDEF'):
@@ -73,15 +76,4 @@ def _print_asciiart(display: List[Segment]):
         print(''.join(line))
 
 
-start = ''.join(seg.char for seg in display)
-res = get_max_swappable(m)
-
-if choice < 3:
-	print()
-	_print_asciiart(display)
-
-	for step in _animate(start, res):
-		print()
-		_print_asciiart(step)
-
-print(res)
+print(get_max_swappable(m))
