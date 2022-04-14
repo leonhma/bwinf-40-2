@@ -2,7 +2,6 @@ import numpy as np
 from itertools import repeat
 from typing import List, Union, Tuple, Generator
 from segment import Segment
-from sys import setrecursionlimit
 from os.path import join, dirname
 
 display: List[Segment]
@@ -13,8 +12,6 @@ choice = int(input("Welches Beispiel soll geöffnet werden? "))
 with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
     display = [Segment(char) for char in f.readline().strip()]
     m = int(f.readline().strip())
-
-setrecursionlimit(m+1)  # at most m+1 depth
 
 # create costmap O(1)
 for x, from_ in enumerate('0123456789ABCDEF'):
