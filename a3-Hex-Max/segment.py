@@ -37,7 +37,7 @@ class Segment:
                 self.panels[6] = 1
 
     def __repr__(self):
-        return f'<Segment ({self.char or self.panels})>'
+        return f'<Segment ({self.char if hasattr(self, "char") else self.panels})>'
 
     def __eq__(self, other):
         return self.panels == other.panels
@@ -63,19 +63,19 @@ class Segment:
         chars[7] = '═' if self.panels[3] else chars[7]
 
         chars[0] = '╔' if self.panels[0] or self.panels[6] else chars[0]
-        chars[0] = '═' if self.panels[0] and not self.panels[6] else chars[0]
+        chars[0] = '╔' if self.panels[0] and not self.panels[6] else chars[0]
         chars[0] = '╔' if chars[0].strip() and self.panels[1] else chars[0]
 
         chars[2] = '╗' if self.panels[0] or self.panels[1] else chars[2]
-        chars[2] = '═' if self.panels[0] and not self.panels[1] else chars[2]
+        chars[2] = '╗' if self.panels[0] and not self.panels[1] else chars[2]
         chars[2] = '╗' if chars[2].strip() and self.panels[6] else chars[2]
 
         chars[6] = '╚' if self.panels[3] or self.panels[4] else chars[6]
-        chars[6] = '═' if self.panels[3] and not self.panels[4] else chars[6]
+        chars[6] = '╚' if self.panels[3] and not self.panels[4] else chars[6]
         chars[6] = '╚' if chars[6].strip() and self.panels[2] else chars[6]
 
         chars[8] = '╝' if self.panels[2] or self.panels[3] else chars[8]
-        chars[8] = '═' if self.panels[3] and not self.panels[2] else chars[8]
+        chars[8] = '╝' if self.panels[3] and not self.panels[2] else chars[8]
         chars[8] = '╝' if chars[8].strip() and self.panels[4] else chars[8]
 
         chars[3] = '║' if self.panels[4] or self.panels[6] else chars[3]
