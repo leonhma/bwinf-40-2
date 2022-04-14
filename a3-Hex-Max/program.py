@@ -21,7 +21,7 @@ def get_max_swappable(m: int) -> str:
 
     def dfs(max_takes, max_gives, index = 0):
         if index == len(display):
-            max_takes == max_gives:
+            if max_takes == max_gives:
                 return ''.join(result)  # return result if at the end of string and number of swaps match
             return  # return None if number of swaps dont match (only applies within inner dfs)
         for hex, (takes, gives) in zip('FEDCBA9876543210', costmap[int(display[index].char, base=16)]):
@@ -36,19 +36,19 @@ def get_max_swappable(m: int) -> str:
     return dfs(m, m)
 
 
-def _animate(from_: str, to: str) -> Generator[List[Segment], None, None]
+def _animate(from_: str, to: str) -> Generator[List[Segment], None, None]:
     from_ = [Segment(char) for char in from_]
     to = [Segment(char) for char in to]
 
     while from_ != to:
-        for i in range(7*len(to))
+        for i in range(7*len(to)):
             seg, i = i//7, i%7
             if from_[seg].panels[i] and not to[seg].panels[i]:
                 from_[seg].panels[i] = 0
             break
         else:
             raise ValueError('Not the same number of sticks!')
-        for i in range(7*len(to))
+        for i in range(7*len(to)):
             seg, i = i//7, i%7
             if not from_[seg].panels[i] and to[seg].panels[i]:
                 from_[seg].panels[i] = 1
@@ -58,7 +58,7 @@ def _animate(from_: str, to: str) -> Generator[List[Segment], None, None]
         yield from_
 
 
-def _print_asciiart(display: List[Segment])
+def _print_asciiart(display: List[Segment]):
     out = [[]]*3
     for seg in display:
         asciiart = seg.ascii_art()

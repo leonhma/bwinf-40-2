@@ -106,7 +106,8 @@ class CityGraph:
 
 # repl
 while True:
-    pth = path.join(path.dirname(__file__), f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
+    pth = path.join(path.dirname(__file__),
+                    f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
     cg = citygraph._from_bwinf_file(pth)
     n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
     maxlen = 0
