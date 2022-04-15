@@ -106,4 +106,4 @@ while True:
     for i, (len_, p) in zip(range(1, n_days+1), cg.get_paths(n_days)):
         print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
         if len_ > maxlen: maxlen = len_
-    print(f'Maximale Lange einer Tagestour: {maxlen_}')
+    print(f'Maximale Lange einer Tagestour: {maxlen}')
