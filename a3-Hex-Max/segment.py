@@ -4,40 +4,36 @@ from typing import Callable, Generator, List, Mapping, Tuple, Union
 class Segment:
     """Class representing a segment of a 7-segment display."""
 
-    def __init__(self, data: Union[str, Tuple[Union[int, bool]]]):
+    def __init__(self, char: Union[str, Tuple[Union[int, bool]]]):
         """
         Initialise the segment with data.
 
         Parameters
         ----------
-        data : Union[str, Tuple[Union[int, bool]]]
+        data : str
             The data to initialise the segment with. Either a hex character [0-9A-F] or a tuple of 7 booleans.
 
         """
-        if isinstance(data, tuple):
-            self.panels = [1 if data[x] else 0 for x in range(7)]
-        else:
-            self.panels = [0] * 7  # 7 panels, ``, ^|, v|, _, |v, --, |^
-            data = data.upper()
-            assert data in '0123456789ABCDEF', "Invalid character for hex display"
-            self.char = data
-            if data not in '14BD':
-                self.panels[0] = 1
-            if data not in '56BCEF':
-                self.panels[1] = 1
-            if data not in '2CEF':
-                self.panels[2] = 1
-            if data not in '147AF':
-                self.panels[3] = 1
-            if data not in '134579':
-                self.panels[4] = 1
-            if data not in '017C':
-                self.panels[5] = 1
-            if data not in '1237D':
-                self.panels[6] = 1
+        self.panels = [0] * 7  # 7 panels, ``, ^|, v|, _, |v, --, |^
+        self.char = char.upper()
+        assert self.char in '0123456789ABCDEF', "Invalid character for hex display"
+        if self.char not in '14BD':
+            self.panels[0] = 1
+        if self.char not in '56BCEF':
+            self.panels[1] = 1
+        if self.char not in '2CEF':
+            self.panels[2] = 1
+        if self.char not in '147AF':
+            self.panels[3] = 1
+        if self.char not in '134579':
+            self.panels[4] = 1
+        if self.char not in '017C':
+            self.panels[5] = 1
+        if self.char not in '1237D':
+            self.panels[6] = 1
 
     def __repr__(self):
-        return f'<Segment ({self.char if hasattr(self, "char") else self.panels})>'
+        return f'<Segment ({self.char if hasattr(self, "char") else self.panels })>'
 
     def __eq__(self, other):
         return self.panels == other.panels

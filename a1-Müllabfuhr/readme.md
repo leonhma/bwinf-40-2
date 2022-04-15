@@ -41,7 +41,7 @@ Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. 
 
 <br>
 
-*citygraph.py*
+*program.py*
 
 **class CityGraph**
 > Klasse die ein Straßennetz (ungerichteter gewichteter Graph) repräsentiert.
@@ -324,7 +324,7 @@ def remove_by_exp(exp: Callable[[Any], bool], lst: List):
 
 <br>
 
-*citygraph.py*
+*program.py*
 
 ```python
 from os import path

@@ -23,8 +23,8 @@ Die Hauptidee ist, für jede Stelle der Zahl, alle 15+1 Möglichkeiten sie zu ve
 **class Segment**
 > Klasse, die ein Segment einer 7-Segment-Anzeige repräsentiert
 
-**def \_\_init__(data: Union[str, Tuple[Union[int, bool]]])**
-> Initialisiert das Segment von einem Zeichen [0-9A-F] oder gegebenen Zuständen der Leuchten
+**def \_\_init__(char: str)**
+> Initialisiert das Segment von einem Zeichen [0-9A-F]
 
 **def \_\_repr__()__**
 > Gibt das Segment in lesbarer Form aus
@@ -42,7 +42,7 @@ Die Hauptidee ist, für jede Stelle der Zahl, alle 15+1 Möglichkeiten sie zu ve
 
 *program.py*
 
-**def get_max_swappable(m: int) -> str**
+**def get_max_swappable(segments: List[Segment], m: int) -> str**
 > Gibt die Maximalzahl mit `m` Umlegungen zurück
 
 **def _animate(from\_: List[Segment], to: List[Segment]) -> Generator[List[Segment], None, None]**
@@ -365,9 +365,11 @@ EF50AA77ECAD25F5E11A307B713EAAEC55215E7E640FD263FA...75092226E7D54DEB42E1BB2CA96
 
 Ausgabe zu `hexmax5.txt`
 
-```python
-RecursionError
 ```
+RecursionError: maximum recursion depth exceeded while calling a Python object
+```
+
+Wenn die gewünschte Anzahl der Umlegungen über `sys.getrecursionlimit()` (normalerweise 997) liegt, gibt es einen Fehler. Das Limit mit `sys.setrecursionlimit(n)` zu erhöhen hat in meinem Fall (auf einem chromebook) nicht funktioniert.
 
 ## Quellcode
 
