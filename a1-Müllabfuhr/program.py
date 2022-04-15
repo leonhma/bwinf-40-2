@@ -51,7 +51,6 @@ class CityGraph:
         return True
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
-        print('getting cycles')
         # get paths using bfs-type algorithm
         visited: Mapping[int, Tuple[float, List[int]]] = {}  # {visited_node_id: (length, path)}
         paths: List[Tuple[float, Tuple[int, ...]]] = []  # [(length, (path)), ...]
@@ -82,13 +81,6 @@ class CityGraph:
             print(f'Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). ({e})')
             return []
 
-        print(f'{paths=}')
-
-
-        shift = 0
-        for i in to_remove:
-            del paths[i-shift]
-            shift += 1
         
         # merge paths while they are > target_n_days
         while len(paths) > days:
