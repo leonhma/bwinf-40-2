@@ -68,9 +68,12 @@ def _print_asciiart(display: List[Segment]):
         print(''.join(line))
 
 while True:
-    choice = int(input("Bitte die Nummer des Beispiels eingeben [0-5]: "))
-    with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
-        display = [Segment(char) for char in f.readline().strip()]
-        m = int(f.readline().strip())
+    try:
+        choice = int(input("Bitte die Nummer des Beispiels eingeben [0-5]: "))
+        with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
+            display = [Segment(char) for char in f.readline().strip()]
+            m = int(f.readline().strip())
 
-    print(get_max_swappable(display, m))
+        print(get_max_swappable(display, m))
+    except Exception as e:
+        print(e)
