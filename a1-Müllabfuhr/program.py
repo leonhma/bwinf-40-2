@@ -1,7 +1,7 @@
 from os import path
 from typing import (FrozenSet, Iterable, List, Mapping, Set,
                     Tuple)
-
+from collections import Counter
 from utility import remove_by_exp
 
 
@@ -81,7 +81,18 @@ class CityGraph:
             print(f'Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). ({e})')
             return []
 
-        
+        # remove unneeded paths
+        paths.sort(reverse=True)
+        edgecounts = Counter(frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1))
+        keys = edgecounts.keys()
+        for len_, path in paths:
+            edgecount = Counter(frozenset((path[i], path[i+1])) for i in range(len(path)-1))
+            print(edgecounts, path, edgecount)
+            tmp = edgecounts-edgecount
+            if not any(v < 1 for v in tmp.values()) and tmp.keys() == keys:
+                paths.remove((len_, path))
+                edgecounts.subtract(edgecount)
+
         # merge paths while they are > target_n_days
         while len(paths) > days:
             paths.sort()
