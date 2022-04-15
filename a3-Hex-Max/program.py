@@ -73,4 +73,4 @@ while True:
         display = [Segment(char) for char in f.readline().strip()]
         m = int(f.readline().strip())
 
-    print(get_max_swappable(m))
+    print(get_max_swappable(display, m))
