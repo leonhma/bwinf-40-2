@@ -87,12 +87,12 @@ class CityGraph:
         keys = edgecounts.keys()
         for len_, path in paths:
             edgecount = Counter(frozenset((path[i], path[i+1])) for i in range(len(path)-1))
-            print(edgecounts, path, edgecount)
             tmp = edgecounts-edgecount
             if not any(v < 1 for v in tmp.values()) and tmp.keys() == keys:
                 paths.remove((len_, path))
                 edgecounts.subtract(edgecount)
 
+        print(f'edges: {Counter(frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1))}')
         if not {frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1)} == self.edgeset:
             print('doesnt match edgeset!')
 
