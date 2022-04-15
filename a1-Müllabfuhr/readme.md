@@ -17,6 +17,8 @@ Zuerst wird das Straßennetz in einer Adjacency-List Datenstruktur gespeichert. 
 
 ![GIF-Animation des Algorithmus](../static/a1-pathfinding.gif)
 
+Da es passieren kann, dass eine Straße ofters als benötigt 'befahren' wird, werden im nächsten Schritt unnötige Wege entfernt.
+
 Nun ist allerdings nicht garantiert, dass `paths` die richtige Länge (z.B. 5 Tage) hat.
 Deshalb werden, solange die Länge von `paths` größer als die Anzahl der Tage ist, die beiden kürzesten Pfade kombiniert. Somit wird eine zu lange Liste verkürzt. Ist sie jedoch zu kurz, wird sie mit Nullen (Wagen bleibt in der Zentrale) aufgefüllt.
 
@@ -91,7 +93,12 @@ Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes 
 Ausgabe zu `muellabfuhr0.txt`
 
 ```
-OUTPUT
+Tag 1: 0 -> 8 -> 9 -> 8 -> 0, Gesamtlaenge: 4.0
+Tag 2: 0 -> 6 -> 7 -> 8 -> 0, Gesamtlaenge: 4.0
+Tag 3: 0 -> 4 -> 5 -> 6 -> 0, Gesamtlaenge: 4.0
+Tag 4: 0 -> 2 -> 3 -> 4 -> 0, Gesamtlaenge: 4.0
+Tag 5: 0 -> 2 -> 1 -> 8 -> 0, Gesamtlaenge: 4.0
+Maximale Lange einer Tagestour: 4.0
 ```
 
 ---
@@ -115,7 +122,12 @@ OUTPUT
 Ausgabe zu `muellabfuhr1.txt`
 
 ```
-OUTPUT
+Tag 1: 0 -> 6 -> 7 -> 5 -> 4 -> 7 -> 6 -> 0, Gesamtlaenge: 19.0
+Tag 2: 0 -> 6 -> 3 -> 2 -> 3 -> 6 -> 0, Gesamtlaenge: 18.0
+Tag 3: 0 -> 4 -> 3 -> 6 -> 0, Gesamtlaenge: 15.0
+Tag 4: 0 -> 6 -> 1 -> 3 -> 6 -> 0, Gesamtlaenge: 13.0
+Tag 5: 0 -> 6 -> 3 -> 5 -> 0, Gesamtlaenge: 11.0
+Maximale Lange einer Tagestour: 19.0
 ```
 
 ---
@@ -139,7 +151,12 @@ OUTPUT
 Ausgabe zu `muellabfuhr2.txt`
 
 ```
-OUTPUT
+Tag 1: 0 -> 9 -> 13 -> 14 -> 5 -> 0 -> 5 -> 11 -> 3 -> 4 -> 6 -> 0 -> 5 -> 11 -> 8 -> 14 -> 5 -> 0 -> 5 -> 14 -> 2 -> 10 -> 9 -> 0, Gesamtlaenge: 23.0
+Tag 2: 0 -> 5 -> 14 -> 7 -> 1 -> 6 -> 0 -> 5 -> 14 -> 8 -> 7 -> 9 -> 0, Gesamtlaenge: 12.0
+Tag 3: 0 -> 5 -> 14 -> 10 -> 4 -> 6 -> 0 -> 6 -> 1 -> 13 -> 4 -> 6 -> 0, Gesamtlaenge: 12.0
+Tag 4: 0 -> 6 -> 4 -> 3 -> 13 -> 9 -> 0 -> 9 -> 12 -> 8 -> 2 -> 11 -> 5 -> 0, Gesamtlaenge: 13.0
+Tag 5: 0 -> 5 -> 9 -> 6 -> 0 -> 5 -> 14 -> 6 -> 0 -> 9 -> 7 -> 11 -> 5 -> 0 -> 9 -> 12 -> 1 -> 6 -> 0, Gesamtlaenge: 18.0
+Maximale Lange einer Tagestour: 23.0
 ```
 
 ---
@@ -163,7 +180,12 @@ OUTPUT
 Ausgabe zu `muellabfuhr3.txt`
 
 ```
-OUTPUT
+Tag 1: 0 -> 6 -> 1 -> 0 -> 8 -> 1 -> 0 -> 10 -> 1 -> 0 -> 12 -> 1 -> 0 -> 14 -> 1 -> 0 -> 1 -> 3 -> 2 -> 0 -> 1 -> 5 -> 2 -> 0 -> 1 -> 7 -> 2 -> 0 -> 1 -> 9 -> 2 -> 0 -> 1 -> 11 -> 2 -> 0 -> 1 -> 13 -> 2 -> 0 -> 2 -> 4 -> 3 -> 0 -> 2 -> 6 -> 3 -> 0 -> 2 -> 8 -> 3 -> 0 -> 2 -> 10 -> 3 -> 0 -> 2 -> 12 -> 3 -> 0, Gesamtlaenge: 59.0
+Tag 2: 0 -> 2 -> 14 -> 3 -> 0 -> 3 -> 5 -> 4 -> 0 -> 3 -> 7 -> 4 -> 0 -> 3 -> 9 -> 4 -> 0 -> 3 -> 11 -> 4 -> 0 -> 3 -> 13 -> 4 -> 0 -> 4 -> 6 -> 5 -> 0 -> 4 -> 8 -> 5 -> 0, Gesamtlaenge: 32.0
+Tag 3: 0 -> 4 -> 10 -> 5 -> 0 -> 4 -> 12 -> 5 -> 0 -> 4 -> 14 -> 5 -> 0 -> 5 -> 7 -> 6 -> 0 -> 5 -> 9 -> 6 -> 0 -> 5 -> 11 -> 6 -> 0 -> 5 -> 13 -> 6 -> 0 -> 6 -> 8 -> 7 -> 0, Gesamtlaenge: 32.0
+Tag 4: 0 -> 6 -> 10 -> 7 -> 0 -> 6 -> 12 -> 7 -> 0 -> 6 -> 14 -> 7 -> 0 -> 7 -> 9 -> 8 -> 0 -> 7 -> 11 -> 8 -> 0 -> 7 -> 13 -> 8 -> 0 -> 8 -> 10 -> 9 -> 0 -> 8 -> 12 -> 9 -> 0, Gesamtlaenge: 32.0
+Tag 5: 0 -> 8 -> 14 -> 9 -> 0 -> 9 -> 11 -> 10 -> 0 -> 9 -> 13 -> 10 -> 0 -> 10 -> 12 -> 11 -> 0 -> 10 -> 14 -> 11 -> 0 -> 11 -> 13 -> 12 -> 0 -> 12 -> 14 -> 13 -> 0 -> 2 -> 1 -> 0 -> 4 -> 1 -> 0, Gesamtlaenge: 34.0
+Maximale Lange einer Tagestour: 59.0
 ```
 
 ---
@@ -187,7 +209,12 @@ OUTPUT
 Ausgabe zu `muellabfuhr4.txt`
 
 ```
-OUTPUT
+Tag 1: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 0, Gesamtlaenge: 10.0
+Tag 2: 0, Gesamtlaenge: 0.0
+Tag 3: 0, Gesamtlaenge: 0.0
+Tag 4: 0, Gesamtlaenge: 0.0
+Tag 5: 0, Gesamtlaenge: 0.0
+Maximale Lange einer Tagestour: 10.0
 ```
 
 ---
@@ -211,7 +238,8 @@ OUTPUT
 Ausgabe zu `muellabfuhr5.txt`
 
 ```
-OUTPUT
+Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). (pop from empty list)
+Maximale Lange einer Tagestour: 0
 ```
 
 ---
@@ -235,7 +263,8 @@ OUTPUT
 Ausgabe zu `muellabfuhr6.txt`
 
 ```
-OUTPUT
+Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). (pop from empty list)
+Maximale Lange einer Tagestour: 0
 ```
 
 ---
@@ -259,7 +288,8 @@ OUTPUT
 Ausgabe zu `muellabfuhr7.txt`
 
 ```
-OUTPUT
+Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). (pop from empty list)
+Maximale Lange einer Tagestour: 0
 ```
 
 ---
@@ -283,7 +313,8 @@ OUTPUT
 Ausgabe zu `muellabfuhr8.txt`
 
 ```
-OUTPUT
+Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). (pop from empty list)
+Maximale Lange einer Tagestour: 0
 ```
 
 ---
@@ -295,13 +326,18 @@ OUTPUT
 0 1 0.5
 0 2 0.5
 1 2 50.7
-eigenes Beispiel
+eigenes Beispiel zur Demonstration von float-Gewichten
 ```
 
 Ausgabe zu `muellabfuhr9.txt`
 
 ```
-OUTPUT
+Tag 1: 0 -> 2 -> 1 -> 0, Gesamtlaenge: 51.7
+Tag 2: 0, Gesamtlaenge: 0.0
+Tag 3: 0, Gesamtlaenge: 0.0
+Tag 4: 0, Gesamtlaenge: 0.0
+Tag 5: 0, Gesamtlaenge: 0.0
+Maximale Lange einer Tagestour: 51.7
 ```
 
 ## Quellcode
@@ -320,6 +356,7 @@ def remove_by_exp(exp: Callable[[Any], bool], lst: List):
                 break
         except Exception:
             pass
+
 ```
 
 <br>
@@ -327,7 +364,8 @@ def remove_by_exp(exp: Callable[[Any], bool], lst: List):
 *program.py*
 
 ```python
-from os import path
+from collections import Counter
+from os.path import dirname, join
 from typing import (FrozenSet, Iterable, List, Mapping, Set,
                     Tuple)
 
@@ -380,7 +418,6 @@ class CityGraph:
         return True
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
-        print('getting cycles')
         # get paths using bfs-type algorithm
         visited: Mapping[int, Tuple[float, List[int]]] = {}  # {visited_node_id: (length, path)}
         paths: List[Tuple[float, Tuple[int, ...]]] = []  # [(length, (path)), ...]
@@ -411,14 +448,17 @@ class CityGraph:
             print(f'Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). ({e})')
             return []
 
-        print(f'{paths=}')
+        # remove unneeded paths
+        paths.sort(reverse=True)
+        edgecounts = Counter(frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1))
+        keys = edgecounts.keys()
+        for len_, path in paths:
+            edgecount = Counter(frozenset((path[i], path[i+1])) for i in range(len(path)-1))
+            tmp = edgecounts-edgecount
+            if not any(v < 1 for v in tmp.values()) and tmp.keys() == keys:
+                paths.remove((len_, path))
+                edgecounts.subtract(edgecount)
 
-
-        shift = 0
-        for i in to_remove:
-            del paths[i-shift]
-            shift += 1
-        
         # merge paths while they are > target_n_days
         while len(paths) > days:
             paths.sort()
@@ -435,12 +475,14 @@ class CityGraph:
 
 # repl
 while True:
-    pth = path.join(path.dirname(__file__), f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
-    cg = citygraph._from_bwinf_file(pth)
+    pth = join(dirname(__file__),
+                    f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
+    cg = CityGraph._from_bwinf_file(pth)
     n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
     maxlen = 0
-    for i, (len_, p) in zip(range(1, n_days+1, cg.get_paths(n_days))):
+    for i, (len_, p) in zip(range(1, n_days+1), cg.get_paths(n_days)):
         print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
         if len_ > maxlen: maxlen = len_
-    print(f'Maximale Lange einer Tagestour: {maxdistance}')
+    print(f'Maximale Lange einer Tagestour: {maxlen}')
+
 ```

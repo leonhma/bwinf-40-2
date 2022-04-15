@@ -382,40 +382,36 @@ from typing import Callable, Generator, List, Mapping, Tuple, Union
 class Segment:
     """Class representing a segment of a 7-segment display."""
 
-    def __init__(self, data: Union[str, Tuple[Union[int, bool]]]):
+    def __init__(self, char: Union[str, Tuple[Union[int, bool]]]):
         """
         Initialise the segment with data.
 
         Parameters
         ----------
-        data : Union[str, Tuple[Union[int, bool]]]
+        data : str
             The data to initialise the segment with. Either a hex character [0-9A-F] or a tuple of 7 booleans.
 
         """
-        if isinstance(data, tuple):
-            self.panels = [1 if data[x] else 0 for x in range(7)]
-        else:
-            self.panels = [0] * 7  # 7 panels, ``, ^|, v|, _, |v, --, |^
-            data = data.upper()
-            assert data in '0123456789ABCDEF', "Invalid character for hex display"
-            self.char = data
-            if data not in '14BD':
-                self.panels[0] = 1
-            if data not in '56BCEF':
-                self.panels[1] = 1
-            if data not in '2CEF':
-                self.panels[2] = 1
-            if data not in '147AF':
-                self.panels[3] = 1
-            if data not in '134579':
-                self.panels[4] = 1
-            if data not in '017C':
-                self.panels[5] = 1
-            if data not in '1237D':
-                self.panels[6] = 1
+        self.panels = [0] * 7  # 7 panels, ``, ^|, v|, _, |v, --, |^
+        self.char = char.upper()
+        assert self.char in '0123456789ABCDEF', "Invalid character for hex display"
+        if self.char not in '14BD':
+            self.panels[0] = 1
+        if self.char not in '56BCEF':
+            self.panels[1] = 1
+        if self.char not in '2CEF':
+            self.panels[2] = 1
+        if self.char not in '147AF':
+            self.panels[3] = 1
+        if self.char not in '134579':
+            self.panels[4] = 1
+        if self.char not in '017C':
+            self.panels[5] = 1
+        if self.char not in '1237D':
+            self.panels[6] = 1
 
     def __repr__(self):
-        return f'<Segment ({self.char if hasattr(self, "char") else self.panels})>'
+        return f'<Segment ({self.char if hasattr(self, "char") else self.panels })>'
 
     def __eq__(self, other):
         return self.panels == other.panels
@@ -480,20 +476,15 @@ class Segment:
 *program.py*
 
 ```python
-import numpy as np
 from itertools import repeat
-from typing import List, Union, Tuple, Generator
-from segment import Segment
 from os.path import join, dirname
+from typing import List, Union, Tuple, Generator
 
-display: List[Segment]
+from segment import Segment
+
+
 costmap: List[List[Tuple[int, int]]] = []
-m: int
 
-choice = int(input("Welches Beispiel soll geöffnet werden? "))
-with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
-    display = [Segment(char) for char in f.readline().strip()]
-    m = int(f.readline().strip())
 
 # create costmap O(1)
 for x, from_ in enumerate('0123456789ABCDEF'):
@@ -501,15 +492,15 @@ for x, from_ in enumerate('0123456789ABCDEF'):
     for y, to in enumerate('FEDCBA9876543210'):
         costmap[x][y] = Segment(from_).get_takes_gives(Segment(to))
 
-def get_max_swappable(m: int) -> str:
+def get_max_swappable(segments: List[Segment], m: int) -> str:
     result: List[str] = []  # list of char
 
     def dfs(max_takes, max_gives, index = 0):
-        if index == len(display):
+        if index == len(segments):
             if max_takes == max_gives:
                 return ''.join(result)  # return result if at the end of string and number of swaps match
             return  # return None if number of swaps dont match (only applies within inner dfs)
-        for hex, (takes, gives) in zip('FEDCBA9876543210', costmap[int(display[index].char, base=16)]):
+        for hex, (takes, gives) in zip('FEDCBA9876543210', costmap[int(segments[index].char, base=16)]):
             if takes > max_takes or gives > max_gives:  # skip possibility if either is exceeded
                 continue
             result.append(hex)
@@ -554,7 +545,12 @@ def _print_asciiart(display: List[Segment]):
     for line in out:
         print(''.join(line))
 
+while True:
+    choice = int(input("Bitte die Nummer des Beispiels eingeben [0-5]: "))
+    with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
+        display = [Segment(char) for char in f.readline().strip()]
+        m = int(f.readline().strip())
 
-print(get_max_swappable(m))
+    print(get_max_swappable(m))
 
 ```

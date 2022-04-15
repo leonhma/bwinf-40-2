@@ -1,8 +1,8 @@
-import numpy as np
 from itertools import repeat
-from typing import List, Union, Tuple, Generator
-from segment import Segment
 from os.path import join, dirname
+from typing import List, Union, Tuple, Generator
+
+from segment import Segment
 
 
 costmap: List[List[Tuple[int, int]]] = []
@@ -68,7 +68,7 @@ def _print_asciiart(display: List[Segment]):
         print(''.join(line))
 
 while True:
-    choice = int(input("Welches Beispiel soll geöffnet werden? "))
+    choice = int(input("Bitte die Nummer des Beispiels eingeben [0-5]: "))
     with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
         display = [Segment(char) for char in f.readline().strip()]
         m = int(f.readline().strip())

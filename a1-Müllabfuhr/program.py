@@ -1,7 +1,8 @@
-from os import path
+from collections import Counter
+from os.path import dirname, join
 from typing import (FrozenSet, Iterable, List, Mapping, Set,
                     Tuple)
-from collections import Counter
+
 from utility import remove_by_exp
 
 
@@ -92,10 +93,6 @@ class CityGraph:
                 paths.remove((len_, path))
                 edgecounts.subtract(edgecount)
 
-        print(f'edges: {Counter(frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1))}')
-        if not {frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1)} == self.edgeset:
-            print('doesnt match edgeset!')
-
         # merge paths while they are > target_n_days
         while len(paths) > days:
             paths.sort()
@@ -112,7 +109,7 @@ class CityGraph:
 
 # repl
 while True:
-    pth = path.join(path.dirname(__file__),
+    pth = join(dirname(__file__),
                     f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
     cg = CityGraph._from_bwinf_file(pth)
     n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
