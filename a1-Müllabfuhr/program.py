@@ -93,6 +93,9 @@ class CityGraph:
                 paths.remove((len_, path))
                 edgecounts.subtract(edgecount)
 
+        if not {frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1)} == self.edgeset:
+            print('doesnt match edgeset!')
+
         # merge paths while they are > target_n_days
         while len(paths) > days:
             paths.sort()
