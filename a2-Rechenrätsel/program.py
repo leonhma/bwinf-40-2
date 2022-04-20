@@ -134,12 +134,12 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
         challenge = '+' + choice('123456789')
         previous = challenge[-1]
         for _ in range(length-1):
-            op = choice('*/-+')
+            op = choice('*-+') if previous in ['3', '5', '7'] else choice('*-+/')  # cant divide with primes
             challenge += op
             if op == '*':
                 challenge += str(choice([num for num in nums if num != 1 and num != int(previous)]))
             elif op == '/':
-                challenge += str(choice([num for num in (1,2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]))
+                challenge += str(choice([num for num in (2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]))
             elif op in '+-':
                 challenge += str(choice([num for num in nums if num != int(previous)]))
             previous = challenge[-1]
@@ -150,4 +150,9 @@ def get_challenge(length: int = 5):
         if is_valid_challenge(challenge):
             return challenge
 
-print(get_challenge(7))
+while True:
+    try:
+        i = int(input("Bitte die Länge des Rätsels eingeben: "))
+        print(get_challenge(i))
+    except Exception as e:
+        print(e)
