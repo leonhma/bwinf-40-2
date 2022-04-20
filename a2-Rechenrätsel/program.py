@@ -134,6 +134,8 @@ def get_challenge(length: int = 5) -> str:
 while True:
     try:
         i = int(input("Bitte die Länge des Rätsels eingeben: "))
-        print(get_challenge(i))
+        challenge = get_challenge(i)
+        print(challenge)
+        print(re.sub(r'[*/+-]', '◦', challenge[1:]))
     except Exception as e:
         print(e)
