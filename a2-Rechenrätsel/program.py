@@ -27,11 +27,9 @@ def cancelling_muls_divs_in_summand(summands):
 
         for div in divs:
             if is_sum_of_list_items(div, muls, lambda i, j: i/j):
-                print('a div can be cancelled by one or more muls')
                 return True
         for mul in muls:
             if is_sum_of_list_items(mul, divs, lambda i, j: i/j):
-                print('a mul can be cancelled by one or more divs')
                 return True
 
 
@@ -47,46 +45,38 @@ def xnx_case(challenge):
             right = Counter(re.findall(r'\d', part[-i:]))
             left.subtract(right)
             if not left-Counter():
-                print(f'found x+n*x case: {part}')
                 return True
         elif i > (len(part)-1)/2:
             left = Counter(re.findall(r'\d', part[:len(part)-i]))
             right = Counter(re.findall(r'\d', part[i+1:]))
             left.subtract(right)
             if not left-Counter():
-                print(f'found x*n+x case: {part}')
                 return True
 
 
-def is_valid_challenge(challenge: str) -> Union[bool, str]:
-    print('---------------------------------------')
-    print(f'checking challenge: {challenge}')
-    print('---------------------------------------')
-
+def check_challenge(challenge: str) -> Union[None, str]:
     # ---- invalid if division/multiplication by 1 ----
     if re.search(r'[/*]1', challenge):
-        print('division/multiplication by 1')
-        return False
+        return
 
     # ---- check that there's not one number followed by the same number again
     if re.search(r'(\d)[*-+/]\1', challenge):
-        print('one number followed by the same number')
-        return False
+        return
 
     # ---- check for 3*4+3 case ----
     if xnx_case(challenge):
-        return False
+        return
 
     # split into summands
     summands = re.findall(r'[+-].*?(?=[+-]|$)', challenge)
 
     # ---- check for cancelling muls/divs in summand ----
     if cancelling_muls_divs_in_summand(summands):
-        return False
+        return
 
     # ---- calculate each summand's result while checking for non-int temporary results ----
-    pluses: list[int] = []
-    minuses: list[int] = []
+    pluses: List[int] = []
+    minuses: List[int] = []
 
     for summand in summands:
         sum_ = 0
@@ -101,8 +91,7 @@ def is_valid_challenge(challenge: str) -> Union[bool, str]:
                     sum_ *= int(summand[i+1])
                 print(f'{sum_=}')
                 if sum_ % 1:
-                    print('non-int temporary result')
-                    return False
+                    return
 
         if sum_ < 0:
             minuses.append(-int(sum_))
@@ -112,19 +101,16 @@ def is_valid_challenge(challenge: str) -> Union[bool, str]:
     # ---- check for cancelling summands/minuends ----
     for plus in pluses:
         if is_sum_of_list_items(plus, minuses):
-            print('a summand can be cancelled by one or more minuends')
-            return False
+            return
     for minus in minuses:
         if is_sum_of_list_items(minus, pluses):
-            print('a minuend can be cancelled by one or more summands')
-            return False
+            return
 
     print(f'{pluses=}, {minuses=}')
     res = sum(pluses) - sum(minuses)
     print(res)
     if res < 0:
-        print('result under 0')
-        return False
+        return
 
     return res
 
@@ -149,11 +135,14 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
             previous = challenge[-1]
         yield challenge
 
-def get_challenge(length: int = 5):
+def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
-        if is_valid_challenge(challenge):
-            return challenge
+        if res := check_challenge(challenge):
+            return f'{challenge}={res}'
 
 while True:
-    i = int(input("Bitte die Länge des Rätsels eingeben: "))
-    print(get_challenge(i))
+    try:
+        i = int(input("Bitte die Länge des Rätsels eingeben: "))
+        print(get_challenge(i))
+    except Exception as e:
+        print(e)
