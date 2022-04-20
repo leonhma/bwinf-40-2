@@ -139,7 +139,11 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
             if op == '*':
                 challenge += str(choice([num for num in nums if num != 1 and num != int(previous)]))
             elif op == '/':
-                challenge += str(choice([num for num in (2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]))
+                try:
+                    challenge += str(choice([num for num in (2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]))
+                except IndexError:
+                    print('index error')
+                    print(f'{previous=}, {op=}, {[num for num in (2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]=}')
             elif op in '+-':
                 challenge += str(choice([num for num in nums if num != int(previous)]))
             previous = challenge[-1]
