@@ -33,7 +33,7 @@ Dieses Rätsel wird nach dem Prinzip von rejection sampling auf mehrere Kriterie
 
 #### Effizienz
 
-Um die beiden häufigsten Fehler in den Rätseln zu verhindern, werden die `Division/Multiplikation durch/mit 1` und das `'ungerade Teilen'` schon während der Generierung verhindert.
+Um die beiden häufigsten Fehler in den Rätseln zu verhindern, werden die `Division/Multiplikation mit 1`, die `nicht-Integer Zwischenergebnisse` und `eine Zahl gefolgt von derselben` schon während der Generierung verhindert.
 
 ### Aufbau
 

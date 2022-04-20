@@ -19,8 +19,6 @@ def is_sum_of_list_items(i: int, lst: List[int], add_action: Callable = lambda i
             return True
     return False
 
-print('testing is_sum_of_list_items')
-print(is_sum_of_list_items(3, [1, 5, 2]))
 
 def cancelling_muls_divs_in_summand(summands):
     for summand in summands:
@@ -131,6 +129,7 @@ def is_valid_challenge(challenge: str) -> Union[bool, str]:
     return res
 
 def generate_challenge(length: int = 5) -> Generator[str, None, None]:
+    nums = (1,2,3,4,5,6,7,8,9)
     while True:
         challenge = '+' + choice('123456789')
         previous = challenge[-1]
@@ -138,11 +137,11 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
             op = choice('*/-+')
             challenge += op
             if op == '*':
-                challenge += choice('23456789')
+                challenge += str(choice([num for num in nums if num != 1 and num != int(previous)]))
             elif op == '/':
-                challenge += str(choice([s for s in (1,2,3,4,5,6,7,8,9) if int(previous) % s == 0]))
+                challenge += str(choice([num for num in (1,2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]))
             elif op in '+-':
-                challenge += choice('123456789')
+                challenge += str(choice([num for num in nums if num != int(previous)]))
             previous = challenge[-1]
         yield challenge
 
