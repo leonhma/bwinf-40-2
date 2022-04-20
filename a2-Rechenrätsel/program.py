@@ -134,7 +134,7 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
         challenge = '+' + choice('123456789')
         previous = challenge[-1]
         for _ in range(length-1):
-            op = choice('*-+') if previous in '1357' else choice('*-+/')  # cant divide with primes
+            op = choice('*-+') if previous in '12357' else choice('*-+/')  # cant divide with primes
             challenge += op
             if op == '*':
                 challenge += str(choice([num for num in nums if num != 1 and num != int(previous)]))
