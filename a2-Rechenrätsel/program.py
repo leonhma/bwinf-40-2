@@ -81,15 +81,12 @@ def check_challenge(challenge: str) -> Union[None, str]:
     for summand in summands:
         sum_ = 0
         sum_ = int(summand[:2])
-        print
         if len(summand) > 2:
             for i in range(len(summand))[2::2]:
-                print(f'{summand[i]}{summand[i+1]}')
                 if summand[i] == '/':
                     sum_ /= int(summand[i+1])
                 elif summand[i] == '*':
                     sum_ *= int(summand[i+1])
-                print(f'{sum_=}')
                 if sum_ % 1:
                     return
 
@@ -106,9 +103,7 @@ def check_challenge(challenge: str) -> Union[None, str]:
         if is_sum_of_list_items(minus, pluses):
             return
 
-    print(f'{pluses=}, {minuses=}')
     res = sum(pluses) - sum(minuses)
-    print(res)
     if res < 0:
         return
 
@@ -125,11 +120,7 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
             if op == '*':
                 challenge += str(choice([num for num in nums if num != 1 and num != int(previous)]))
             elif op == '/':
-                try:
-                    challenge += str(choice([num for num in (2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]))
-                except IndexError:
-                    print('index error')
-                    print(f'{previous=}, {op=}, {[num for num in (2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]=}')
+                challenge += str(choice([num for num in (2,3,4,5,6,7,8,9) if int(previous) % num == 0 and num != int(previous)]))
             elif op in '+-':
                 challenge += str(choice([num for num in nums if num != int(previous)]))
             previous = challenge[-1]
