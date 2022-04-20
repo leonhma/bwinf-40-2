@@ -155,8 +155,5 @@ def get_challenge(length: int = 5):
             return challenge
 
 while True:
-    try:
-        i = int(input("Bitte die Länge des Rätsels eingeben: "))
-        print(get_challenge(i))
-    except Exception as e:
-        print(e)
+    i = int(input("Bitte die Länge des Rätsels eingeben: "))
+    print(get_challenge(i))
