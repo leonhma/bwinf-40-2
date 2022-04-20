@@ -37,33 +37,29 @@ Um die beiden häufigsten Fehler in den Rätseln zu verhindern, werden die `Divi
 
 ### Aufbau
 
-*utility.py*
+*program.py*
 
-**def remove_by_exp(exp: Callable[[Any], bool], lst: List)**
-> Removes the first item from the list where `exp` evaluates to true (inplace modification).
+**def is_sum_of_list_items(i: int, lst: List[int], add_action: Callable = lambda i, j: i-j) -> bool**
+> Gibt als Wahrheitswert zurück, ob `i` durch aufrufen von `add_action` mit elementen von `lst` erreicht werden kann.
 
-<br>
+**def cancelling_muls_divs_in_summand(summands)**
+> Checkt, ob es in einem Summand sich kürzende Multiplikationen/Divisionen gibt (eg. `9*9/3/3`)
 
-*citygraph.py*
+**def xnx_case(challenge)**
+> Prüft, dass es keinen Fall wie z.B. `3*4+3` oder `5*6*7+6*5` gibt
 
-**class CityGraph**
-> Klasse die ein Straßennetz (ungerichteter gewichteter Graph) repräsentiert.
+**def check_challenge(challenge: str) -> Union[None, str]**
+> Uberfrüft das Rätsel auf Eindeutigkeit und gibt das Ergebnis zurück
 
-**def __init\_\_(vertices: List[int], edges: List[Tuple[int, int, float]])**
-> Initialisiert den CityGraph mit einer Liste der Vertices und der adjacency-list.
+**def generate_challenge(length: int = 5) -> Generator[str, None, None]**
+> Generiert mögliche Rätsel (noch unüberprüft)
 
-**@classmethod <br> def _from_bwinf_file(path: str) -> 'CityGraph'**
-> Liest eine Beispieldatei ein, und gibt einen CityGraph zurück.
-
-**def _contains_all_edges(paths: Iterable[Iterable[int]]) -> bool**
-> Gibt als Wahrheitswert zurück, ob die gegebene Liste an Pfaden alle 'Straßen' im Graph abdeckt.
-
-**def get_paths(days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]**
-> Gibt eine Liste zurück, die Tuples mit dem Pfad, und der Länge dessen an erster Stelle, enthält.
+**def get_challenge(length: int = 5) -> str**
+> Gibt ein eindeutiges Rätsel mit Ergebnis zurück
 
 ## Umsetzung
 
-Das Programm ist in der Sprache Python umgesetzt. Der Aufgabenordner enthält neben dieser Dokumentation eine ausführbare Python-Datei. Diese Datei ist mit einer Python-Umgebung ab der Version `3.6` ausführbar.
+Das Programm ist in der Sprache Python umgesetzt. Der Aufgabenordner enthält neben dieser Dokumentation eine ausführbare Python-Datei. Diese Datei ist mit einer Python-Umgebung ab der Version `3.8` ausführbar.
 
 Wird das Programm gestartet, wird zuerst eine Eingabe in Form einer einstelligen Zahl erwartet, um ein bestimmtes Beispiel auszuwählen. *(Das heißt: `0` für Beispiel `muellabfuhr0.txt`)*
 
@@ -75,7 +71,7 @@ Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes 
 
 ---
 
-`FILENAME0.txt`
+Rätsel von Länge `2`
 
 ```
 CONTENT

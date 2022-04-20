@@ -128,7 +128,7 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
 
 def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
-        if res := check_challenge(challenge):
+        if res := check_challenge(challenge):  # walrus
             return f'{challenge}={res}'
 
 while True:
