@@ -74,7 +74,7 @@ def check_challenge(challenge: str) -> Union[None, str]:
     if cancelling_muls_divs_in_summand(summands):
         return
 
-    # ---- calculate each summand's result while checking for non-int temporary results ----
+    # ---- calculate each summand's result ----
     pluses: List[int] = []
     minuses: List[int] = []
 
@@ -87,8 +87,6 @@ def check_challenge(challenge: str) -> Union[None, str]:
                     sum_ /= int(summand[i+1])
                 elif summand[i] == '*':
                     sum_ *= int(summand[i+1])
-                if sum_ % 1:
-                    return
 
         if sum_ < 0:
             minuses.append(-int(sum_))
@@ -131,6 +129,7 @@ def get_challenge(length: int = 5) -> str:
         if res := check_challenge(challenge):  # walrus
             return f'{challenge}={res}'
 
+# repl
 while True:
     try:
         i = int(input("Bitte die Länge des Rätsels eingeben: "))

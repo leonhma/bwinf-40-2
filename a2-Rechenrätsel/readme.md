@@ -23,7 +23,7 @@ Dieses Rätsel wird nach dem Prinzip von rejection sampling auf mehrere Kriterie
 - Kein 'x*n+x'-Muster
     > Schließt fälle wie `3*4+3` oder `7*4*6*3+4*7` aus
 - Keine sich-aufhebenden Multiplikationen/Divisionen in den Summanden
-    > Schließt z.B. `5/2*4/2` aus
+    > Schließt z.B. `8/2*4/2` aus
 - Keine sich-aufhebenden Additionen/Subtraktionen im Rätsel
     > Schließt Fälle wie `1+4-4` und `3+6/3+1-8/4` aus
 - Keine nicht-Integer Zwischenergebnisse
@@ -33,14 +33,14 @@ Dieses Rätsel wird nach dem Prinzip von rejection sampling auf mehrere Kriterie
 
 #### Effizienz
 
-Um die beiden häufigsten Fehler in den Rätseln zu verhindern, werden die `Division/Multiplikation mit 1`, die `nicht-Integer Zwischenergebnisse` und `eine Zahl gefolgt von derselben` schon während der Generierung verhindert.
+Um die drei häufigsten Fehler in den Rätseln zu verhindern, werden die `Division/Multiplikation mit 1`, die `nicht-Integer Zwischenergebnisse` und `eine Zahl gefolgt von derselben` schon während der Generierung verhindert.
 
 ### Aufbau
 
 *program.py*
 
 **def is_sum_of_list_items(i: int, lst: List[int], add_action: Callable = lambda i, j: i-j) -> bool**
-> Gibt als Wahrheitswert zurück, ob `i` durch aufrufen von `add_action` mit elementen von `lst` erreicht werden kann.
+> Gibt als Wahrheitswert zurück, ob `i` durch aufrufen von `add_action` mit Elementen von `lst` erreicht werden kann.
 
 **def cancelling_muls_divs_in_summand(summands)**
 > Checkt, ob es in einem Summand sich kürzende Multiplikationen/Divisionen gibt (eg. `9*9/3/3`)
@@ -49,7 +49,7 @@ Um die beiden häufigsten Fehler in den Rätseln zu verhindern, werden die `Divi
 > Prüft, dass es keinen Fall wie z.B. `3*4+3` oder `5*6*7+6*5` gibt
 
 **def check_challenge(challenge: str) -> Union[None, str]**
-> Uberfrüft das Rätsel auf Eindeutigkeit und gibt das Ergebnis zurück
+> Uberprüft das Rätsel auf Eindeutigkeit und gibt das Ergebnis zurück
 
 **def generate_challenge(length: int = 5) -> Generator[str, None, None]**
 > Generiert mögliche Rätsel (noch unüberprüft)
@@ -193,7 +193,7 @@ def check_challenge(challenge: str) -> Union[None, str]:
     if cancelling_muls_divs_in_summand(summands):
         return
 
-    # ---- calculate each summand's result while checking for non-int temporary results ----
+    # ---- calculate each summand's result ----
     pluses: List[int] = []
     minuses: List[int] = []
 
@@ -206,8 +206,6 @@ def check_challenge(challenge: str) -> Union[None, str]:
                     sum_ /= int(summand[i+1])
                 elif summand[i] == '*':
                     sum_ *= int(summand[i+1])
-                if sum_ % 1:
-                    return
 
         if sum_ < 0:
             minuses.append(-int(sum_))
@@ -250,6 +248,7 @@ def get_challenge(length: int = 5) -> str:
         if res := check_challenge(challenge):  # walrus
             return f'{challenge}={res}'
 
+# repl
 while True:
     try:
         i = int(input("Bitte die Länge des Rätsels eingeben: "))
