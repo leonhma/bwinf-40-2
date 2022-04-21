@@ -49,9 +49,10 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             for summand in summands:
                 s, *dm = [summand[i]+summand[i+1] for i in range(0, len(summand)-1, 2)]
                 while dm:
-                    s = eval(f'{s}{dm.pop(0)}')
+                    s = float(eval(f'{s}{dm.pop(0)}'))
+                    print(s)
                     if s%1:
-                        print('divisible by 1')
+                        print('not divisible by 1')
                         next_flag = True
                         break
                 if next_flag: break
