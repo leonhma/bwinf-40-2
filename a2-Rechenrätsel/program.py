@@ -129,12 +129,13 @@ def get_challenge(length: int = 5) -> str:
         if res := check_challenge(challenge):  # walrus
             return f'{challenge}={res}'
 
-# repl
-while True:
-    try:
-        i = int(input("Bitte die Länge des Rätsels eingeben: "))
-        challenge = get_challenge(i)
-        print(challenge)
-        print(re.sub(r'[*/+-]', '◦', challenge[1:]))
-    except Exception as e:
-        print(e)
+if __name__ == '__main__':
+    # repl
+    while True:
+        try:
+            i = int(input("Bitte die Länge des Rätsels eingeben: "))
+            challenge = get_challenge(i)
+            print(challenge)
+            print(re.sub(r'[*/+-]', '◦', challenge[1:]))
+        except Exception as e:
+            print(e)

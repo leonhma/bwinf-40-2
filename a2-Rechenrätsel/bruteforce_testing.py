@@ -1,5 +1,9 @@
 from re import findall, sub
 
+from alive_progress import alive_bar
+
+from program import get_challenge
+
 
 def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> bool:
     try:
@@ -38,9 +42,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
     while step():
         # test if ops combination matches res and no non-int results
         combination = ''.join(nums[i//2] if i%2==0 else ops[(i-1)//2] for i in range(length*2+1))
-        print(f'checking {combination}, {int(eval(combination))=}, {int(res)=}')
         if int(eval(combination)) == int(res):
-            print('matching res')
             next_flag = False
             # body matches the result, now check for non-int results
             summands = findall(r'[+-].*?(?=[+-]|$)', body)
@@ -60,8 +62,9 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                 return False
     return True
 
-print(is_unique('3*4+3=15', progressbar=True))
 
-
-
-    
+with alive_bar(10000) as bar():
+    for i in range(1, 10001):
+        challenge = get_challenge()
+        if is_unique(challenge):
+            bar(f'{(1-0.5**i)*100}%')
