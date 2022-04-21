@@ -68,11 +68,11 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                 return False
     return True
 
-
-with alive_bar(10000) as bar:
-    for i in range(10000):
-        challenge = get_challenge()
-        if is_unique(challenge):
-            bar()
-            bar.text = f'{(1-0.5**i)*100}%'
-        else: break
+if __name__ == '__main__':
+    with alive_bar(10000) as bar:
+        for i in range(10000):
+            challenge = get_challenge()
+            if is_unique(challenge):
+                bar() 
+                bar.text = f'{(1-0.5**i)*100}%'
+            else: break
