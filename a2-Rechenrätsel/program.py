@@ -128,7 +128,10 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
 
 def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
-        challenge = f'{challenge}={eval(challenge)}'
+        res = eval(challenge)
+        if res%1:
+            continue  # skip non-int results
+        challenge = f'{challenge}={int(eval(challenge))}'
         if is_unique(challenge):  # walrus
             return challenge
 
