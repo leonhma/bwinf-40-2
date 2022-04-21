@@ -17,8 +17,9 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
     ops = [''] * length
     
     def step(i):
-        if not ops[i]:
-            ops = ['+'] * len(ops)
+        if not ops[0]:
+            for j in range(len(ops)):
+                ops[j] = '+'
         elif ops[i] == '+':
             ops[i] = '-'
         elif ops[i] == '-':
