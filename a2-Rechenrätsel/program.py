@@ -128,8 +128,9 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
 
 def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
+        challenge = f'{challenge}={eval(challenge)}'
         if is_unique(challenge):  # walrus
-            return f'{challenge}={eval(challenge)}'
+            return challenge
 
 if __name__ == '__main__':
     # repl
