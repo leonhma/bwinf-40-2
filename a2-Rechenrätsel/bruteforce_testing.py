@@ -21,13 +21,13 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             for j in range(len(ops)):
                 ops[j] = '+'
         elif ops[i] == '+':
-            ops[i] = '*'
+            ops[i] = '-'
         elif ops[i] == '-':
-            ops[i] == '*'
+            ops[i] = '*'
         elif ops[i] == '*':
-            ops[i] == '/'
+            ops[i] = '/'
         elif ops[i] == '/':
-            ops[i] == '+'
+            ops[i] = '+'
             if i+1<len(ops):
                 step(i+1)
             else:
