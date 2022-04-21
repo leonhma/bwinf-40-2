@@ -28,7 +28,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             ops[i] = '/'
         elif ops[i] == '/':
             ops[i] = '+'
-            if i+1<len(ops):
+            if i+2<len(ops):
                 step(i+1)
             else:
                 print('returning false')
