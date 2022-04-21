@@ -16,7 +16,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
     ops = [''] * length
     
     def step(i=0):
-        print('calling step')
+        print(f'calling step {ops=}')
         if not ops[0]:
             for j in range(len(ops)):
                 ops[j] = '+'
@@ -32,11 +32,10 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                 step(i+1)
             else:
                 return False
+        print(f'now {ops=}')
         return True
     
-    while True:
-        a = step()
-        if not a: break
+    while step():
         # test if ops combination matches res and no non-int results
         combination = ''.join(nums[i//2] if i%2==0 else ops[(i-1)//2] for i in range(length*2+1))
         print(f'checking {combination}')
