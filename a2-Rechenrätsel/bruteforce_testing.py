@@ -40,7 +40,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
         if not a: break
         # test if ops combination matches res and no non-int results
         combination = ''.join(nums[i//2] if i%2==0 else ops[(i-1)//2] for i in range(length*2+1))
-        print(f'checking {combination}')
+        print(f'checking {combination}, {int(eval(combination))=}, {int(res)=}')
         if int(eval(combination)) == int(res):
             print('matching res')
             # body matches the result, now check for non-int results
