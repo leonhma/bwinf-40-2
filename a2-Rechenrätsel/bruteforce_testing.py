@@ -8,7 +8,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
         challenge = f'+{challenge}'
 
     previous = None
-    body, res = sub(r'[*/+-]', '◦', challenge).split('=')
+    body, res = challenge.split('=')
 
     nums = [x for x in body if x in '123456789']
     length = len(nums)-1
@@ -44,7 +44,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
         if int(eval(combination)) == int(res):
             print('matching res')
             # body matches the result, now check for non-int results
-            summands = findall(r'[+-].*?(?=[+-]|$)', challenge)
+            summands = findall(r'[+-].*?(?=[+-]|$)', body)
             for summand in summands:
                 s, *dm = [summand[i]+summand[i+1] for i in range(0, len(summand)-1, 2)]
                 while dm:
