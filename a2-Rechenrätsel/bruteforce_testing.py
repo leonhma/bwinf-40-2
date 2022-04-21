@@ -2,7 +2,7 @@ from re import findall, search, sub
 
 from alive_progress import alive_bar
 
-from program import get_challenge
+# from program import get_challenge
 
 
 def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> bool:
