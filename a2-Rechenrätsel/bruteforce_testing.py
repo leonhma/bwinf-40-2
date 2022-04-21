@@ -1,7 +1,5 @@
 from re import findall, sub
-from random import random
 
-from alive_progress import alive_bar
 
 def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> bool:
     try:
@@ -35,14 +33,9 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                 return False
         return True
     
-    def bar():
-        pass
-    
-    if progressbar:
-        bar = alive_bar(4**length)
     while True:
         a = step()
-        if a: break
+        if not a: break
         # test if ops combination matches res and no non-int results
         combination = ''.join(nums[i//2] if i%2==0 else ops[(i-1)//2] for i in range(length*2+1))
         print(f'checking {combination}')
@@ -59,7 +52,6 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                         else:
                             print(f'NOT UNIQUE: {challenge}! {previous}, {combination}')
                             return False
-        bar()
     return True
 
 print(is_unique('3*4+3=12', progressbar=True))
