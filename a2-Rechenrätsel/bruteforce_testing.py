@@ -16,7 +16,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
     ops = [''] * length
     
     def step(i=0):
-        print(f'calling step {ops=}')
+        print(f'calling step {ops=}, {i=}')
         if not ops[0]:
             for j in range(len(ops)):
                 ops[j] = '+'
@@ -28,7 +28,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             ops[i] = '/'
         elif ops[i] == '/':
             ops[i] = '+'
-            if i+2<len(ops):
+            if i+1<len(ops):
                 step(i+1)
             else:
                 print('returning false')
