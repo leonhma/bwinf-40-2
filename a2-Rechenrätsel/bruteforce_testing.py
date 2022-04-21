@@ -46,6 +46,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             next_flag = False
             # body matches the result, now check for non-int results
             summands = findall(r'[+-].*?(?=[+-]|$)', body)
+            print(f'{summands=')
             for summand in summands:
                 s, *dm = [summand[i]+summand[i+1] for i in range(0, len(summand)-1, 2)]
                 print(f'{s=} {dm=}')
