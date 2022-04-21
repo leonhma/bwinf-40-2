@@ -56,7 +56,7 @@ def xnx_case(challenge):
                 return True
 
 
-def check_challenge(challenge: str) -> Union[None, str]:
+def check_challenge_fast(challenge: str) -> Union[None, str]:
     # ---- invalid if division/multiplication by 1 ----
     if re.search(r'[/*]1', challenge):
         return
@@ -128,12 +128,10 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
 
 def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
-        res = eval(challenge)
-        if res%1:
-            continue  # skip non-int results
-        challenge = f'{challenge}={int(eval(challenge))}'
-        if is_unique(challenge):  # walrus
-            return challenge
+        if res := check_challenge_fast(challenge):
+            challenge = f'{challenge}={res}'
+            if is_unique(challenge):
+                return challenge
 
 if __name__ == '__main__':
     # repl
