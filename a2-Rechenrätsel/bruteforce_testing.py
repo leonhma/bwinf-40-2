@@ -48,6 +48,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             summands = findall(r'[+-].*?(?=[+-]|$)', body)
             for summand in summands:
                 s, *dm = [summand[i]+summand[i+1] for i in range(0, len(summand)-1, 2)]
+                print(f'{s=} {dm=}')
                 while dm:
                     s = float(eval(f'{s}{dm.pop(0)}'))
                     print(s)
