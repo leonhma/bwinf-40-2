@@ -35,26 +35,29 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                 return False
         return True
     
-    while True:
-        a = step()
-        if not a: break
+    while step():
         # test if ops combination matches res and no non-int results
         combination = ''.join(nums[i//2] if i%2==0 else ops[(i-1)//2] for i in range(length*2+1))
         print(f'checking {combination}, {int(eval(combination))=}, {int(res)=}')
         if int(eval(combination)) == int(res):
             print('matching res')
+            next_flag = False
             # body matches the result, now check for non-int results
             summands = findall(r'[+-].*?(?=[+-]|$)', body)
             for summand in summands:
                 s, *dm = [summand[i]+summand[i+1] for i in range(0, len(summand)-1, 2)]
                 while dm:
                     s = eval(f'{s}{dm.pop(0)}')
-                    if not s%1:
-                        if not previous:
-                            previous = combination
-                        else:
-                            print(f'NOT UNIQUE: {challenge}! {previous}, {combination}')
-                            return False
+                    if s%1:
+                        next_flag = True
+                        break
+                if next_flag: break
+            if next_flag: continue
+            if not previous:
+                previous = combination
+            else:
+                print(f'NOT UNIQUE: {challenge}! {previous}, {combination}')
+                return False
     return True
 
 print(is_unique('3*4+3=15', progressbar=True))
