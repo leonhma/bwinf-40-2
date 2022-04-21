@@ -49,7 +49,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                 s, *dm = [summand[i]+summand[i+1] for i in range(0, len(summand)-1, 2)]
                 while dm:
                     s = eval(f'{s}{dm.pop(0)}')
-                    if s%1:
+                    if not s%1:
                         if not previous:
                             previous = combination
                         else:
@@ -57,7 +57,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                             return False
     return True
 
-print(is_unique('3*4+3=12', progressbar=True))
+print(is_unique('3*4+3=15', progressbar=True))
 
 
 
