@@ -1,4 +1,4 @@
-from re import findall, sub
+from re import findall, search, sub
 
 from alive_progress import alive_bar
 
@@ -42,7 +42,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
     while step():
         # test if ops combination matches res and no non-int results
         combination = ''.join(nums[i//2] if i%2==0 else ops[(i-1)//2] for i in range(length*2+1))
-        if re.search(r'[/*]1', combination):
+        if search(r'[/*]1', combination):
             continue
         if int(eval(combination)) == int(res):
             next_flag = False
