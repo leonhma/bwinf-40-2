@@ -48,15 +48,11 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             next_flag = False
             # body matches the result, now check for non-int results
             summands = findall(r'[+-].*?(?=[+-]|$)', combination)
-            print(f'{summands=}')
             for summand in summands:
                 s, *dm = [summand[i]+summand[i+1] for i in range(0, len(summand)-1, 2)]
-                print(f'{s=} {dm=}')
                 while dm:
                     s = float(eval(f'{s}{dm.pop(0)}'))
-                    print(s)
                     if s%1:
-                        print('not divisible by 1')
                         next_flag = True
                         break
                 if next_flag: break
