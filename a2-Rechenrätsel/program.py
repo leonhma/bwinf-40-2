@@ -5,6 +5,8 @@ from typing import Callable, List, Union
 
 import regex as re
 
+from bruteforce_testing import is_unique
+
 
 def is_sum_of_list_items(i: int, lst: List[int], add_action: Callable = lambda i, j: i-j) -> bool:
     """
@@ -126,8 +128,8 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
 
 def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
-        if res := check_challenge(challenge):  # walrus
-            return f'{challenge}={res}'
+        if is_unique(challenge):  # walrus
+            return f'{challenge}={eval(challenge)}'
 
 if __name__ == '__main__':
     # repl
