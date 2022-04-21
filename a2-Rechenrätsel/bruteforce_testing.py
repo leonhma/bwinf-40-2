@@ -51,6 +51,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                 while dm:
                     s = eval(f'{s}{dm.pop(0)}')
                     if s%1:
+                        print('divisible by 1')
                         next_flag = True
                         break
                 if next_flag: break
@@ -69,3 +70,4 @@ with alive_bar(10000) as bar:
         if is_unique(challenge):
             bar()
             bar.text = f'{(1-0.5**i)*100}%'
+        else: break
