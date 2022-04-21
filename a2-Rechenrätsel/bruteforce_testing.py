@@ -31,7 +31,9 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             if i+1<len(ops):
                 step(i+1)
             else:
+                print('returning false')
                 return False
+
         print(f'now {ops=}')
         return True
     
