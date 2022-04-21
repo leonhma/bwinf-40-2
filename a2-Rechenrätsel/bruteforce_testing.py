@@ -16,6 +16,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
     ops = [''] * length
     
     def step(i=0):
+        print('calling step')
         if not ops[0]:
             for j in range(len(ops)):
                 ops[j] = '+'
