@@ -16,7 +16,6 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
     ops = [''] * length
     
     def step(i=0):
-        print(f'calling step {ops=}, {i=}')
         if not ops[0]:
             for j in range(len(ops)):
                 ops[j] = '+'
@@ -33,10 +32,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
                 if not res:  # propagate upwards
                     return False
             else:
-                print('returning false')
                 return False
-
-        print(f'now {ops=}')
         return True
     
     while True:
@@ -46,6 +42,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
         combination = ''.join(nums[i//2] if i%2==0 else ops[(i-1)//2] for i in range(length*2+1))
         print(f'checking {combination}')
         if int(eval(combination)) == int(res):
+            print('matching res')
             # body matches the result, now check for non-int results
             summands = findall(r'[+-].*?(?=[+-]|$)', challenge)
             for summand in summands:
