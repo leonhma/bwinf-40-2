@@ -36,9 +36,11 @@ def cancelling_muls_divs_in_summand(summands):
 
 
 def xnx_case(challenge):
+    print(f'testing xnx on {challenge}')
     parts = re.findall(
         r'(?<=[+-])(?:(?:\d\*?)+\+(?:\*?\d){2,}|(?:\d\*?){2,}\+(?:\*?\d)+)(?=[+-]|$)',
         challenge, overlapped=True)
+    print(f'{parts=}')
 
     for part in parts:
         i = part.find('+')

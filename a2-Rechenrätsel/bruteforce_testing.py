@@ -62,7 +62,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
             else:
                 print(f'NOT UNIQUE: {challenge}! {previous}, {combination}')
                 return False
-    return not not previous  # cast to bool
+    return True  # cast to bool
 
 if __name__ == '__main__':
     with alive_bar(10000) as bar:
