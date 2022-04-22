@@ -44,7 +44,7 @@ def is_unique(challenge: str, /, progressbar=False, print_nonunique=True) -> boo
         combination = '+'+''.join(nums[i//2] if i%2==0 else ops[(i-1)//2] for i in range(length*2+1))
         if search(r'[/*]1', combination):
             continue
-        if int(eval(combination)) == int(res):
+        if int(float(eval(combination))) == int(res):
             next_flag = False
             # body matches the result, now check for non-int results
             summands = findall(r'[+-].*?(?=[+-]|$)', combination)
