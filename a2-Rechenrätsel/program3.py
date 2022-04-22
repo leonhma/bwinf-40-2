@@ -6,7 +6,9 @@ def is_unique_dfs(challenge: str) -> bool:
     solutions = set()
 
     def dfs(stub: str, nums: List[str]):
+        print(f'calling dfs with {stub=}, {nums=}')
         if (ev := eval(stub)) in solutions:
+            print('in solutions')
             # body matches the result, now check for non-int results
             summands = findall(r'[+-].*?(?=[+-]|$)', stub)
             for summand in summands:
@@ -15,6 +17,7 @@ def is_unique_dfs(challenge: str) -> bool:
                     s = float(eval(f'{s}{dm.pop(0)}'))
                     if not s%1:
                         return True
+                        print('returning true')
         else:
             solutions.add(ev)
         if len(nums):
