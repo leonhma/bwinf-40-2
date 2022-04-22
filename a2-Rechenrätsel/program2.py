@@ -24,6 +24,7 @@ def is_unique_cl(challenge: str) -> bool:
                     prev = ''.join(s_comb)
                 else:
                     print(f'{prev=}, {"".join(s_comb)}')
+                    return False
             offset += len(summand)//2
     return True
 
