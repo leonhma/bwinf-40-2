@@ -19,9 +19,9 @@ def is_unique_cl(challenge: str) -> bool:
         offset = 0
         for summand in s_comb:
             if (Counter(int(summand[i]) for i in range(1, len(summand), 2))
-                == Counter(skyline[offset:][:len(summand)/2])):  # may discriminate some divisions
+                == Counter(skyline[offset:][:len(summand)//2])):  # may discriminate some divisions
                 return False
-            offset += len(summand)/2
+            offset += len(summand)//2
     return True
 
 while True:
