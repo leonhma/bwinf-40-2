@@ -10,8 +10,8 @@ def is_unique_bfs(challenge: str) -> bool:
 
     while q:
         results.clear()
-        for stub, nums in q:
-            q.popleft()
+        for _ in range(len(q)):
+            stub, nums = q.popleft()
             if (ev := eval(stub)) in results:
                 print('in solutions')
                 # body matches the result, now check for non-int results
