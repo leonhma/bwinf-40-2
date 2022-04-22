@@ -23,6 +23,7 @@ def is_unique_cl(challenge: str) -> bool:
                 break
             offset += len(summand)//2
         else:
+            print('else')
             if not prev:
                 prev = ''.join(s_comb)
             else:
