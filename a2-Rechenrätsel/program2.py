@@ -19,8 +19,10 @@ def is_unique_cl(challenge: str) -> bool:
         if s_comb[0].startswith('-'): continue  # first summand cant be negative
         offset = 0
         for summand in s_comb:
-            if not (Counter(int(summand[i]) for i in range(1, len(summand), 2))
-                == Counter(skyline[offset:][:len(summand)//2])):  # may discriminate some divisions
+            a_cnt = Counter(int(summand[i]) for i in range(1, len(summand), 2))
+            b_cnt = Counter(skyline[offset:][:len(summand)//2])
+            print(f'{a_cnt=}, {b_cnt=}')
+            if a_cnt != b_cnt:  # may discriminate some divisions
                 break
             offset += len(summand)//2
         else:
