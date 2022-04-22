@@ -2,6 +2,7 @@ from collections import Counter
 from typing import Generator
 from secrets import choice
 from typing import Callable, List, Union
+from program2 import is_unique_cl
 
 import regex as re
 
@@ -130,8 +131,8 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
 
 def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
-        if res := check_challenge_fast(challenge):
-            challenge = f'{challenge}={res}'
+        if is_unique_cl(challenge):
+            challenge = f'{challenge}={eval(challenge)}'
             if is_unique(challenge):
                 return challenge
 

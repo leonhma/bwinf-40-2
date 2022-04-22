@@ -15,18 +15,15 @@ def is_unique_cl(challenge: str) -> bool:
     summands = findall(r'[+-].*?(?=[+-]|$)', challenge)
     prev = None
     for s_comb in permutations(summands, len(summands)):
-        print(f'{s_comb=}')
         if s_comb[0].startswith('-'): continue  # first summand cant be negative
         offset = 0
         for summand in s_comb:
             a_cnt = Counter(int(summand[i]) for i in range(1, len(summand), 2))
             b_cnt = Counter(skyline[offset:][:len(summand)//2])
-            print(f'{a_cnt=}, {b_cnt=}')
             if a_cnt != b_cnt:  # may discriminate some divisions
                 break
             offset += len(summand)//2
         else:
-            print('else')
             if not prev:
                 prev = ''.join(s_comb)
             else:
@@ -34,8 +31,9 @@ def is_unique_cl(challenge: str) -> bool:
                 return False
     return True
 
-while True:
-    challenge = input('challenge > ')
-    print(is_unique_cl(challenge))
+if __name__ == '__main__':
+    while True:
+        challenge = input('challenge > ')
+        print(is_unique_cl(challenge))
 
 
