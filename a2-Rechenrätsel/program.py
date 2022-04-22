@@ -135,7 +135,8 @@ def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
         if is_unique_cl(challenge):
             challenge = f'{challenge}={int(eval(challenge))}'
-            return challenge
+            if is_unique(challenge):
+                return challenge
 
 if __name__ == '__main__':
     # repl
