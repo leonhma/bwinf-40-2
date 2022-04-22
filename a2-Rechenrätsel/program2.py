@@ -15,6 +15,7 @@ def is_unique_cl(challenge: str) -> bool:
     summands = findall(r'[+-].*?(?=[+-]|$)', challenge)
     prev = None
     for s_comb in combinations(summands, len(summands)):
+        print(f'{s_comb=}')
         if s_comb[0].startswith('-'): continue  # first summand cant be negative
         offset = 0
         for summand in s_comb:
