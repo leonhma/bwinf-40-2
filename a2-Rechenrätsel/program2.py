@@ -18,14 +18,16 @@ def is_unique_cl(challenge: str) -> bool:
         if s_comb[0].startswith('-'): continue  # first summand cant be negative
         offset = 0
         for summand in s_comb:
-            if (Counter(int(summand[i]) for i in range(1, len(summand), 2))
+            if not (Counter(int(summand[i]) for i in range(1, len(summand), 2))
                 == Counter(skyline[offset:][:len(summand)//2])):  # may discriminate some divisions
-                if not prev:
-                    prev = ''.join(s_comb)
-                else:
-                    print(f'{prev=}, {"".join(s_comb)}')
-                    return False
+                break
             offset += len(summand)//2
+        else:
+            if not prev:
+                prev = ''.join(s_comb)
+            else:
+                print(f'{prev=}, {"".join(s_comb)}')
+                return False
     return True
 
 while True:
