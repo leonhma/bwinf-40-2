@@ -8,7 +8,7 @@ def is_unique_dfs(challenge: str) -> bool:
     def dfs(stub: str, nums: List[str]):
         if (ev := eval(stub)) in solutions:
             # body matches the result, now check for non-int results
-            summands = findall(r'[+-].*?(?=[+-]|$)', combination)
+            summands = findall(r'[+-].*?(?=[+-]|$)', stub)
             for summand in summands:
                 s, *dm = [summand[i]+summand[i+1] for i in range(0, len(summand)-1, 2)]
                 while dm:
