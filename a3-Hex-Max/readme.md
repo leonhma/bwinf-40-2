@@ -12,7 +12,7 @@
 
 ## Lösungsidee
 
-Die Hauptidee ist, für jede Stelle der Zahl, alle 15+1 Möglichkeiten sie zu verändern anzuschauen, und dann einen Depth-First-Search Algorithmus daruber laufen zu lassen. Es wird immer mitgezählt, wieviele Segmente genommen/platziert werden, und nur Veränderungen, die das Maximum `m` nicht überschreiten kommen infrage. Am Ende der Zahl/des Displays (`index == len(display`) wird gecheckt, ob die Zahl der genommenen und platzierten Stäbchen übereinstimmt, ansonsten wird eine weitere Möglichkeit zurückverfolgt.
+Die Hauptidee ist, für jede Stelle der Zahl, alle 15+1 Möglichkeiten sie zu verändern anzuschauen, und dann einen Depth-First-Search Algorithmus darüber laufen zu lassen. Es wird immer mitgezählt, wieviele Segmente genommen/platziert werden, und nur Veränderungen, die das Maximum `m` nicht überschreiten kommen infrage. Am Ende der Zahl/des Displays (`index == len(display`) wird gecheckt, ob die Zahl der genommenen und platzierten Stäbchen übereinstimmt, ansonsten wird eine weitere Möglichkeit zurückverfolgt.
 
 ![Bild aus der Entstehungsphase](../static/a3-d24.png)
 
@@ -476,7 +476,6 @@ class Segment:
 *program.py*
 
 ```python
-from itertools import repeat
 from os.path import join, dirname
 from typing import List, Union, Tuple, Generator
 
@@ -486,7 +485,7 @@ from segment import Segment
 costmap: List[List[Tuple[int, int]]] = []
 
 
-# create costmap O(1)
+# create lookup O(1)
 for x, from_ in enumerate('0123456789ABCDEF'):
     costmap.append([0]*16)
     for y, to in enumerate('FEDCBA9876543210'):
@@ -499,13 +498,13 @@ def get_max_swappable(segments: List[Segment], m: int) -> str:
         if index == len(segments):
             if max_takes == max_gives:
                 return ''.join(result)  # return result if at the end of string and number of swaps match
-            return  # return None if number of swaps dont match (only applies within inner dfs)
-        for hex, (takes, gives) in zip('FEDCBA9876543210', costmap[int(segments[index].char, base=16)]):
+            return  # return None if number of swaps dont match (one match is guaranteed)
+        for hex_, (takes, gives) in zip('FEDCBA9876543210', costmap[int(segments[index].char, base=16)]):
             if takes > max_takes or gives > max_gives:  # skip possibility if either is exceeded
                 continue
-            result.append(hex)
+            result.append(hex_)
             res = dfs(max_takes-takes, max_gives-gives, index+1)
-            if res:  # propagate result upwards
+            if res:  # propagate match upwards
                 return res
             del result[-1]
 

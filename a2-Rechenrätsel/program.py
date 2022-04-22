@@ -7,6 +7,7 @@ from program2 import is_unique_cl
 import regex as re
 
 from bruteforce_testing import is_unique
+from program3 import is_unique_dfs
 
 
 def is_sum_of_list_items(i: int, lst: List[int], add_action: Callable = lambda i, j: i-j) -> bool:
@@ -132,10 +133,9 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
 
 def get_challenge(length: int = 5) -> str:
     for challenge in generate_challenge(length):
-        if is_unique_cl(challenge):
+        if is_unique_dfs(challenge):
             challenge = f'{challenge}={int(eval(challenge))}'
-            if is_unique(challenge):
-                return challenge
+            return challenge
 
 if __name__ == '__main__':
     # repl
