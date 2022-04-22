@@ -127,6 +127,7 @@ def generate_challenge(length: int = 5) -> Generator[str, None, None]:
             elif op in '+-':
                 challenge += str(choice([num for num in nums if num != int(previous)]))
             previous = challenge[-1]
+        if eval(challenge) < 0: continue
         yield challenge
 
 def get_challenge(length: int = 5) -> str:
