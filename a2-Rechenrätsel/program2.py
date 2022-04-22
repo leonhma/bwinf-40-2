@@ -1,5 +1,5 @@
 from collections import Counter
-from itertools import combinations
+from itertools import permutations
 
 from regex import findall
 
@@ -14,7 +14,7 @@ def is_unique_cl(challenge: str) -> bool:
     skyline = [int(challenge[i]) for i in range(1, len(challenge), 2)]
     summands = findall(r'[+-].*?(?=[+-]|$)', challenge)
     prev = None
-    for s_comb in combinations(summands, len(summands)):
+    for s_comb in permutations(summands, len(summands)):
         print(f'{s_comb=}')
         if s_comb[0].startswith('-'): continue  # first summand cant be negative
         offset = 0
