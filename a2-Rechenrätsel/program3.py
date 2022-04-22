@@ -1,12 +1,12 @@
 from typing import List
 from re import findall
-from collections import dequeue
+from collections import deque
 
 
 def is_unique_bfs(challenge: str) -> bool:
     results = set()
     s, *n = findall(r'\d', challenge)
-    q = dequeue(((f'+{s}', n),))
+    q = deque(((f'+{s}', n),))
 
     while q:
         results.clear()
