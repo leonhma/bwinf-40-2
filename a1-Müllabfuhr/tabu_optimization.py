@@ -101,7 +101,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 min_sp_v = sp_v[1]
 
         # splice
-        print(f'{min_idx=}')
         return tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
 
         
@@ -187,7 +186,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             if other_tour_idx == current_max_tour_idx:
                 continue
             other_tour = currentSolution[other_tour_idx]
-            print(f'changing between {current_max_tour} and {other_tour}')
+            print(f'changing between {current_max_tour} and {other_tour}\n------------------------------------')
             for i in range(len(current_max_tour)-2):
                 walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
                 local_tours = currentSolution.copy()
