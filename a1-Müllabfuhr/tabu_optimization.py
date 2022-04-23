@@ -177,7 +177,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         for other_tour_idx in range(len(tours)):
             if other_tour_idx == current_max_tour_idx:
                 continue
-            other_tour = tours[other_tour_idx]
+            other_tour = currentSolution[other_tour_idx]
             print(f'changing between {current_max_tour} and {other_tour}')
             for i in range(len(current_max_tour)-2):
                 walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
