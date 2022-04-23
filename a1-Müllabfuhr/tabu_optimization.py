@@ -97,15 +97,24 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         # splice
         return tour[:min_idx+1]+min_sp_u+walk+min_sp_v+tour[min_idx:]
 
+    # fix this
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         u, v = walk[0], walk[-1]
-        if u not in tour or v not in tour:
+        if u not in tour or v not in tour or u == v:
             return tour
-        if tour.index(v) < tour.index(u):
-            u, v = v, u
-        if 0 in walk and 0 not in tour:
-            return tour[:(left := tour.index(u))]+(u,)+dijkstra[u][0]+(0,)+dijkstra[0][v]+tour[tour.index(v, left-1):]
-        return tour[:(left := tour.index(u))]+(u,) if u != v else ()+dijkstra[u][v]+tour[tour.index(v, left):]
+        li, ri = min(tour.index(u), tour.index(v)), max(tour.index(u), tour.index(v))
+        
+        if li == 0:
+            if 0 in tour[ri:]:
+                return tour[ri:]
+            return dijkstra[0][u][1]+tour[ri:]
+        if ri == len(tour)-1:
+            if 0 in tour[:ri+1]:
+                return tour[:ri+1]
+            return tour[:ri+1]+dijkstra[v][0][1]
+        if walk.count(0) >= tour.count(0):
+            return tour[:li+1]+dijkstra[u][0][1]+(0,)+dijkstra[0][v][1]+tour[ri:]
+        return tour[:li+1]+dijkstra[u][v]+tour[ri:]
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         print(f'debug in _ReorderToCloseWalk {edgeset=}')
