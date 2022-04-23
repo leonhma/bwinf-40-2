@@ -107,6 +107,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return tour[:(left := tour.index(u))]+(u,) if u != v else ()+dijkstra[u][v]+tour[tour.index(v, left):]
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
+        print(f'debug in _ReorderToCloseWalk {edgeset=}')
         newtour = [0]  # depot node
 
         while edgeset:
@@ -187,7 +188,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 neighborhood.append(tuple(local_tours))
 
         # select max neighbor
-        currentSolution = list(min(neighborhood, key=(tabuList.get, w_max_tours)))
+        currentSolution = list(min(neighborhood, key=lambda x: (tabuList.get(x), w_max_tours(x))))
         tabuList.add(currentSolution)
         currentSolutionValue = w_max_tours(currentSolution)
 
