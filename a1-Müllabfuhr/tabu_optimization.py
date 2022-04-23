@@ -156,7 +156,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                     if stop:
                         print(f'not connected {edge}')
                         break
-                else:
+                if nodes == all_nodes:
                     # remove edges
                     print(f'filtering out {edge}')
                     edgeset = list(filter(lambda x: x != edge, edgeset))
