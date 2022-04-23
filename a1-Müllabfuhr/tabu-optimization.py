@@ -1,13 +1,13 @@
-from collections import deque
+from collections import Counter, deque
 from time import time
 from typing import Dict
 
+from utility import TabuList
 
-
-def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[List[int]], maxNOfItsWithoutImprovement: int = 100,
-                          maxRunningTime: float = 0, tabuTenure: int = 20) -> List[List[int]]:
+def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], maxNOfItsWithoutImprovement: int = 100,
+                          maxRunningTime: float = 0, tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
-    Perform a tabu search metaheuristic optimization on `tour` in the graph `G`.
+    Perform a tabu search metaheuristic optimization on `tours` in the graph `G`.
 
     Parameters
     ----------
@@ -29,7 +29,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[List[int]], maxNOfIt
 
     """
     # precompute shortest paths O(|V|²)
-    dijkstra = {k: {} for k in G}  # deepcopy
+    print('computing dijstra')
+    dijkstra = {k: {} for k in G}  # shallowcopy doesnt work
     for start in dijkstra:
         q = deque(((0, start, []),))
         while q:
@@ -39,16 +40,28 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[List[int]], maxNOfIt
             for next_, weight in G[current].items():
                 q.append((length+weight, next_, currentpath+[current]))
 
+    def edges(tour: Tuple[int, ...]) -> Iterable[frozenset]:
+        return (frozenset(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
+
     # cost function
-    def w_max(tours: List[List[int]]) -> float:
-        return max(sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1)) for tour in tours)
+    def w_tour(tour: Tuple[int, ...]) -> float:
+        return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
+
+    def w_max_tours(tours: List[Tuple[int, ...]]) -> float:
+        return max(w_tour(tour) for tour in tours)
+
+    def edgecount_tour(tour: Tuple[int, ...]) -> Counter:
+        return Counter(edges(tour))
+
+    def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter:
+        return sum(edgecount_tour(tour) for tour in tours)
     
-    def MergeWalkWithTour(tour: List[int], walk: List[int]) -> List[int]:
+    def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         # remove edges from walk that are already in tour
         if len(walk) == 1:
             return tour
 
-        tour_edges = set(frozenset((tour[i], tour[i+1])) for i in range(len(tour)-1))
+        tour_edges = set(edges(tour))
 
         while frozenset(walk[0], walk[1]) in tour_edges:
             del walk[0]
@@ -74,21 +87,55 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[List[int]], maxNOfIt
                 min_sp_u = sp_u[1]
                 min_sp_v = sp_v[1]
 
-        # splice SP(t, u), Ĥ, SP(v, t) into Ci at node t
+        # splice
         return tour[:min_idx+1]+min_sp_u+walk+min_sp_v+tour[min_idx:]
 
-    def SeparateWalkFromTour(tour: List[int], walk: List[int]) -> List[int]:
+    def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
+        # assuming endnodes of walk lie on tour
         u, v = walk[0], walk[-1]
-        if # TODO
-        if 0 in walk:
-            return (left := tour.index())
-
-
-
-        
-        
-
+        if tour.index(v) < tour.index(u):
+            u, v = v, u
+        if 0 in walk and 0 not in tour:
+            return tour[:(left := tour.index(u))]+(u)+dijkstra[u][0]+(0)+dijkstra[0][v]+tour[tour.index(v, left-1):]
+        return tour[:(left := tour.index(u))]+(u) if u != v else ()+dijkstra[u][v]+tour[tour.index(v, left):]
     
+    def _ReorderToClosedWalk(edgeset: List[frozenset]) -> Tuple[int, ...]:
+        newtour = [0]  # depot node
+
+        while edgeset:
+            for edge in edgeset:
+                if newtour[-1] in edge:
+                    edge.remove(newtour[-1])
+                    newtour.append(edge.pop())
+                    edgeset.remove(edge)
+        
+        if newtour[-1] != 0:
+            raise ValueError(f'something went wrong! newtour was {newtour}')
+        
+        return tuple(newtour)
+
+    def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
+        edgeset = list(edges(tour))
+        for edge in edges(tour):
+            if edgecount_tours(tours)[edge] > (ect := edgecount_tour(tour)[edge]) and ect % 2 == 0:
+                # check if tour remains connected to node 0
+                nodes = set((0,))
+                remaining = set(edges(tour)).drop(edge)
+                while remaining:
+                    stop = True
+                    for edge in remaining:
+                        if nodes.intersection(edge):
+                            nodes.update(edge)
+                            remaining.remove(edge)
+                            stop = False
+                    if stop:
+                        break
+                else:
+                    # remove edges
+                    edgeset = filter(lambda x: x != edge, edgeset)
+        
+        return _ReorderToClosedWalk(edgeset)
+
     bestSolution = tours
     currentSolution = tours
 
@@ -97,19 +144,37 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[List[int]], maxNOfIt
 
     nOfItsWithoutImprovement = 0
 
+    tabuList = TabuList(20)
+
     if maxRunningTime:
         startTime = time()
 
+    print('starting algorithm')
     while (nOfItsWithoutImprovement < maxNOfItsWithoutImprovement and not
            (maxRunningTime and time() > startTime + maxRunningTime)):
         
         nOfItsWithoutImprovement += 1
+        tabuList.tick()
         
-        # Compute a list of neighborhood solutions N(currentSolution) (with parameter improvementProcedure) in decreasing order of their move value.
-    
-        # Let neighborSolution be the first solution of the list which is either non-tabu or tabu but
-        # neighborSolutionValue < bestSolutionValue (if no such solution exists the algorithm terminates).
-        # Set currentSolution = neighborSolution and currentSolutionValue = neighborSolutionValue.
-        # If currentSolutionValue < bestSolutionValue then bestSolution=currentSolution, bestSolutionValue = currentSolutionValue and nOfItsWithoutImprovement = 0.
+        neighborhood: List[Tuple[Tuple[int]]] = []
+
+        # compute neighborhood
+        current_max_tour = max(tours, key=w_tour)
+        current_max_tour_idx = currentSolution.index(current_max_tour)
+
+        for other_tour_idx in range(len(tours)) if not other_tour_idx == current_max_tour_idx:
+            other_tour = tours[other_tour_idx]
+            for i in range(len(current_max_tour)-2):
+                walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
+                local_tours = tours.copy()
+                current = SeparateWalkFromTour(current_max_tour, walk)
+                current = RemoveEvenRedundantEdges(current, local_tours)
+                local_tours[current_max_tour_idx] = current
+                other = MergeWalkWithTour(other_tour, walk)
+                other = RemoveEvenRedundantEdges(other, local_tours)
+                local_tours[other_tour_idx] = other
+
+                neighborhood.append(tuple(local_tours))
+
         
 
