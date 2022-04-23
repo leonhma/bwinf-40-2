@@ -41,9 +41,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             for _ in range(len(q)):
                 length, current, currentpath = q.popleft()
                 if current in dijkstra[start]: continue
-                dijkstra[start][current] = (length, tuple(currentpath) if level > 2 else tuple(currentpath[1:]))
+                dijkstra[start][current] = (length, tuple(currentpath) if level > 1 else tuple(currentpath[1:]))
                 for next_, weight in G[current].items():
                     q.append((length+weight, next_, currentpath+[current]))
+        
+    print(f'{dijkstra[0][3]=} {dijkstra[8][9]=}')
 
     def edges(tour: Tuple[int, ...]) -> Iterable[set]:
         print(f'edges() input {tour=}')
