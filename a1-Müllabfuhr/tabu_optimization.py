@@ -131,7 +131,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         print(f'optimizing {tour=}')
         all_nodes = set(tour)
         edgeset = list(edges(tour))
-        for edge in set(edgeset):
+        for edge in set(map(frozenset, edgeset)):
             edge = frozenset(edge)  # 🥶
             ects = edgecount_tours(tours)[edge]
             ect = edgecount_tour(tour)[edge]
