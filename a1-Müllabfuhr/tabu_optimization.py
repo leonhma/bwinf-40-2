@@ -182,24 +182,24 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         current_max_tour = max(currentSolution, key=w_tour)
         current_max_tour_idx = currentSolution.index(current_max_tour)
 
-        for other_tour_idx in range(len(tours)):
-            if other_tour_idx == current_max_tour_idx:
-                continue
-            other_tour = currentSolution[other_tour_idx]
-            print(f'changing between {current_max_tour} and {other_tour}\n------------------------------------')
-            for i in range(len(current_max_tour)-2):
-                walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
-                local_tours = currentSolution.copy()
-                current = SeparateWalkFromTour(current_max_tour, walk)
-                local_tours[current_max_tour_idx] = current
-                current = RemoveEvenRedundantEdges(current, local_tours)
-                print(f'max is now {current}')
-                local_tours[current_max_tour_idx] = current
-                other = MergeWalkWithTour(other_tour, walk)
-                local_tours[other_tour_idx] = other
-                other = RemoveEvenRedundantEdges(other, local_tours)
-                print(f'other is now {other}')
-                local_tours[other_tour_idx] = other
+        for i in range(len(current_max_tour)-2):
+            semilocal_tours = currentSolution.copy()
+            walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
+            print(f'checking {walk=}')
+            semilocal_tours[current_max_tour_idx] = SeperateWalkFromTour(current_max_tour, walk)
+            semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(current_max_tour, walk)
+            print(f'max is now {semilocal_tours[current_max_tour_idx]}')
+
+
+            for other_tour_idx in range(len(tours)):
+                if other_tour_idx == current_max_tour_idx:
+                    continue
+                other_tour = currentSolution[other_tour_idx]
+                local_tours = semilocal_tours.copy()
+
+                local_tours[other_tour_idx] = MergeWalkWithTour(other_tour, walk)
+                local_tours[other_tour_idx] = RemoveEvenRedundantEdges(other, local_tours)
+                print(f'other is now {local_tours[other_tour_idx]}')
                 print(f'> neighbor {local_tours}')
 
                 neighborhood.append(tuple(local_tours))
