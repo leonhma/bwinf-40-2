@@ -107,10 +107,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         
 
         if li == 0:
-            return (0,) if v != 0 else ()+dijkstra[0][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]+(0,) if tour[-1] != 0 else ()
+            return ((0,) if v != 0 else ())+dijkstra[0][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]+((0,) if tour[-1] != 0 else ())
         if ri == len(tour)-1:
-            return (0,) if tour[0] != 0 else ()+dijkstra[0][tour[0]][1]+tour[:ri+1]+dijkstra[u][0][1]+(0,) if tour[ri] != 0 else ()
-        return (0,) if tour[0] != 0 else ()+dijkstra[0][tour[0]][1]+tour[:li+1]+dijkstra[u][v]+tour[ri:]+dijkstra[tour[-1]][0][1]+(0,) if tour[-1] != 0 else ()
+            return ((0,) if tour[0] != 0 else ())+dijkstra[0][tour[0]][1]+tour[:ri+1]+dijkstra[u][0][1]+((0,) if tour[ri] != 0 else ())
+        return ((0,) if tour[0] != 0 else ())+dijkstra[0][tour[0]][1]+tour[:li+1]+dijkstra[u][v]+tour[ri:]+dijkstra[tour[-1]][0][1]+((0,) if tour[-1] != 0 else ())
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         print(f'debug in _ReorderToClosedWalk {edgeset=}')
