@@ -42,17 +42,13 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             for next_, weight in G[current].items():
                 q.append((length+weight, next_, currentpath+[current]))
         
-    print(f'{dijkstra[0][3]=} {dijkstra[8][9]=}')
-
     def edges(tour: Tuple[int, ...]) -> Iterable[set]:
-        print(f'edges() input {tour=}')
-        edges = (set(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
-        return edges
+        return (set(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
 
-    # cost function
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
+    # cost function
     def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
 
@@ -131,12 +127,13 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
         print(f'called RemoveEvenRedundantEdges with {tour=}')
         edgeset = list(edges(tour))
-        print(f'{edgeset=}')
         for edge in edgeset:
-            print(f'{edgeset=}')
+            print(f'evaluating {edge}')
             edge = frozenset(edge)  # 🥶
+            ects = edgecount_tours(tours)[edge]
             ect = edgecount_tour(tour)[edge]
-            if edgecount_tours(tours)[edge] > ect and ect % 2 == 0:
+            print(f'{ects=}, {ect=}')
+            if ects > ect and ect % 2 == 0:
                 print(f'{edgecount_tours(tours)[edge]=}, {edgecount_tour(tour)[edge]=}')
                 # check if tour remains connected to node 0
                 nodes = set((0,))
