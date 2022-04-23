@@ -35,12 +35,15 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     dijkstra = {k: {} for k in G}  # shallowcopy doesnt work
     for start in dijkstra:
         q = deque(((0, start, []),))
+        level = 0
         while q:
-            length, current, currentpath = q.popleft()
-            if current in dijkstra[start]: continue
-            dijkstra[start][current] = (length, tuple(currentpath))
-            for next_, weight in G[current].items():
-                q.append((length+weight, next_, currentpath+[current]))
+            level += 1
+            for _ in range(len(q):)
+                length, current, currentpath = q.popleft()
+                if current in dijkstra[start]: continue
+                dijkstra[start][current] = (length, tuple(currentpath) if level > 2 else ())
+                for next_, weight in G[current].items():
+                    q.append((length+weight, next_, currentpath+[current]))
 
     def edges(tour: Tuple[int, ...]) -> Iterable[set]:
         print(f'edges() input {tour=}')
