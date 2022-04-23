@@ -3,6 +3,7 @@ from os.path import dirname, join
 from typing import (FrozenSet, Iterable, List, Mapping, Set,
                     Tuple)
 
+from tabu_optimization import MMKCPP_TEE_TabuSearch
 from utility import remove_by_exp
 
 
@@ -54,23 +55,22 @@ class CityGraph:
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
         # get paths using bfs-type algorithm
         visited: Mapping[int, Tuple[float, List[int]]] = {}  # {visited_node_id: (length, path)}
-        paths: List[Tuple[float, Tuple[int, ...]]] = []  # [(length, (path)), ...]
+        paths: List[Tuple[int, ...]] = []  # [(length, (path)), ...]
         queue: List[Tuple[float, Tuple[int, ...]]] = [(0.0, [0])]  # [(distance, path), ...]
 
         try:
             while not self._contains_all_edges(map(lambda x: x[1], paths)):
                 queue.sort()
                 current_length, current_path = queue.pop(0)
-                if current_path[-1] in visited:  # check if path meets another path TODO make path not meet with itself
-                    paths.append((current_length+visited[current_path[-1]][0],
-                                 (*visited[current_path[-1]][1], *reversed(current_path[:-1]))))
+                if current_path[-1] in visited:  # check if path meets another path
+                    paths.append((*visited[current_path[-1]][1], *reversed(current_path[:-1])))
                     visited[current_path[-1]] = (current_length, current_path)
 
                     # remove the path merging into the current path
                     remove_by_exp(lambda x: x[1][-1] == current_path[-2], queue)
                     continue
                 if len(self.vertices[current_path[-1]]) == 1:  # check if it's a dead end
-                    paths.append((current_length*2, (*current_path, *reversed(current_path[:-1]))))
+                    paths.append((*current_path, *reversed(current_path[:-1])))
                     continue
                 visited[current_path[-1]] = (current_length, current_path)
                 for next_node_id in self.vertices[current_path[-1]]:
@@ -83,28 +83,28 @@ class CityGraph:
             return []
 
         # remove unneeded paths
-        paths.sort(reverse=True)
+        paths.sort(key=lambda path: sum(self.vertices[path[i]][path[i+1]] for i in range(len(path)-1)), reverse=True)
         edgecounts = Counter(frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1))
         keys = edgecounts.keys()
-        for len_, path in paths:
+        for path in paths:
             edgecount = Counter(frozenset((path[i], path[i+1])) for i in range(len(path)-1))
             tmp = edgecounts-edgecount
             if not any(v < 1 for v in tmp.values()) and tmp.keys() == keys:
-                paths.remove((len_, path))
+                paths.remove(path)
                 edgecounts.subtract(edgecount)
 
         # merge paths while they are > target_n_days
         while len(paths) > days:
-            paths.sort()
+            paths.sort(key=lambda path: sum(self.vertices[path[i]][path[i+1]] for i in range(len(path)-1)))
             first = paths.pop(0)
             second = paths[0]
-            paths[0] = (first[0] + second[0], (*first[1], *second[1][1:]))
+            paths[0] = (*first[1], *second[1][1:])
 
         # pad to length of target_n_days
         while len(paths) < days:
-            paths.append((0.0, (0,)))
+            paths.append((0,))
         
-        return paths
+        return MMKCPP_TEE_TabuSearch(self.vertices, paths, maxRunningTime=10)
 
 
 # repl

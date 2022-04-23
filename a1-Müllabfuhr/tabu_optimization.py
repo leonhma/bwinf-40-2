@@ -4,7 +4,7 @@ from typing import Dict
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], maxNOfItsWithoutImprovement: int = 100,
+def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], /, maxNOfItsWithoutImprovement: int = 100,
                           maxRunningTime: float = 0, tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
     Perform a tabu search metaheuristic optimization on `tours` in the graph `G`.
@@ -47,7 +47,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], ma
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
-    def w_max_tours(tours: List[Tuple[int, ...]]) -> float:
+    def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
 
     def edgecount_tour(tour: Tuple[int, ...]) -> Counter:
@@ -62,6 +62,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], ma
             return tour
 
         tour_edges = set(edges(tour))
+        if not tour_edges:
+            return walk
 
         while frozenset(walk[0], walk[1]) in tour_edges:
             del walk[0]
@@ -91,8 +93,9 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], ma
         return tour[:min_idx+1]+min_sp_u+walk+min_sp_v+tour[min_idx:]
 
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
-        # assuming endnodes of walk lie on tour
         u, v = walk[0], walk[-1]
+        if u not in tour or v not in tour:
+            return tour
         if tour.index(v) < tour.index(u):
             u, v = v, u
         if 0 in walk and 0 not in tour:
@@ -144,7 +147,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], ma
 
     nOfItsWithoutImprovement = 0
 
-    tabuList = TabuList(20)
+    tabuList = TabuList(tabuTenure)
 
     if maxRunningTime:
         startTime = time()
@@ -175,6 +178,18 @@ def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], ma
                 local_tours[other_tour_idx] = other
 
                 neighborhood.append(tuple(local_tours))
+
+        # select max neighbor
+        currentSolution = list(min(neighborhood, key=(tabuList.get, w_max_tours)))
+        tabuList.add(currentSolution)
+        currentSolutionValue = w_max_tours(currentSolution)
+
+        if currentSolutionValue < bestSolutionValue:
+            bestSolutionValue = currentSolutionValue
+            bestSolution = currentSolution
+            nOfItsWithoutImprovement = 0
+
+    return bestSolution
 
         
 
