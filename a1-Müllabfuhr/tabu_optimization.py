@@ -99,8 +99,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         if tour.index(v) < tour.index(u):
             u, v = v, u
         if 0 in walk and 0 not in tour:
-            return tour[:(left := tour.index(u))]+(u)+dijkstra[u][0]+(0)+dijkstra[0][v]+tour[tour.index(v, left-1):]
-        return tour[:(left := tour.index(u))]+(u) if u != v else ()+dijkstra[u][v]+tour[tour.index(v, left):]
+            return tour[:(left := tour.index(u))]+(u,)+dijkstra[u][0]+(0,)+dijkstra[0][v]+tour[tour.index(v, left-1):]
+        return tour[:(left := tour.index(u))]+(u,) if u != v else (,)+dijkstra[u][v]+tour[tour.index(v, left):]
     
     def _ReorderToClosedWalk(edgeset: List[frozenset]) -> Tuple[int, ...]:
         newtour = [0]  # depot node
