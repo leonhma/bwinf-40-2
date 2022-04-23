@@ -138,9 +138,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             ects = edgecount_tours(tours)[edge]
             ect = edgecount_tour(tour)[edge]
             if ects > ect and ect % 2 == 0:
-                # check if tour remains connected to node 0
+                # check if tour remains connected to node 0 when removing edge
                 nodes = set((0,))
-                remaining = set(map(frozenset, edges(tour))).discard(edge)
+                remaining = set(map(frozenset, edges(tour)))
+                remaining.discard(edge)
                 while remaining:
                     stop = True
                     for edge in remaining:
@@ -185,7 +186,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         for i in range(len(current_max_tour)-2):
             semilocal_tours = currentSolution.copy()
             walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
-            print(f'checking {walk=}')
+            print(f'checking {walk=}\n---------------------')
             semilocal_tours[current_max_tour_idx] = SeparateWalkFromTour(current_max_tour, walk)
             semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(current_max_tour, semilocal_tours)
             print(f'max is now {semilocal_tours[current_max_tour_idx]}')
