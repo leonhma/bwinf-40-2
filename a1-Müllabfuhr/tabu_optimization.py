@@ -122,6 +122,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
         edgeset = list(edges(tour))
         for edge in edgeset:
+            edge = frozenset(edge)  # 🥶
             if edgecount_tours(tours)[edge] > (ect := edgecount_tour(tour)[edge]) and ect % 2 == 0:
                 # check if tour remains connected to node 0
                 nodes = set((0,))
