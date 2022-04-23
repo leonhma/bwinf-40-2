@@ -92,7 +92,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 min_sp_v = sp_v[1]
 
         # splice
-        return tour[:min_idx+(1 if min_idx > 0 else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx:]
+        return tour[:min_idx+(1 if min_idx > 0 else 0)]+('|')+min_sp_u+('|')+walk+('|')+min_sp_v+('|')+tour[min_idx:]
 
     # fix this
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
