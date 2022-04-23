@@ -110,11 +110,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         
 
         if li == 0:
-            tour = dijkstra[0][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]
+            tour = dijkstra[0][v][1]+tour[ri:]
         elif ri == len(tour)-1:
-            tour = dijkstra[0][tour[0]][1]+tour[:ri+1]+dijkstra[u][0][1]
+            tour = tour[:li+1]+dijkstra[u][0][1]
         else:
-            tour = dijkstra[0][tour[0]][1]+tour[:li+1]+dijkstra[u][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]
+            tour = tour[:li+1]+dijkstra[u][v][1]+tour[ri:]
 
         return ((0,) if tour[0] != 0 else ())+tour+((0,) if tour[-1] != 0 else ())
     
