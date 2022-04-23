@@ -48,6 +48,9 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
+    def w_tours(tours: Iterable[Tuple[int, ...]]) -> float:
+        return sum(w_tour(tour) for tour in tours)
+
     # cost function
     def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
@@ -91,8 +94,14 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 min_sp_u = sp_u[1]
                 min_sp_v = sp_v[1]
 
-        # splice
-        return tour[:min_idx]+min_sp_u+walk+min_sp_v+tour[min_idx:]
+        # splice TODO remove consecutive duplicates
+        tour = tour[:min_idx]+min_sp_u+walk+min_sp_v+tour[min_idx:]
+        while i < len(tour)-1:
+            if tour[i] == tour[i+1]:
+                del tour[i]
+            else:
+                i = i+1
+        return tour
 
     # fix this
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
@@ -202,8 +211,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 neighborhood.append(tuple(local_tours))
 
         print(f'{neighborhood=}')
-        # select max neighbor
-        currentSolution = min(neighborhood, key=lambda x: (tabuList.get(x), w_max_tours(x)))
+        # filter tabu, prioritise overall length, then reduce max length
+        currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: (w_tours(x), w_max_tours(x)))
         tabuList.add(currentSolution)
         currentSolution = list(currentSolution)
         currentSolutionValue = w_max_tours(currentSolution)
