@@ -113,8 +113,5 @@ while True:
                     f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
     cg = CityGraph._from_bwinf_file(pth)
     n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
-    maxlen = 0
-    for i, (len_, p) in zip(range(1, n_days+1), cg.get_paths(n_days)):
-        print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
-        if len_ > maxlen: maxlen = len_
-    print(f'Maximale Lange einer Tagestour: {maxlen}')
+    for i, p in zip(range(1, n_days+1), cg.get_paths(n_days)):
+        print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge:')
