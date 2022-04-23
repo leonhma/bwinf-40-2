@@ -104,7 +104,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         li, ri = min(tour.index(u), tour.index(v)), max(tour.index(u), tour.index(v))
         
         if li == 0:
-            return dijkstra[0][u][1]+tour[ri:]+dijkstra[tour[-1][0][1]]
+            return dijkstra[0][u][1]+tour[ri:]+dijkstra[tour[-1]][0][1]
         if ri == len(tour)-1:
             return dijkstra[0][tour[0]][1]+tour[:ri+1]+dijkstra[v][0][1]
         return dijkstra[0][tour[0]][1]+tour[:li+1]+dijkstra[u][v]+tour[ri:]+dijkstra[tour[-1]][0][1]
