@@ -109,7 +109,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return ((0,) if tour[0] != 0 else ())+dijkstra[0][tour[0]][1]+tour[:li+1]+dijkstra[u][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]+((0,) if tour[-1] != 0 else ())
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
-        print(f'debug in _ReorderToClosedWalk {edgeset=}')
         newtour = [0]  # depot node
 
         while edgeset:
@@ -128,13 +127,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         print(f'called RemoveEvenRedundantEdges with {tour=}')
         edgeset = list(edges(tour))
         for edge in edgeset:
-            print(f'evaluating {edge}')
             edge = frozenset(edge)  # 🥶
             ects = edgecount_tours(tours)[edge]
             ect = edgecount_tour(tour)[edge]
-            print(f'{ects=}, {ect=}')
             if ects > ect and ect % 2 == 0:
-                print(f'{edgecount_tours(tours)[edge]=}, {edgecount_tour(tour)[edge]=}')
                 # check if tour remains connected to node 0
                 nodes = set((0,))
                 remaining = set(map(frozenset, edges(tour))).discard(edge)
@@ -150,7 +146,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 else:
                     # remove edges
                     edgeset = list(filter(lambda x: x != edge, edgeset))
-        print(f'{edgeset=}')
         return _ReorderToClosedWalk(edgeset)
 
     bestSolution = tours
