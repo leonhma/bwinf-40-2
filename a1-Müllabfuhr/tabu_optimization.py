@@ -4,14 +4,14 @@ from typing import Dict
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[Dict[float]], tours: List[Tuple[int, ...]], /, maxNOfItsWithoutImprovement: int = 100,
+def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]], /, maxNOfItsWithoutImprovement: int = 100,
                           maxRunningTime: float = 0, tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
     Perform a tabu search metaheuristic optimization on `tours` in the graph `G`.
 
     Parameters
     ----------
-    G : Dict[Dict[float]]
+    G : Dict[int, Dict[int, float]]
         The undirected, non-windy weighted graph to operate on.
     tours : List[List[int]]
         List of `k` tours to start with.
