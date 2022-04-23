@@ -138,6 +138,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         for edge in edgeset:
             edge = frozenset(edge)  # 🥶
             if edgecount_tours(tours)[edge] > (ect := edgecount_tour(tour)[edge]) and ect % 2 == 0:
+                print(f'{edgecount_tours(tours)[edge]=}, {edgecount_tour(tour)[edge]=}')
                 # check if tour remains connected to node 0
                 nodes = set((0,))
                 remaining = set(edges(tour)).drop(edge)
