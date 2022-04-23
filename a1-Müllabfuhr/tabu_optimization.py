@@ -225,7 +225,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
         # print(f'{neighborhood=}')
         # filter tabu, reduce max length
-        currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: w_max_tours(x))
+        try:
+            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: w_max_tours(x))
+        except ValueError:  # no non-tabu neighbors, were done
+            return bestSolution
         tabuList.add(currentSolution)
         currentSolution = list(currentSolution)
         currentSolutionValue = w_max_tours(currentSolution)
