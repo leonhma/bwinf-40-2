@@ -1,4 +1,6 @@
 from collections import Counter, deque
+from functools import reduce
+from operator import add
 from time import time
 from typing import Dict, List, Tuple, Iterable
 
@@ -54,7 +56,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return Counter(edges(tour))
 
     def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter:
-        return sum(edgecount_tour(tour) for tour in tours)
+        return reduce(add, edgecount_tour(tour) for tour in tours)
     
     def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         # remove edges from walk that are already in tour
