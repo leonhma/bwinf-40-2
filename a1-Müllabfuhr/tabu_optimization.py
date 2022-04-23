@@ -43,7 +43,9 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 q.append((length+weight, next_, currentpath+[current]))
 
     def edges(tour: Tuple[int, ...]) -> Iterable[set]:
-        return (set(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
+        edges = (set(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
+        print(f'edges() returning edges={list(edges)}')
+        return edges
 
     # cost function
     def w_tour(tour: Tuple[int, ...]) -> float:
@@ -105,7 +107,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return tour[:(left := tour.index(u))]+(u,) if u != v else ()+dijkstra[u][v]+tour[tour.index(v, left):]
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
-        print(f'{edgeset=}')
         newtour = [0]  # depot node
 
         while edgeset:
