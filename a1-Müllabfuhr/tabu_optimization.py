@@ -142,6 +142,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 remaining.discard(edge)
                 print(f'remaining for {edge}: {remaining}')
                 while nodes != all_nodes:
+                    print(f'{nodes=}')
                     stop = True
                     to_remove = None
                     for edge_ in remaining:
