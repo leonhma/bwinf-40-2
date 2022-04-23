@@ -189,8 +189,9 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 neighborhood.append(tuple(local_tours))
 
         # select max neighbor
-        currentSolution = list(min(neighborhood, key=lambda x: (tabuList.get(x), w_max_tours(x))))
+        currentSolution = min(neighborhood, key=lambda x: (tabuList.get(x), w_max_tours(x)))
         tabuList.add(currentSolution)
+        currentSolution = list(currentSolution)
         currentSolutionValue = w_max_tours(currentSolution)
 
         if currentSolutionValue < bestSolutionValue:
