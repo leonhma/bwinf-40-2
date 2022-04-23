@@ -149,7 +149,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                         break
                 else:
                     # remove edges
-                    edgeset = filter(lambda x: x != edge, edgeset)
+                    edgeset = list(filter(lambda x: x != edge, edgeset))
         print(f'{edgeset=}')
         return _ReorderToClosedWalk(edgeset)
 
