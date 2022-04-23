@@ -131,7 +131,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         print(f'optimizing {tour=}')
         all_nodes = set(tour)
         edgeset = list(edges(tour))
-        for edge in edgeset:
+        for edge in set(edgeset):
             edge = frozenset(edge)  # 🥶
             ects = edgecount_tours(tours)[edge]
             ect = edgecount_tour(tour)[edge]
@@ -151,10 +151,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                     if to_remove:
                         remaining.remove(to_remove)
                     if stop:
-                        print('not connected')
+                        print(f'not connected {edge}')
                         break
                 else:
                     # remove edges
+                    print(f'filtering out {edge}')
                     edgeset = list(filter(lambda x: x != edge, edgeset))
         return _ReorderToClosedWalk(edgeset)
 
