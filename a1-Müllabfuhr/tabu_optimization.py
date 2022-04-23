@@ -146,7 +146,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                     stop = True
                     to_remove = None
                     for edge_ in remaining:
-                        if nodes.intersection(edge):
+                        if nodes.intersection(edge_):
                             nodes.update(edge_)
                             print(f'{nodes=}')
 
