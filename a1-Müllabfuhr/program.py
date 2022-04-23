@@ -55,16 +55,16 @@ class CityGraph:
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
         # get paths using bfs-type algorithm
         visited: Mapping[int, Tuple[float, List[int]]] = {}  # {visited_node_id: (length, path)}
-        paths: List[Tuple[int, ...]] = []  # [(length, (path)), ...]
+        paths: List[Tuple[int, ...]] = []  # [(path), ...]
         queue: List[Tuple[float, Tuple[int, ...]]] = [(0.0, [0])]  # [(distance, path), ...]
 
         try:
-            while not self._contains_all_edges(map(lambda x: x[1], paths)):
+            while not self._contains_all_edges(paths):
                 queue.sort()
                 current_length, current_path = queue.pop(0)
                 if current_path[-1] in visited:  # check if path meets another path
-                    paths.append((*visited[current_path[-1]][1], *reversed(current_path[:-1])))
-                    visited[current_path[-1]] = (current_length, current_path)
+                    paths.append((*visited[current_path[-1]], *reversed(current_path[:-1])))
+                    visited[current_path[-1]] = current_path
 
                     # remove the path merging into the current path
                     remove_by_exp(lambda x: x[1][-1] == current_path[-2], queue)
@@ -72,7 +72,7 @@ class CityGraph:
                 if len(self.vertices[current_path[-1]]) == 1:  # check if it's a dead end
                     paths.append((*current_path, *reversed(current_path[:-1])))
                     continue
-                visited[current_path[-1]] = (current_length, current_path)
+                visited[current_path[-1]] = current_path
                 for next_node_id in self.vertices[current_path[-1]]:
                     if next_node_id == (current_path[-2] if len(current_path) > 1 else None):  # skip going backwards
                         continue
