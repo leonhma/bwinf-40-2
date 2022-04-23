@@ -41,7 +41,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             for _ in range(len(q)):
                 length, current, currentpath = q.popleft()
                 if current in dijkstra[start]: continue
-                dijkstra[start][current] = (length, tuple(currentpath) if level > 2 else ())
+                dijkstra[start][current] = (length, tuple(currentpath) if level > 3 else ())
                 for next_, weight in G[current].items():
                     q.append((length+weight, next_, currentpath+[current]))
 
