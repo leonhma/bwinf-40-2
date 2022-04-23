@@ -95,7 +95,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 min_sp_v = sp_v[1]
 
         # splice TODO remove consecutive duplicates
-        tour = tour[:min_idx+(1 if min_idx == 0 else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(0 if min_idx == len(tour)-1 else 1):]
+        tour = tour[:min_idx+(1 if tour[min_idx+1] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(0 if tour[min_idx+1] != walk[-1] else 1):]
 
         while i < len(tour)-1:
             if tour[i] == tour[i+1]:
