@@ -49,9 +49,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
-    def w_tours(tours: Iterable[Tuple[int, ...]]) -> float:
-        return sum(w_tour(tour) for tour in tours)
-
     # cost function
     def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
@@ -190,13 +187,14 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             semilocal_tours[current_max_tour_idx] = SeparateWalkFromTour(current_max_tour, walk)
             semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(current_max_tour, semilocal_tours)
             print(f'max is now {semilocal_tours[current_max_tour_idx]}')
+            print(f'{SeparateWalkFromTour(current_max_tour, walk)=}')
 
 
             for other_tour_idx in range(len(tours)):
                 if other_tour_idx == current_max_tour_idx:
                     continue
-                other_tour = currentSolution[other_tour_idx]
                 local_tours = semilocal_tours.copy()
+                other_tour = local_tours[other_tour_idx]
 
                 local_tours[other_tour_idx] = MergeWalkWithTour(other_tour, walk)
                 local_tours[other_tour_idx] = RemoveEvenRedundantEdges(other_tour, local_tours)
@@ -206,15 +204,17 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 neighborhood.append(tuple(local_tours))
 
         print(f'{neighborhood=}')
-        # filter tabu, prioritise overall length, then reduce max length
-        currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: (w_tours(x), w_max_tours(x)))
+        # filter tabu, reduce max length
+        currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: w_max_tours(x))
         tabuList.add(currentSolution)
         currentSolution = list(currentSolution)
         currentSolutionValue = w_max_tours(currentSolution)
 
         if currentSolutionValue < bestSolutionValue:
+            print(f'choosing new best. old: {bestSolution}@{bestSolutionValue}')
             bestSolutionValue = currentSolutionValue
             bestSolution = currentSolution
+            print(f'choosing new best {bestSolution}@{bestSolutionValue}')
             nOfItsWithoutImprovement = 0
 
     return bestSolution
