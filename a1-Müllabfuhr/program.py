@@ -98,7 +98,7 @@ class CityGraph:
             paths.sort(key=lambda path: sum(self.vertices[path[i]][path[i+1]] for i in range(len(path)-1)))
             first = paths.pop(0)
             second = paths[0]
-            paths[0] = (*first[1], *second[1][1:])
+            paths[0] = (*first, *second[1:])
 
         # pad to length of target_n_days
         while len(paths) < days:
