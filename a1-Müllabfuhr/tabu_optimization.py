@@ -169,7 +169,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         neighborhood: List[Tuple[Tuple[int]]] = []
 
         # compute neighborhood
-        current_max_tour = max(tours, key=w_tour)
+        current_max_tour = max(currentSolution, key=w_tour)
         current_max_tour_idx = currentSolution.index(current_max_tour)
 
         for other_tour_idx in range(len(tours)):
@@ -178,7 +178,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             other_tour = tours[other_tour_idx]
             for i in range(len(current_max_tour)-2):
                 walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
-                local_tours = tours.copy()
+                local_tours = currentSolution.copy()
                 current = SeparateWalkFromTour(current_max_tour, walk)
                 current = RemoveEvenRedundantEdges(current, local_tours)
                 local_tours[current_max_tour_idx] = current
