@@ -116,12 +116,28 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         newtour = [0]  # depot node
 
         while edgeset:
+            stop = True
             for edge in edgeset:
                 if newtour[-1] in edge:
                     edge.remove(newtour[-1])
                     newtour.append(edge.pop())
                     edgeset.remove(edge)
+                    stop = False
+            if stop: break
         
+        while edgeset:  # find walks and append them to the main path
+            walk = [edgeset.pop()]
+            while True:
+                stop = True
+                for edge in edgeset:
+                    if newtour[-1] in edge:
+                        edge.remove(newtour[-1])
+                        walk.append(edge.pop())
+                        edgeset.remove(edge)
+                        stop = False
+                if stop: break
+            newtour = MergeWalkWithTour(newtour, walk)
+
         if newtour[-1] != 0:
             raise ValueError(f'something went wrong! newtour was {newtour}')
         
@@ -130,7 +146,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
         print(f'optimizing {tour=}')
         all_nodes = set(tour)
-        print(f'{all_nodes=}')
         edgeset = list(edges(tour))
         for edge in set(map(frozenset, edgeset)):
             edge = frozenset(edge)  # 🥶
@@ -141,26 +156,20 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 nodes = set((0,))
                 remaining = set(map(frozenset, edges(tour)))
                 remaining.discard(edge)
-                print(f'remaining for {edge}: {remaining}')
                 while nodes != all_nodes:
                     stop = True
                     to_remove = None
                     for edge_ in remaining:
                         if nodes.intersection(edge_):
                             nodes.update(edge_)
-                            print(f'{nodes=}')
-
                             to_remove = edge_
                             stop = False
                     if to_remove:
                         remaining.remove(to_remove)
                     if stop:
-                        print(f'not connected {edge}')
                         break
                 if nodes == all_nodes:
                     # remove edges
-                    print(f'filtering out {edge}')
-                    print(f'{nodes=}, {all_nodes=}')
                     edgeset = list(filter(lambda x: x != edge, edgeset))
         return _ReorderToClosedWalk(edgeset)
 
