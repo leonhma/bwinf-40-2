@@ -68,6 +68,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         if len(walk) == 1:
             return tour
 
+        walk = list(walk)
+
         tour_edges = edges(tour)
         if not tour_edges:
             return walk
@@ -81,6 +83,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             del walk[-1]
             if len(walk) == 1:
                 return tour
+        
+        walk = tuple(walk)
         
         # find node `t` closest to `u` and `v`, the end nodes of `walk`
         min_idx = None
@@ -109,12 +113,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         li, ri = min(tour.index(u), tour.index(v)), max(tour.index(u), tour.index(v))
         
 
-        if li == 0:
-            tour = dijkstra[0][v][1]+tour[ri:]
-        elif ri == len(tour)-1:
-            tour = tour[:li+1]+dijkstra[u][0][1]
-        else:
-            tour = tour[:li+1]+dijkstra[u][v][1]+tour[ri:]
+        tour = tour[:li+1]+dijkstra[u][v][1]+tour[ri:]
 
         return ((0,) if tour[0] != 0 else ())+tour+((0,) if tour[-1] != 0 else ())
     
