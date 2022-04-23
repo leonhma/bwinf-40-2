@@ -185,9 +185,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
             print(f'checking {walk=}\n---------------------')
             semilocal_tours[current_max_tour_idx] = SeparateWalkFromTour(current_max_tour, walk)
-            semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(current_max_tour, semilocal_tours)
+            semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(semilocal_tours[current_max_tour_idx], semilocal_tours)
             print(f'max is now {semilocal_tours[current_max_tour_idx]}')
-            print(f'{SeparateWalkFromTour(current_max_tour, walk)=}')
 
 
             for other_tour_idx in range(len(tours)):
@@ -197,7 +196,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 other_tour = local_tours[other_tour_idx]
 
                 local_tours[other_tour_idx] = MergeWalkWithTour(other_tour, walk)
-                local_tours[other_tour_idx] = RemoveEvenRedundantEdges(other_tour, local_tours)
+                local_tours[other_tour_idx] = RemoveEvenRedundantEdges(local_tours[other_tour_idx], local_tours)
                 print(f'other is now {local_tours[other_tour_idx]}')
                 print(f'> neighbor {local_tours}')
 
