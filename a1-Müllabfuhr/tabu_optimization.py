@@ -43,6 +43,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 q.append((length+weight, next_, currentpath+[current]))
 
     def edges(tour: Tuple[int, ...]) -> Iterable[set]:
+        print(f'edges() input {tour=}')
         edges = (set(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
         print(f'edges() returning edges={list(edges)}')
         return edges

@@ -19,7 +19,7 @@ class TabuList:
                 del self.tabu[k]
 
     def add(self, item: Hashable, tenure: int = None):
-        self.tabu[item] = (tenure or self.default_tenure)-offset
+        self.tabu[item] = (tenure or self.default_tenure)-self.offset
 
     def get(self, item: Hashable) -> int:
         if item in self.tabu:
