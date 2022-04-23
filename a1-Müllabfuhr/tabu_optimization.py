@@ -63,6 +63,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return reduce(add, (edgecount_tour(tour) for tour in tours))
     
     def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
+        print(f'merging {tour=} and {walk=}')
         # remove edges from walk that are already in tour
         if len(walk) == 1:
             return tour
