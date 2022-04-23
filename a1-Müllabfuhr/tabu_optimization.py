@@ -142,8 +142,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     bestSolution = tours
     currentSolution = tours
 
-    bestSolutionValue = wmax(tours)
-    currentSolutionValue = wmax(tours)
+    bestSolutionValue = w_max_tours(tours)
+    currentSolutionValue = w_max_tours(tours)
 
     nOfItsWithoutImprovement = 0
 
