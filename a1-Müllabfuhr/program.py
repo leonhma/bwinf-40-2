@@ -84,7 +84,7 @@ class CityGraph:
 
         # remove unneeded paths
         paths.sort(key=lambda path: sum(self.vertices[path[i]][path[i+1]] for i in range(len(path)-1)), reverse=True)
-        edgecounts = Counter(frozenset((path[i], path[i+1])) for _, path in paths for i in range(len(path)-1))
+        edgecounts = Counter(frozenset((path[i], path[i+1])) for path in paths for i in range(len(path)-1))
         keys = edgecounts.keys()
         for path in paths:
             edgecount = Counter(frozenset((path[i], path[i+1])) for i in range(len(path)-1))
