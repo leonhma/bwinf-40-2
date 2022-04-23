@@ -104,16 +104,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         li, ri = min(tour.index(u), tour.index(v)), max(tour.index(u), tour.index(v))
         
         if li == 0:
-            if 0 in tour[ri:]:
-                return tour[ri:]
-            return dijkstra[0][u][1]+tour[ri:]
+            return dijkstra[0][u][1]+tour[ri:]+dijkstra[tour[-1][0][1]]
         if ri == len(tour)-1:
-            if 0 in tour[:ri+1]:
-                return tour[:ri+1]
-            return tour[:ri+1]+dijkstra[v][0][1]
-        if walk.count(0) >= tour.count(0):
-            return tour[:li+1]+dijkstra[u][0][1]+(0,)+dijkstra[0][v][1]+tour[ri:]
-        return tour[:li+1]+dijkstra[u][v]+tour[ri:]
+            return dijkstra[0][tour[0]][1]+tour[:ri+1]+dijkstra[v][0][1]
+        return dijkstra[0][tour[0]][1]+tour[:li+1]+dijkstra[u][v]+tour[ri:]+dijkstra[tour[-1]][0][1]
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         print(f'debug in _ReorderToClosedWalk {edgeset=}')
@@ -138,7 +132,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         for edge in edgeset:
             print(f'{edgeset=}')
             edge = frozenset(edge)  # 🥶
-            if edgecount_tours(tours)[edge] > (ect := edgecount_tour(tour)[edge]) and ect % 2 == 0:
+            ect = edgecount_tour(tour)[edge]
+            if edgecount_tours(tours)[edge] > ect and ect % 2 == 0:
                 print(f'{edgecount_tours(tours)[edge]=}, {edgecount_tour(tour)[edge]=}')
                 # check if tour remains connected to node 0
                 nodes = set((0,))
