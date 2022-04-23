@@ -1,6 +1,6 @@
 from collections import Counter, deque
 from time import time
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Iterable
 
 from utility import TabuList
 
