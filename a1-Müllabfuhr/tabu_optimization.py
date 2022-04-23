@@ -85,7 +85,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         min_distance = 999999
         min_sp_v = min_sp_u = None
 
-        for node in tour:
+        for i, node in enumerate(tour):
             sp_u = dijkstra[node][walk[0]]
             sp_v = dijkstra[walk[-1]][node]
             if sp_u[0]+sp_v[0] < min_distance:
