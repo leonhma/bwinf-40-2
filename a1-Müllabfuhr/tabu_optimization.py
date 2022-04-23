@@ -42,8 +42,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             for next_, weight in G[current].items():
                 q.append((length+weight, next_, currentpath+[current]))
 
-    def edges(tour: Tuple[int, ...]) -> Iterable[frozenset]:
-        return (frozenset(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
+    def edges(tour: Tuple[int, ...]) -> Iterable[set]:
+        return (set(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
 
     # cost function
     def w_tour(tour: Tuple[int, ...]) -> float:
@@ -53,7 +53,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return max(w_tour(tour) for tour in tours)
 
     def edgecount_tour(tour: Tuple[int, ...]) -> Counter:
-        return Counter(edges(tour))
+        return Counter(frozenset(x) for x in edges(tour))
 
     def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter:
         return reduce(add, (edgecount_tour(tour) for tour in tours))
@@ -63,7 +63,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         if len(walk) == 1:
             return tour
 
-        tour_edges = set(edges(tour))
+        tour_edges = edges(tour)
         if not tour_edges:
             return walk
 
@@ -104,7 +104,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             return tour[:(left := tour.index(u))]+(u,)+dijkstra[u][0]+(0,)+dijkstra[0][v]+tour[tour.index(v, left-1):]
         return tour[:(left := tour.index(u))]+(u,) if u != v else ()+dijkstra[u][v]+tour[tour.index(v, left):]
     
-    def _ReorderToClosedWalk(edgeset: List[frozenset]) -> Tuple[int, ...]:
+    def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         newtour = [0]  # depot node
 
         while edgeset:
@@ -121,7 +121,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
         edgeset = list(edges(tour))
-        for edge in edges(tour):
+        for edge in edgeset:
             if edgecount_tours(tours)[edge] > (ect := edgecount_tour(tour)[edge]) and ect % 2 == 0:
                 # check if tour remains connected to node 0
                 nodes = set((0,))
