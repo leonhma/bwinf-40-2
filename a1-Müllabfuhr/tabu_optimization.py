@@ -184,7 +184,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 local_tours = currentSolution.copy()
                 print(f'seperating walk {walk} from max')
                 current = SeparateWalkFromTour(current_max_tour, walk)
-                print(f'optimizing max')
+                print(f'optimizing max={current}')
                 current = RemoveEvenRedundantEdges(current, local_tours)
                 print(f'max is now {current}')
                 local_tours[current_max_tour_idx] = current
