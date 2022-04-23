@@ -191,7 +191,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 other = MergeWalkWithTour(other_tour, walk)
                 print(f'optimizing other')
                 other = RemoveEvenRedundantEdges(other, local_tours)
-                print(f'other is now {}')
+                print(f'other is now {other}')
                 local_tours[other_tour_idx] = other
                 print(f'neighbor {local_tours}')
 
