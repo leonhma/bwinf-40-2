@@ -6,8 +6,9 @@ from typing import Dict, List, Tuple, Iterable
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]], /, maxNOfItsWithoutImprovement: int = 100,
-                          maxRunningTime: float = 0, tabuTenure: int = 20) -> List[Tuple[int, ...]]:
+def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]], /,
+                          maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0,
+                          tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
     Perform a tabu search metaheuristic optimization on `tours` in the graph `G`.
 
@@ -94,17 +95,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 min_sp_u = sp_u[1]
                 min_sp_v = sp_v[1]
 
-        # splice TODO remove consecutive duplicates
+        # splice
         tour = tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
 
-        while i < len(tour)-1:
-            if tour[i] == tour[i+1]:
-                del tour[i]
-            else:
-                i = i+1
-        return tour
+        
 
-    # fix this
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         u, v = walk[0], walk[-1]
         if u not in tour or v not in tour or u == v:
@@ -113,10 +108,13 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         
 
         if li == 0:
-            return ((0,) if v != 0 else ())+dijkstra[0][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]+((0,) if tour[-1] != 0 else ())
-        if ri == len(tour)-1:
-            return ((0,) if tour[0] != 0 else ())+dijkstra[0][tour[0]][1]+tour[:ri+1]+dijkstra[u][0][1]+((0,) if tour[ri] != 0 else ())
-        return ((0,) if tour[0] != 0 else ())+dijkstra[0][tour[0]][1]+tour[:li+1]+dijkstra[u][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]+((0,) if tour[-1] != 0 else ())
+            tour = dijkstra[0][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]
+        elif ri == len(tour)-1:
+            tour = dijkstra[0][tour[0]][1]+tour[:ri+1]+dijkstra[u][0][1]
+        else:
+            tour = dijkstra[0][tour[0]][1]+tour[:li+1]+dijkstra[u][v][1]+tour[ri:]+dijkstra[tour[-1]][0][1]
+
+        return ((0,) if tour[0] != 0 else ())+tour+((0,) if tour[-1] != 0 else ())
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         newtour = [0]  # depot node
