@@ -126,7 +126,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             if stop: break 
         
         while edgeset:  # find walks and append them to the main path
-            walk = [edgeset.pop()]
+            walk = list(edgeset.pop())
             while True:
                 stop = True
                 for edge in edgeset:
