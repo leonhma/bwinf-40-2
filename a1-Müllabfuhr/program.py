@@ -58,7 +58,7 @@ class CityGraph:
         return not unseen
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
-        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, maxNOfItsWithoutImprovement=100, maxRunningTime=600))
+        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, 100, 600, 0.95, 1.2))
 
 
 # repl
