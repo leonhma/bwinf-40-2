@@ -10,7 +10,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                           maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = None,
                           tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
-    Perform a tabu search metaheuristic optimization on `tours` in the graph `G`.
+    Generate a starting path and perform a meta-heuristic optimisation.
 
     Parameters
     ----------
@@ -222,7 +222,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
             semilocal_tours[current_max_tour_idx] = SeparateWalkFromTour(current_max_tour, walk)
             semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(semilocal_tours[current_max_tour_idx], semilocal_tours)
 
-            for other_tour_idx in range(len(tours)):
+            for other_tour_idx in range(k):
                 if other_tour_idx == current_max_tour_idx:
                     continue
                 local_tours = semilocal_tours.copy()
