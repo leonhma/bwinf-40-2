@@ -160,15 +160,16 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
         print(f'optimizing {tour=}')
         edgeset = list(edges(tour))
-        for edge in set(map(frozenset, edgeset)):
-            edge = frozenset(edge)  # 🥶
+        for edge in map(frozenset, edgeset):
             ects = edgecount_tours(tours)[edge]
             ect = edgecount_tour(tour)[edge]
             if ects > ect and ect % 2 == 0:
-                # check if tour remains connected to node 0 when removing edge
+                # check if tour remains connected to node 0 when removing edge 2x
                 nodes = set((0,))
                 remaining = set(map(frozenset, edges(tour)))
                 remaining.discard(edge)
+                if ect > 2:
+                    remaining.clear()  # skip to else if no connection is in danger
                 while remaining:
                     stop = True
                     to_remove = None
@@ -183,8 +184,9 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                     if stop:
                         break
                 else:
-                    # remove edges
-                    edgeset = list(filter(lambda x: x != edge, edgeset))
+                    # remove 2 edges
+                    edgeset.remove(edge)
+                    edgeset.remove(edge)
         return ReorderToClosedWalk(edgeset)
 
     # first make a starting solution
