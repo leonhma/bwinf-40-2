@@ -59,6 +59,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         return reduce(add, (edgecount_tour(tour) for tour in tours))
     
     def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
+        print(f'merging {walk=} into {tour=}')
         # remove edges from walk that are already in tour
         if len(walk) == 1:
             return tour
@@ -98,6 +99,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         # splice
         tour_ =  tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
         if set(map(frozenset, edges(tour_))).issuperset(set.union(set(map(frozenset, edges(walk))), set(map(frozenset, edges(tour))))):
+            print(f'returning {tour_=}')
             return tour_
         else:
             raise ValueError(f'merge failed to include all edges: {tour=}, {walk=}, {tour_=}')
@@ -105,6 +107,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         
     # basically  shortenPath
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
+        print(f'seperating {walk=} from {tour=}')
         # assuming walk is a subsegment of tour
         u, v = walk[0], walk[-1]
 
@@ -117,9 +120,12 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         else:
             ValueError('walk not found in graph')
         
-        return ((0,) if tour[0] != 0 else ())+tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
+        ret = ((0,) if tour[0] != 0 else ())+tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
+        print(f'returning {ret=}')
+        return ret
     
     def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
+        print(f'reordering {edgeset=}')
         newtour = [0]  # depot node
 
         while edgeset:
@@ -148,9 +154,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         if newtour[-1] != 0:
             raise ValueError(f'something went wrong! newtour was {newtour}')
         
+        print(f'returning {tuple(newtour)=}')
         return tuple(newtour)
 
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
+        print(f'optimizing {tour=}'))
         edgeset = list(edges(tour))
         for edge in set(map(frozenset, edgeset)):
             edge = frozenset(edge)  # 🥶
@@ -235,6 +243,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
 
                 neighborhood.append(tuple(local_tours))
 
+        print(f'{neighborhood=}')
         if any(len(set.union(*(set(map(frozenset, edges(path))) for path in paths))) < allEdgesCnt for paths in neighborhood):
             raise ValueError('neighborhood contains missing edge')
 
