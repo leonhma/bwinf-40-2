@@ -75,12 +75,16 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 del walk[0]
                 if len(walk) == 1:
                     return tour
+            else:
+                break
 
         while tour_edges:
             if frozenset((walk[-1], walk[-2])) in tour_edges:
                 del walk[-1]
                 if len(walk) == 1:
                     return tour
+            else:
+                break
         
         walk = tuple(walk)
         
