@@ -125,6 +125,8 @@ Nun wird die Logik des Programms angewandt und die Ausgabe erscheint in der Komm
 
 Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes angewendet (jeweils mit einem Ziel von `5` Tagen):
 
+*(die Anzahl der Punkte ist die Anzahl der vorgenommenen Verbesserungen)*
+
 ---
 
 `muellabfuhr0.txt`
