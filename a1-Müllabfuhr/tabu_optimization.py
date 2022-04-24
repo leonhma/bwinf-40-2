@@ -99,7 +99,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
         # splice
         tour_ =  tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
-        if set(map(frozenset, edges(tour_))).issuperset(set(map(frozenset, edges(walk)))+set(map(frozenset, edges(tour)))):
+        if set(map(frozenset, edges(tour_))).issuperset(set.union(set(map(frozenset, edges(walk))), set(map(frozenset, edges(tour))))):
             return tour_
         else:
             raise ValueError(f'merge failed to include all edges: {tour=}, {walk=}, {tour_=}')
