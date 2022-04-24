@@ -13,7 +13,7 @@
 
 ## Lösungsidee
 
-Zuerst ist bei dieser Problemstellung eine gewisse Ähnlichkeit zum `min-max k-Chinese Postman problem` festzustellen. Da dieses Problem NP-Schwer ist, wird hier ein meta-heuristischer Algorithmus zur Annäherung an eine möglichst optimale Lösung verwendet, wie in dieser [Arbeit](https://www.sciencedirect.com/science/article/abs/pii/S0305054805000663) beschrieben. Als Startpunkt wird ein einziger Pfad durch den Graph verlegt und die restlichen Tage mit Nullen aufgefüllt. Nun wird optimiert: Kurzgesagt wird iterativ eine 'Nachbarschaft', also leichte Veränderungen zweier Touren durch das Verschieben von zwei Kanten berechnet, und der beste Kandidat, der nicht in der tabu-Liste enthalten ist, wird weiterverbessert. Wenn zwei Möglichkeiten zur Weiterverbesserung gleich 'gut' sind, wird zufällig eine der beiden ausgewählt. Somit ist der Algorithmus zwar nicht deterministisch, mit ausreichender Laufzeit wir die Menge der möglichen Ergebnisse jedoch immer enger. Diese Auswahl wird nun der tabu-Liste hinzugefügt. Die tabu-Liste hat eine bestimmte Zeit, für die Elemente nicht noch einmal ausgewählt werden dürfen. Diese Zeit hat mit einem Wert von `20` (20 Iterationen) gute Ergebnisse geliefert. Zusätzlich wird der Algorithmus durch ein Limit von `100` Iterationen ohne Verbesserung, und eine maximale Laufzeit von `600` Sekunden beschränkt.
+Zuerst ist bei dieser Problemstellung eine gewisse Ähnlichkeit zum `min-max k-Chinese Postman problem` festzustellen. Da dieses Problem NP-Schwer ist, wird hier ein meta-heuristischer Algorithmus zur Annäherung an eine möglichst optimale Lösung verwendet, wie in dieser [Arbeit](https://www.sciencedirect.com/science/article/abs/pii/S0305054805000663) beschrieben. Als Startpunkt wird ein einziger Pfad durch den Graph verlegt (vgl. [Hierholzer's algorithm](https://en.wikipedia.org/wiki/Eulerian_path#Hierholzer.27s_algorithm)) und die restlichen Tage mit Nullen aufgefüllt. <br> Nun wird optimiert: Kurzgesagt wird iterativ eine 'Nachbarschaft', also leichte Veränderungen zweier Touren durch das Verschieben von zwei Kanten berechnet, und der beste Kandidat, der nicht in der tabu-Liste enthalten ist, wird weiterverbessert. Wenn zwei Möglichkeiten zur Weiterverbesserung gleich 'gut' sind, wird zufällig eine der beiden ausgewählt. Somit ist der Algorithmus zwar nicht deterministisch, mit ausreichender Laufzeit wir die Menge der möglichen Ergebnisse jedoch immer enger. Diese Auswahl wird nun der tabu-Liste hinzugefügt. Die tabu-Liste hat eine bestimmte Zeit, für die Elemente nicht noch einmal ausgewählt werden dürfen. Diese Zeit hat mit einem Wert von `20` (20 Iterationen) gute Ergebnisse geliefert. Zusätzlich wird der Algorithmus durch ein Limit von `100` Iterationen ohne Verbesserung, und eine maximale Laufzeit von `600` Sekunden beschränkt.
 
 ### Verbesserungen
 
@@ -63,11 +63,14 @@ Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. 
 **class CityGraph**
 > Klasse die ein Straßennetz (ungerichteter gewichteter Graph) repräsentiert.
 
-**def __init\_\_(vertices: List[int], edges: List[Tuple[int, int, float]])**
+**def CityGraph.__init\_\_(vertices: List[int], edges: List[Tuple[int, int, float]])**
 > Initialisiert den CityGraph mit einer Liste der Vertices und der adjacency-list.
 
-**@classmethod <br> def _from_bwinf_file(path: str) -> 'CityGraph'**
+**@classmethod <br> def CityGraph._from_bwinf_file(path: str) -> 'CityGraph'**
 > Liest eine Beispieldatei ein, und gibt einen CityGraph zurück.
+
+**def is_connected(self) -> bool**
+> Gibt als Wahrheitswert zurück, ob der Graph verbunden ist, d. h. es gibt nur ein verbundenes Straßennetz.
 
 **def get_paths(days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]**
 > Gibt eine Liste zurück, die Tuples mit dem Pfad, und der Länge dessen an erster Stelle, enthält.
@@ -502,8 +505,20 @@ class CityGraph:
     def w_tour(self, tour: Tuple[int, ...]) -> float:
         return sum(self.vertices[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
+    def is_connected(self) -> bool:
+        unseen = set(self.vertices.keys())
+        q = deque((0,))
+        while q:
+            current = q.popleft()
+            if current not in unseen:
+                continue
+            unseen.remove(current)
+            for next_ in self.vertices[current]:
+                q.append(next_)
+        return not unseen
+
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
-        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, maxNOfItsWithoutImprovement=200, maxRunningTime=600))
+        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, maxNOfItsWithoutImprovement=100, maxRunningTime=600))
 
 
 # repl

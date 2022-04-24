@@ -9,7 +9,7 @@ from utility import TabuList
 
 def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                           maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = None,
-                          tabuTenure: int = 20) -> List[Tuple[int, ...]]:
+                          dropout: float = 0.2, tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
     Generate a starting path and perform a meta-heuristic optimisation.
 
@@ -206,7 +206,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
     while (nOfItsWithoutImprovement < maxNOfItsWithoutImprovement and not
            (maxRunningTime and time() > startTime + maxRunningTime)):
         
-        print('tabu-it')
         nOfItsWithoutImprovement += 1
         tabuList.tick()
         
@@ -223,7 +222,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
             semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(semilocal_tours[current_max_tour_idx], semilocal_tours)
 
             for other_tour_idx in range(k):
-                if other_tour_idx == current_max_tour_idx:
+                if other_tour_idx == current_max_tour_idx or random() <= dropout:
                     continue
                 local_tours = semilocal_tours.copy()
                 other_tour = local_tours[other_tour_idx]

@@ -45,6 +45,18 @@ class CityGraph:
     def w_tour(self, tour: Tuple[int, ...]) -> float:
         return sum(self.vertices[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
+    def is_connected(self) -> bool:
+        unseen = set(self.vertices.keys())
+        q = deque((0,))
+        while q:
+            current = q.popleft()
+            if current not in unseen:
+                continue
+            unseen.remove(current)
+            for next_ in self.vertices[current]:
+                q.append(next_)
+        return not unseen
+
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
         return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, maxNOfItsWithoutImprovement=100, maxRunningTime=600))
 
