@@ -206,8 +206,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
 
     singlePath = ReorderToClosedWalk(edges_)
 
-    print(f'starting on {singlePath=}')
-
     bestSolution = [singlePath]+[(0,)]*(k-1)
     currentSolution = bestSolution
 
@@ -266,7 +264,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         currentSolutionValue = w_max_tours(currentSolution)
 
         if currentSolutionValue < bestSolutionValue:
-            print(f'choosing new best {currentSolution}')
+            print('.', end='')
             bestSolutionValue = currentSolutionValue
             bestSolution = currentSolution
             nOfItsWithoutImprovement = 0
