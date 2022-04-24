@@ -7,9 +7,9 @@ from typing import Dict, List, Tuple, Iterable
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
-                          maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = None,
-                          dropout: float = 0.2, tabuTenure: int = 20) -> List[Tuple[int, ...]]:
+def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsWithoutImprovement: int = 100,
+                          maxRunningTime: float = None, dropout: float = 0.2, dropout_fn: Callable = lambda x: x**2,
+                          tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
     Generate a starting path and perform a meta-heuristic optimisation.
 
@@ -247,6 +247,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
             nOfItsWithoutImprovement = 0
             bestSolutionValue = currentSolutionValue
             bestSolution = currentSolution
+
+        dropout = dropout_fn(dropout)
 
     print()
     return bestSolution
