@@ -120,7 +120,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         else:
             ValueError('walk not found in graph')
         
-        return ((0,) if tour[0] != 0 else ())+tour[:li+1]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
+        return ((0,) if tour[0] != 0 else ())+tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         print(f'reordering {edgeset=}')
