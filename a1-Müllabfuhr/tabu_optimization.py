@@ -205,7 +205,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
 
     while (nOfItsWithoutImprovement < maxNOfItsWithoutImprovement and not
            (maxRunningTime and time() > startTime + maxRunningTime)):
-        
+        print('tabu-it')
         nOfItsWithoutImprovement += 1
         tabuList.tick()
         
