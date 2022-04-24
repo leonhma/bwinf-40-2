@@ -243,6 +243,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 local_tours[other_tour_idx] = MergeWalkWithTour(other_tour, walk)
                 local_tours[other_tour_idx] = RemoveEvenRedundantEdges(local_tours[other_tour_idx], local_tours)
 
+                print(f'> {neighbor}')
                 neighborhood.append(tuple(local_tours))
 
         print(f'{neighborhood=}')
