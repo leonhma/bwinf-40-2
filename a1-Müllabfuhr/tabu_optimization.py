@@ -232,7 +232,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
         print(f'{neighborhood=}')
 
-        if any(len(set.union(set(map(frozenset, edges(path)))) < allEdgesCnt for path in paths) for paths in neighborhood):
+        if any(len(set.union(set(map(frozenset, edges(path))) for path in paths)) < allEdgesCnt for paths in neighborhood):
             raise ValueError('neighborhood contains missing edge')
 
         # filter tabu, reduce max length
