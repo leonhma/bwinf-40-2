@@ -264,9 +264,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
 
         if currentSolutionValue <= bestSolutionValue:
             print('.', end='')
+            if currentSolutionValue < bestSolutionValue:
+                nOfItsWithoutImprovement = 0
             bestSolutionValue = currentSolutionValue
             bestSolution = currentSolution
-            nOfItsWithoutImprovement = 0
 
     print()
     return bestSolution
