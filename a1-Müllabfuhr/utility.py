@@ -7,7 +7,7 @@ class TabuList:
     default_tenure: int
     cleanup_freq: int
 
-    def __init__(self, default_tenure: int, /, cleanup_freq=20):
+    def __init__(self, default_tenure: int, /, cleanup_freq: int = 20):
         self.tabu = {}
         self.offset = 0
         self.default_tenure = default_tenure
