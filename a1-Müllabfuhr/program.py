@@ -104,7 +104,7 @@ class CityGraph:
         while len(paths) < days:
             paths.append((0,))
         
-        return MMKCPP_TEE_TabuSearch(self.vertices, paths, maxRunningTime=10)
+        return MMKCPP_TEE_TabuSearch(self.vertices, paths, maxNOfItsWithoutImprovement=10, maxRunningTime=10)
 
 
 # repl
