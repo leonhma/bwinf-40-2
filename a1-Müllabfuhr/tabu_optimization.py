@@ -120,7 +120,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         else:
             raise ValueError(f'walk not found in tour {walk=}, {tour=}')
         
-        ret = ((0,) if tour[0] != 0 else ())+tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
+        ret = tour[:li+1]+dijkstra[u][v][1]+tour[ri:]
         print(f'returning {ret=}')
         return ret
     
