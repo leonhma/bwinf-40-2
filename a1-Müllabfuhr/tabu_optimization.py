@@ -1,6 +1,7 @@
 from collections import Counter, deque
 from functools import reduce
 from operator import add
+from random import random
 from time import time
 from typing import Dict, List, Tuple, Iterable
 
@@ -56,7 +57,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
 
     def cost(tours: Iterable[Tuple[int, ...]]) -> Tuple[float, float]:
         w_avg = w_avg_tours(tours)
-        return (w_max_tours(tours), sum(abs(w_tour(tour)-w_avg) for tour in tours))
+        return (w_max_tours(tours), random())
 
     def edgecount_tour(tour: Tuple[int, ...]) -> Counter: #
         return Counter(frozenset(x) for x in edges(tour))
