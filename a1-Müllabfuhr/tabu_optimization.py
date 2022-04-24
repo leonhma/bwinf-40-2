@@ -6,8 +6,8 @@ from typing import Dict, List, Tuple, Iterable
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]],
-                          maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0,
+def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
+                          maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = None,
                           tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
     Perform a tabu search metaheuristic optimization on `tours` in the graph `G`.
@@ -16,8 +16,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     ----------
     G : Dict[int, Dict[int, float]]
         The undirected, non-windy weighted graph to operate on.
-    tours : List[List[int]]
-        List of `k` tours to start with.
+    k : int, default=5
+        Number of Vehicles.
     maxNOfItsWithoutImprovement : int, default=100
         Maximum number of iterations without improvement to stop early.
     maxRunningTime : float, optional
@@ -119,7 +119,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         
         return ((0,) if tour[0] != 0 else ())+tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
     
-    def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
+    def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         newtour = [0]  # depot node
 
         while edgeset:
@@ -177,13 +177,22 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 else:
                     # remove edges
                     edgeset = list(filter(lambda x: x != edge, edgeset))
-        return _ReorderToClosedWalk(edgeset)
+        return ReorderToClosedWalk(edgeset)
 
-    bestSolution = tours
-    currentSolution = tours
+    # first make a starting solution
+    # all edges in graph + dijkstra between odd connections
+    edges = list(set(frozenset((start, end)) for start in self.vertices for end in self.vertices[start]))
+    odd = [k for k, v in self.vertices.items() if len(v) % 2]
+    for _ in range(0, odd, 2):
+        edges.append(list(map(frozenset, edges(dijkstra[odd.pop()][odd.pop()][1]))))
 
-    bestSolutionValue = w_max_tours(tours)
-    currentSolutionValue = w_max_tours(tours)
+    singlePath = ReorderToClosedWalk(edges)
+
+    bestSolution = [singlePath]+[(0,)]*(k-1)
+    currentSolution = bestSolution
+
+    bestSolutionValue = w_max_tours(bestSolution)
+    currentSolutionValue = w_max_tours(bestSolution)
 
     nOfItsWithoutImprovement = 0
 
