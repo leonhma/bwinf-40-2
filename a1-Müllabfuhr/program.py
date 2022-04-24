@@ -51,6 +51,10 @@ class CityGraph:
             if edge not in edges:
                 return False
         return True
+    
+
+    def w_tour(tour: Tuple[int, ...]) -> float:
+        return sum(self.vertices[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
         # get paths using bfs-type algorithm
@@ -104,7 +108,7 @@ class CityGraph:
         while len(paths) < days:
             paths.append((0,))
         
-        return MMKCPP_TEE_TabuSearch(self.vertices, paths, maxNOfItsWithoutImprovement=10, maxRunningTime=10)
+        return map(lambda x: (w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, paths, maxRunningTime=10))
 
 
 # repl
@@ -113,5 +117,8 @@ while True:
                     f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
     cg = CityGraph._from_bwinf_file(pth)
     n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
-    for i, p in zip(range(1, n_days+1), cg.get_paths(n_days)):
-        print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge:')
+    maxlen = 0
+    for i, (len_, p) in zip(range(1, n_days+1), cg.get_paths(n_days)):
+        print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
+        maxlen = max(maxlen, len_)
+    print(f'Maximale Lange einer Tagestour: {maxlen}')
