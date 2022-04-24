@@ -243,7 +243,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
         currentSolutionValue = w_max_tours(currentSolution)
 
         if currentSolutionValue < bestSolutionValue:
-            print('.', end='')
+            print('.') # end=''
             nOfItsWithoutImprovement = 0
             bestSolutionValue = currentSolutionValue
             bestSolution = currentSolution
