@@ -60,7 +60,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return reduce(add, (edgecount_tour(tour) for tour in tours))
     
     def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
-        # print(f'merging {walk=} with {tour=}')
+        print(f'merging {walk=} with {tour=}')
         # remove edges from walk that are already in tour
         if len(walk) == 1:
             return tour
@@ -103,7 +103,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         
 
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
-        # print(f'seperating {walk=} from {tour=}')
+        print(f'seperating {walk=} from {tour=}')
         u, v = walk[0], walk[-1]
         if u not in tour or v not in tour or u == v:
             return tour
