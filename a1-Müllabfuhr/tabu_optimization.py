@@ -101,7 +101,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
 
         
-
+    # basicall shortenPath
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         print(f'seperating {walk=} from {tour=}')
         u, v = walk[0], walk[-1]
@@ -112,7 +112,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return ((0,) if tour[0] != 0 else ())+tour[:li+1]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
     
     def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
-        # print(f'reordering {edgeset=}')
+        print(f'reordering {edgeset=}')
         newtour = [0]  # depot node
 
         while edgeset:
