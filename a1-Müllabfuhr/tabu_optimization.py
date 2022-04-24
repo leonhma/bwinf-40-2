@@ -3,7 +3,7 @@ from functools import reduce
 from operator import add
 from random import random
 from time import time
-from typing import Dict, List, Tuple, Iterable
+from typing import Dict, List, Tuple, Iterable, Callable
 
 from utility import TabuList
 
