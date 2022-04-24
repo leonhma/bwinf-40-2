@@ -55,7 +55,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         return max(w_tour(tour) for tour in tours)
 
     def cost(tours: Iterable[Tuple[int, ...]]) -> Tuple[float, float]:
-        print(f'calling cost with {tours=}')
         w_avg = w_avg_tours(tours)
         return (w_max_tours(tours), sum(abs(w_tour(tour)-w_avg) for tour in tours))
 
@@ -236,7 +235,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         neighborhood: List[Tuple[Tuple[int]]] = []
 
         # compute neighborhood
-        current_max_tour = max(currentSolution, key=cost)
+        current_max_tour = max(currentSolution, key=w_tour)
         current_max_tour_idx = currentSolution.index(current_max_tour)
 
         for i in range(len(current_max_tour)-2):
@@ -263,7 +262,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
 
         # filter tabu, reduce max length
         try:
-            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: (w_max_tours(x), ))
+            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=cost)
         except ValueError:  # no non-tabu neighbors, were done
             return bestSolution
         tabuList.add(currentSolution)
