@@ -107,11 +107,18 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         
     # basically  shortenPath
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
+        # assuming walk is a subsegment of tour
         print(f'seperating {walk=} from {tour=}')
         u, v = walk[0], walk[-1]
-        if u not in tour or v not in tour or u == v:
-            return tour
-        li, ri = min(tour.index(u), tour.index(v)), max(tour.index(u), tour.index(v))
+
+        # better lr ri finding
+        for i in range(len(tour)-2):
+            if tour[i] = u and tour[i+2] == v:
+                li = i
+                ri = i+2
+                break
+        else:
+            ValueError('walk not found in graph')
         
         return ((0,) if tour[0] != 0 else ())+tour[:li+1]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
     
