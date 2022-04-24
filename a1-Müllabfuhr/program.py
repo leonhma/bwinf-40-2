@@ -108,7 +108,7 @@ class CityGraph:
         while len(paths) < days:
             paths.append((0,))
         
-        return map(lambda x: (w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, paths, maxRunningTime=10))
+        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, paths, maxRunningTime=10))
 
 
 # repl
