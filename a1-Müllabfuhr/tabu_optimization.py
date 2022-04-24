@@ -144,7 +144,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         return tuple(newtour)
 
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
-        # print(f'optimizing {tour=}')
+        print(f'optimizing {tour=}')
         edgeset = list(edges(tour))
         for edge in set(map(frozenset, edgeset)):
             edge = frozenset(edge)  # 🥶
