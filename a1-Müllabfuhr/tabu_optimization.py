@@ -49,15 +49,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
-    def w_avg_tours(tours: Iterable[Tuple[int, ...]]) -> float:
-        return sum(w_tour(tour) for tour in tours)/k
-
     def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
-
-    def cost(tours: Iterable[Tuple[int, ...]]) -> Tuple[float, float]:
-        w_avg = w_avg_tours(tours)
-        return (w_max_tours(tours), random())
 
     def edgecount_tour(tour: Tuple[int, ...]) -> Counter: #
         return Counter(frozenset(x) for x in edges(tour))
@@ -66,7 +59,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         return reduce(add, (edgecount_tour(tour) for tour in tours))
     
     def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]: #
-        # print(f'merging {walk=} into {tour=}')
         # remove edges from walk that are already in tour
         if len(walk) == 1:
             return tour
@@ -110,17 +102,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 min_sp_v = sp_v[1]
 
         # splice
-        tour_ = tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
-        if set(map(frozenset, edges(tour_))).issuperset(set.union(set(map(frozenset, edges(walk))), set(map(frozenset, edges(tour))))):
-            # print(f'returning {tour_=}')
-            return tour_
-        else:
-            raise ValueError(f'merge failed to include all edges: {tour=}, {walk=}, {tour_=}')
+        return tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
 
         
     # basically shortenPath
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
-        # print(f'seperating {walk=} from {tour=}')
         # assuming walk is a subsegment of tour
         u, v, = walk[0], walk[-1]
 
@@ -130,15 +116,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 li = i
                 ri = i+2
                 break
-        else:
-            raise ValueError(f'walk not found in tour {walk=}, {tour=}')
         
-        ret = tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]
-        # print(f'returning {ret=}')
-        return ret
+        return tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]
     
     def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
-        # print(f'reordering {edgeset=}')
         newtour = [0]  # depot node
 
         while edgeset:
@@ -164,14 +145,9 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 if stop: break
             newtour = list(MergeWalkWithTour(tuple(newtour), tuple(walk)))
 
-        if newtour[-1] != 0:
-            raise ValueError(f'something went wrong! newtour was {newtour}')
-        
-        # print(f'returning {tuple(newtour)=}')
         return tuple(newtour)
 
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
-        # print(f'optimizing {tour=}')
         edgeset = list(edges(tour))
         for edge in map(frozenset, edgeset):
             ects = edgecount_tours(tours)[edge]
@@ -254,16 +230,12 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 local_tours[other_tour_idx] = MergeWalkWithTour(other_tour, walk)
                 local_tours[other_tour_idx] = RemoveEvenRedundantEdges(local_tours[other_tour_idx], local_tours)
 
-                # print(f'> {local_tours}')
                 neighborhood.append(tuple(local_tours))
 
-        # print(f'{neighborhood=}')
-        if any(len(set.union(*(set(map(frozenset, edges(path))) for path in paths))) < allEdgesCnt for paths in neighborhood):
-            raise ValueError('neighborhood contains missing edge')
 
         # filter tabu, reduce max length
         try:
-            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=cost)
+            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: (w_max_tours(x), random()))
         except ValueError:  # no non-tabu neighbors, were done
             return bestSolution
         tabuList.add(currentSolution)
@@ -271,7 +243,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         currentSolutionValue = w_max_tours(currentSolution)
 
         if currentSolutionValue < bestSolutionValue:
-            print('.', end='')
+            print('.')  # end=''
             nOfItsWithoutImprovement = 0
             bestSolutionValue = currentSolutionValue
             bestSolution = currentSolution

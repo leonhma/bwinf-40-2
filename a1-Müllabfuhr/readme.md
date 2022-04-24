@@ -13,16 +13,7 @@
 
 ## Lösungsidee
 
-Zuerst wird das Straßennetz in einer Adjacency-List Datenstruktur gespeichert. Nun wird von der Basis (Vertex 0) ausgehend ein modifizierter Breadth-First-Search Algorithmus verwendet, um die in Frage kommenden Routen zu erhalten. Der Algorithmus speichert die aktuelle Node zusammen mit dem Pfad der bis dorthin beschritten wurde in `visited`, und zeichnet alle Möglichkeiten von der derzeitigen Node weiterzugehen (rückwärtsgehen ausgeschlossen), zusammen mit der dann entstehenden Länge des Pfades auf. Wenn ein Pfad auf eine Vertex aus dem `visited`-Set trifft, wird der jetzige Pfad mit dem in `visited` gespeicherten Pfad zusammengefügt und als Ergebnis des Algorithmus in der Liste `paths` gespeichert. Wenn alle Straßen vom Algorithmus abgedeckt wurden, ist dieser Schritt fertig.
-
-![GIF-Animation des Algorithmus](../static/a1-pathfinding.gif)
-
-Da es passieren kann, dass eine Straße ofters als benötigt 'befahren' wird, werden im nächsten Schritt unnötige Wege entfernt.
-
-Nun ist allerdings nicht garantiert, dass `paths` die richtige Länge (z.B. 5 Tage) hat.
-Deshalb werden, solange die Länge von `paths` größer als die Anzahl der Tage ist, die beiden kürzesten Pfade kombiniert. Somit wird eine zu lange Liste verkürzt. Ist sie jedoch zu kurz, wird sie mit Nullen (Wagen bleibt in der Zentrale) aufgefüllt.
-
-Soweit bis jetzt. Nach längerem Nachdenken über eine bessere Lösung bin ich auf das `min-max k-Chinese Postman problem` gestoßen. Das Ziel ist es, die Touren von `k` Briefträgern so zu verteilen, dass die längste Tour minimiert wird. Es wurde auch bewiesen dass dieses Problem nicht effizient lösbar ist. Für die Optimierung habe ich den tabu-Suche Algorithmus aus dieser [Arbeit](https://www.sciencedirect.com/science/article/pii/S0305054805000663) implementiert. Kurzgesagt wird iterativ eine 'Nachbarschaft', also leichte Veränderungen zweier Touren durch das Verschieben von zwei Kanten berechnet, und der beste Kandidat, der nicht in der tabu-Liste enthalten ist, wird weiterverbessert. Die tabu-Liste hat eine bestimmte Zeit, für die Elemente als tabu gelten. Diese Zeit hat mit einem Wert von `20` (20 Iterationen) gute Ergebnisse geliefert. Zusätzlich wird die Optimierungsphase durch ein Limit von `100` Iterationen ohne Verbesserung, und eine maximale Laufzeit von `10` Sekunden beschränkt.
+Zuerst ist bei dieser Problemstellung aine gewisse Ähnlichkeit zum `min-max k-Chinese Postman problem` festzustellen. Da dieses Problem NP-Schwer ist, wird hier ein meta-heuristischer Algorithmus zur Annäherung an eine möglichst optimale Lösung verwendet, wie in dieser [Arbeit](https://www.sciencedirect.com/science/article/abs/pii/S0305054805000663) beschrieben. Als Startpunkt wird ein einziger Pfad durch den Graph verlegt und die restlichen Tage mit Nullen aufgefüllt. Nun wird optimiert: Kurzgesagt wird iterativ eine 'Nachbarschaft', also leichte Veränderungen zweier Touren durch das Verschieben von zwei Kanten berechnet, und der beste Kandidat, der nicht in der tabu-Liste enthalten ist, wird weiterverbessert. Wenn zwei Möglichkeiten zur Weiterverbesserung gleich 'gut' sind, wird zufällig eine der beiden ausgewählt. Somit ist der Algorithmus zwar nicht deterministisch, mit ausreichender Laufzeit wir die Menge der möglichen Ergebnisse jedoch immer enger. Diese Auswahl wird nun der tabu-Liste hinzugefügt. Die tabu-Liste hat eine bestimmte Zeit, für die Elemente nicht noch einmal ausgewählt werden dürfen. Diese Zeit hat mit einem Wert von `20` (20 Iterationen) gute Ergebnisse geliefert. Zusätzlich wird der Algorithmus durch ein Limit von `100` Iterationen ohne Verbesserung, und eine maximale Laufzeit von `600` Sekunden beschränkt.
 
 ### Verbesserungen
 
@@ -78,9 +69,6 @@ Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. 
 **@classmethod <br> def _from_bwinf_file(path: str) -> 'CityGraph'**
 > Liest eine Beispieldatei ein, und gibt einen CityGraph zurück.
 
-**def _contains_all_edges(paths: Iterable[Iterable[int]]) -> bool**
-> Gibt als Wahrheitswert zurück, ob die gegebene Liste an Pfaden alle 'Straßen' im Graph abdeckt.
-
 **def get_paths(days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]**
 > Gibt eine Liste zurück, die Tuples mit dem Pfad, und der Länge dessen an erster Stelle, enthält.
 
@@ -88,8 +76,8 @@ Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. 
 
 *tabu_optimization.py*
 
-**def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]], maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0, tabuTenure: int = 20) -> List[Tuple[int, ...]]**
-> Min-Max K-Chinese Postman Problem - Two Edge Exchange. Optimiert die gegebenen `tours` nach dem beschriebenen Verfahren.
+**def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0, tabuTenure: int = 20) -> List[Tuple[int, ...]]**
+> Min-Max K-Chinese Postman Problem - Two Edge Exchange. Findet und verbessert `k` Touren, die alle Kanten im Graph abdecken.
 > `G` ist eine adjacency-List in der auch die Gewichte der Kanten gespeichert sind.
 > `maxNOfItsWithoutImprovement` ist die Maximalzahl der Iterationen ohne das Finden einer besseren Lösung, dass der Algorithmus abgebrochen wird.
 > `maxRunningTime` ist die maximale Laufzeit des Algorithmus, bevor dieser abgebrochen wird.
@@ -118,7 +106,7 @@ Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. 
 **def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]**
 > Entfernt die Kanten `walk` im Pfad `tour`, während aufgepasst wird, dass der Pfad verbunden bleibt.
 
-**def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]**
+**def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]**
 > Ordnet die Kanten `edges` so, dass ein geschlossener Pfad, der bei Kreuzung 0 anfängt und endet, entsteht.
 
 **def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]**
@@ -131,7 +119,7 @@ Das Programm ist in der Sprache Python umgesetzt. Der Aufgabenordner enthält ne
 Wird das Programm gestartet, wird zuerst eine Eingabe in Form einer einstelligen Zahl erwartet, um ein bestimmtes Beispiel auszuwählen. *(Das heißt: `0` für Beispiel `muellabfuhr0.txt`)*.
 Dann wird nach der Anzahl der zu planenden Tage gefragt (default ist 5).
 
-Nun wird die Logik des Programms angewandt und die Ausgabe erscheint in der Kommandozeile.
+Nun wird die Logik des Programms angewandt und die Ausgabe erscheint in der Kommandozeile (kann bis zu 10 Minuten dauern!).
 
 ## Beispiele
 
@@ -158,11 +146,12 @@ Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes 
 Ausgabe zu `muellabfuhr0.txt`
 
 ```
-Tag 1: 0 -> 2 -> 3 -> 4 -> 0, Gesamtlaenge: 4.0
-Tag 2: 0 -> 4 -> 5 -> 6 -> 0, Gesamtlaenge: 4.0
-Tag 3: 0 -> 2 -> 1 -> 8 -> 0, Gesamtlaenge: 4.0
-Tag 4: 0 -> 6 -> 7 -> 8 -> 0, Gesamtlaenge: 4.0
-Tag 5: 0 -> 8 -> 9 -> 8 -> 0, Gesamtlaenge: 4.0
+.......
+Tag 1: 0 -> 8 -> 7 -> 6 -> 0, Gesamtlaenge: 4.0
+Tag 2: 0 -> 6 -> 5 -> 4 -> 0, Gesamtlaenge: 4.0
+Tag 3: 0 -> 4 -> 3 -> 2 -> 0, Gesamtlaenge: 4.0
+Tag 4: 0 -> 8 -> 9 -> 8 -> 0, Gesamtlaenge: 4.0
+Tag 5: 0 -> 8 -> 1 -> 2 -> 0, Gesamtlaenge: 4.0
 Maximale Lange einer Tagestour: 4.0
 ```
 
@@ -187,12 +176,13 @@ Maximale Lange einer Tagestour: 4.0
 Ausgabe zu `muellabfuhr1.txt`
 
 ```
-Tag 1: 0 -> 6 -> 7 -> 5 -> 4 -> 7 -> 6 -> 0, Gesamtlaenge: 19.0
-Tag 2: 0 -> 6 -> 3 -> 2 -> 3 -> 6 -> 0, Gesamtlaenge: 18.0
-Tag 3: 0 -> 4 -> 3 -> 6 -> 0, Gesamtlaenge: 15.0
-Tag 4: 0 -> 6 -> 1 -> 3 -> 6 -> 0, Gesamtlaenge: 13.0
-Tag 5: 0 -> 6 -> 3 -> 5 -> 0, Gesamtlaenge: 11.0
-Maximale Lange einer Tagestour: 19.0
+...........
+Tag 1: 0 -> 6 -> 3 -> 2 -> 3 -> 6 -> 0, Gesamtlaenge: 18.0
+Tag 2: 0 -> 6 -> 7 -> 4 -> 0 -> 6 -> 0, Gesamtlaenge: 18.0
+Tag 3: 0 -> 6 -> 1 -> 3 -> 6 -> 0, Gesamtlaenge: 13.0
+Tag 4: 0 -> 5 -> 3 -> 6 -> 0, Gesamtlaenge: 11.0
+Tag 5: 0 -> 6 -> 7 -> 5 -> 4 -> 3 -> 6 -> 0, Gesamtlaenge: 18.0
+Maximale Lange einer Tagestour: 18.0
 ```
 
 ---
@@ -216,12 +206,13 @@ Maximale Lange einer Tagestour: 19.0
 Ausgabe zu `muellabfuhr2.txt`
 
 ```
-Tag 1: 0 -> 6 -> 1 -> 13 -> 3 -> 4 -> 13 -> 9 -> 10 -> 2 -> 14 -> 5 -> 0 -> 6 -> 0, Gesamtlaenge: 14.0
-Tag 2: 0 -> 9 -> 0 -> 6 -> 4 -> 3 -> 11 -> 3 -> 4 -> 10 -> 14 -> 10 -> 4 -> 6 -> 0, Gesamtlaenge: 14.0
-Tag 3: 0 -> 5 -> 11 -> 8 -> 14 -> 7 -> 1 -> 7 -> 1 -> 12 -> 9 -> 6 -> 0 -> 5 -> 0, Gesamtlaenge: 14.0
-Tag 4: 0 -> 9 -> 7 -> 11 -> 2 -> 8 -> 12 -> 9 -> 6 -> 14 -> 5 -> 0 -> 5 -> 0, Gesamtlaenge: 13.0
-Tag 5: 0 -> 9 -> 5 -> 9 -> 0 -> 9 -> 13 -> 14 -> 7 -> 8 -> 12 -> 1 -> 6 -> 0, Gesamtlaenge: 13.0
-Maximale Lange einer Tagestour: 14.0
+..............
+Tag 1: 0 -> 9 -> 10 -> 2 -> 8 -> 11 -> 3 -> 4 -> 3 -> 13 -> 9 -> 0, Gesamtlaenge: 11.0
+Tag 2: 0 -> 9 -> 13 -> 14 -> 10 -> 14 -> 7 -> 8 -> 12 -> 9 -> 6 -> 0, Gesamtlaenge: 11.0
+Tag 3: 0 -> 6 -> 14 -> 13 -> 9 -> 5 -> 14 -> 6 -> 1 -> 7 -> 9 -> 0, Gesamtlaenge: 11.0
+Tag 4: 0 -> 5 -> 11 -> 2 -> 14 -> 8 -> 12 -> 1 -> 7 -> 9 -> 0, Gesamtlaenge: 10.0
+Tag 5: 0 -> 5 -> 11 -> 7 -> 1 -> 13 -> 4 -> 10 -> 4 -> 6 -> 0, Gesamtlaenge: 10.0
+Maximale Lange einer Tagestour: 11.0
 ```
 
 ---
@@ -245,12 +236,13 @@ Maximale Lange einer Tagestour: 14.0
 Ausgabe zu `muellabfuhr3.txt`
 
 ```
-Tag 1: 0 -> 14 -> 7 -> 10 -> 8 -> 1 -> 14 -> 11 -> 13 -> 12 -> 0 -> 1 -> 6 -> 14 -> 10 -> 6 -> 12 -> 9 -> 8 -> 13 -> 7 -> 11 -> 8 -> 12 -> 7 -> 9 -> 10 -> 0, Gesamtlaenge: 27.0
-Tag 2: 0 -> 4 -> 12 -> 5 -> 10 -> 4 -> 3 -> 0 -> 5 -> 7 -> 8 -> 6 -> 13 -> 5 -> 0 -> 5 -> 14 -> 5 -> 9 -> 0 -> 7 -> 6 -> 11 -> 5 -> 0 -> 5 -> 0, Gesamtlaenge: 26.0
-Tag 3: 0 -> 6 -> 4 -> 13 -> 3 -> 7 -> 4 -> 9 -> 6 -> 5 -> 8 -> 4 -> 11 -> 3 -> 5 -> 4 -> 1 -> 2 -> 0 -> 3 -> 14 -> 2 -> 1 -> 3 -> 9 -> 0, Gesamtlaenge: 25.0
-Tag 4: 0 -> 1 -> 0 -> 11 -> 1 -> 0 -> 14 -> 4 -> 2 -> 12 -> 3 -> 6 -> 2 -> 8 -> 3 -> 10 -> 2 -> 9 -> 1 -> 13 -> 2 -> 0, Gesamtlaenge: 21.0
-Tag 5: 0 -> 3 -> 2 -> 7 -> 1 -> 12 -> 11 -> 12 -> 14 -> 13 -> 9 -> 11 -> 2 -> 5 -> 1 -> 10 -> 12 -> 10 -> 11 -> 10 -> 13 -> 0 -> 9 -> 14 -> 8 -> 0 -> 9 -> 0, Gesamtlaenge: 27.0
-Maximale Lange einer Tagestour: 27.0
+.............................................
+Tag 1: 0 -> 11 -> 6 -> 10 -> 3 -> 12 -> 9 -> 11 -> 1 -> 10 -> 9 -> 6 -> 1 -> 3 -> 8 -> 14 -> 4 -> 10 -> 5 -> 2 -> 14 -> 0, Gesamtlaenge: 21.0
+Tag 2: 0 -> 13 -> 5 -> 6 -> 3 -> 0 -> 2 -> 12 -> 14 -> 11 -> 3 -> 13 -> 4 -> 1 -> 12 -> 13 -> 10 -> 11 -> 13 -> 9 -> 7 -> 0, Gesamtlaenge: 21.0
+Tag 3: 0 -> 6 -> 14 -> 3 -> 7 -> 5 -> 9 -> 0 -> 8 -> 2 -> 10 -> 14 -> 5 -> 11 -> 2 -> 4 -> 7 -> 10 -> 12 -> 5 -> 4 -> 0, Gesamtlaenge: 21.0
+Tag 4: 0 -> 12 -> 6 -> 13 -> 7 -> 11 -> 4 -> 9 -> 3 -> 4 -> 8 -> 1 -> 9 -> 14 -> 7 -> 8 -> 9 -> 2 -> 13 -> 14 -> 1 -> 0, Gesamtlaenge: 21.0
+Tag 5: 0 -> 10 -> 8 -> 13 -> 1 -> 2 -> 6 -> 8 -> 11 -> 12 -> 8 -> 5 -> 1 -> 7 -> 6 -> 4 -> 12 -> 7 -> 2 -> 3 -> 5 -> 0, Gesamtlaenge: 21.0
+Maximale Lange einer Tagestour: 21.0
 ```
 
 ---
@@ -274,6 +266,7 @@ Maximale Lange einer Tagestour: 27.0
 Ausgabe zu `muellabfuhr4.txt`
 
 ```
+
 Tag 1: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 0, Gesamtlaenge: 10.0
 Tag 2: 0, Gesamtlaenge: 0
 Tag 3: 0, Gesamtlaenge: 0
@@ -504,92 +497,25 @@ class CityGraph:
             self.vertices[v][u] = len_
             self.vertices[u][v] = len_
 
-    def _contains_all_edges(self, paths: Iterable[Iterable[int]]) -> bool:
-        # convert all paths into an edgesets
-        flattened = tuple(j for path in paths for j in path)
-        edges = set(frozenset((flattened[i], flattened[i+1])) for i in range(len(flattened)-1))
-        # check if all edges are contained in the resulting edgeset
-        for edge in self.edgeset:
-            if edge not in edges:
-                return False
-        return True
-    
-
     def w_tour(self, tour: Tuple[int, ...]) -> float:
         return sum(self.vertices[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
-        print('\ngeneriere Startlösung...')
-        # get paths using bfs-type algorithm
-        visited: Mapping[int, Tuple[float, List[int]]] = {}  # {visited_node_id: (length, path)}
-        paths: List[Tuple[int, ...]] = []  # [(path), ...]
-        queue: List[Tuple[float, Tuple[int, ...]]] = [(0.0, [0])]  # [(distance, path), ...]
-
-        try:
-            while not self._contains_all_edges(paths):
-                queue.sort()
-                current_length, current_path = queue.pop(0)
-                if current_path[-1] in visited:  # check if path meets another path
-                    paths.append((*visited[current_path[-1]], *reversed(current_path[:-1])))
-                    visited[current_path[-1]] = current_path
-
-                    # remove the path merging into the current path
-                    remove_by_exp(lambda x: x[1][-1] == current_path[-2], queue)
-                    continue
-                if len(self.vertices[current_path[-1]]) == 1:  # check if it's a dead end
-                    paths.append((*current_path, *reversed(current_path[:-1])))
-                    continue
-                visited[current_path[-1]] = current_path
-                for next_node_id in self.vertices[current_path[-1]]:
-                    if next_node_id == (current_path[-2] if len(current_path) > 1 else None):  # skip going backwards
-                        continue
-                    queue.append((self.vertices[current_path[-1]][next_node_id] + current_length,
-                                  current_path + [next_node_id]))
-        except IndexError as e:
-            raise ValueError(f'Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). ({e})')
-
-        # remove unneeded paths
-        paths.sort(key=lambda path: sum(self.vertices[path[i]][path[i+1]] for i in range(len(path)-1)), reverse=True)
-        edgecounts = Counter(frozenset((path[i], path[i+1])) for path in paths for i in range(len(path)-1))
-        keys = edgecounts.keys()
-        for path in paths:
-            edgecount = Counter(frozenset((path[i], path[i+1])) for i in range(len(path)-1))
-            tmp = edgecounts-edgecount
-            if not any(v < 1 for v in tmp.values()) and tmp.keys() == keys:
-                paths.remove(path)
-                edgecounts.subtract(edgecount)
-
-        # merge paths while they are > target_n_days
-        while len(paths) > days:
-            paths.sort(key=lambda path: sum(self.vertices[path[i]][path[i+1]] for i in range(len(path)-1)))
-            first = paths.pop(0)
-            second = paths[0]
-            paths[0] = (*first, *second[1:])
-
-        # pad to length of target_n_days
-        while len(paths) < days:
-            paths.append((0,))
-        
-        print('optimiere... (maximale Laufzeit: 10sek)')
-        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, paths, maxRunningTime=10))
+        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, maxNOfItsWithoutImprovement=200, maxRunningTime=600))
 
 
 # repl
 while True:
-    try:
-        pth = join(dirname(__file__),
-                        f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
-        cg = CityGraph._from_bwinf_file(pth)
-        n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
-        maxlen = 0
-        iterable = zip(range(1, n_days+1), cg.get_paths(n_days))
-        print('done.\n----------------------------------------------')
-        for i, (len_, p) in iterable:
-            print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
-            maxlen = max(maxlen, len_)
-        print(f'Maximale Lange einer Tagestour: {maxlen}')
-    except Exception as e:
-        print(e)
+    pth = join(dirname(__file__),
+                    f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
+    cg = CityGraph._from_bwinf_file(pth)
+    n_days = int(input('Für wieviele Tage soll geplant werden? (5): ') or 5)
+    maxlen = 0
+    iterable = zip(range(1, n_days+1), cg.get_paths(n_days))
+    for i, (len_, p) in iterable:
+        print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
+        maxlen = max(maxlen, len_)
+    print(f'Maximale Lange einer Tagestour: {maxlen}')
 
 ```
 
@@ -601,23 +527,24 @@ while True:
 from collections import Counter, deque
 from functools import reduce
 from operator import add
+from random import random
 from time import time
 from typing import Dict, List, Tuple, Iterable
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]],
-                          maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0,
+def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
+                          maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = None,
                           tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
-    Perform a tabu search metaheuristic optimization on `tours` in the graph `G`.
+    Generate a starting path and perform a meta-heuristic optimisation.
 
     Parameters
     ----------
     G : Dict[int, Dict[int, float]]
         The undirected, non-windy weighted graph to operate on.
-    tours : List[List[int]]
-        List of `k` tours to start with.
+    k : int, default=5
+        Number of Vehicles.
     maxNOfItsWithoutImprovement : int, default=100
         Maximum number of iterations without improvement to stop early.
     maxRunningTime : float, optional
@@ -642,23 +569,22 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             for next_, weight in G[current].items():
                 q.append((length+weight, next_, currentpath+[current]))
         
-    def edges(tour: Tuple[int, ...]) -> Iterable[set]:
-        return (set(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
+    def edges(tour: Tuple[int, ...]) -> Iterable[set]: #
+        return (set(tour[i:][:2]) for i in range(len(tour)-1))
 
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
-    # cost function
     def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
 
-    def edgecount_tour(tour: Tuple[int, ...]) -> Counter:
+    def edgecount_tour(tour: Tuple[int, ...]) -> Counter: #
         return Counter(frozenset(x) for x in edges(tour))
 
-    def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter:
+    def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter: #
         return reduce(add, (edgecount_tour(tour) for tour in tours))
     
-    def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
+    def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]: #
         # remove edges from walk that are already in tour
         if len(walk) == 1:
             return tour
@@ -667,17 +593,23 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
         tour_edges = edges(tour)
         if not tour_edges:
-            return walk
+            return ((0,) if walk[0] != 0 else ())+dijkstra[0][walk[0]][1]+tuple(walk)+dijkstra[walk[-1]][0][1]+((0,) if walk[-1] != 0 else ())
 
-        while frozenset((walk[0], walk[1])) in tour_edges:
-            del walk[0]
-            if len(walk) == 1:
-                return tour
+        while tour_edges:
+            if frozenset((walk[0], walk[1])) in tour_edges:
+                del walk[0]
+                if len(walk) == 1:
+                    return tour
+            else:
+                break
 
-        while frozenset((walk[-1], walk[-2])) in tour_edges:
-            del walk[-1]
-            if len(walk) == 1:
-                return tour
+        while tour_edges:
+            if frozenset((walk[-1], walk[-2])) in tour_edges:
+                del walk[-1]
+                if len(walk) == 1:
+                    return tour
+            else:
+                break
         
         walk = tuple(walk)
         
@@ -696,30 +628,24 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 min_sp_v = sp_v[1]
 
         # splice
-        tour_ =  tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
-        if set(map(frozenset, edges(tour_))).issuperset(set.union(set(map(frozenset, edges(walk))), set(map(frozenset, edges(tour))))):
-            return tour_
-        else:
-            raise ValueError(f'merge failed to include all edges: {tour=}, {walk=}, {tour_=}')
+        return tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
 
         
-    # basically  shortenPath
+    # basically shortenPath
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         # assuming walk is a subsegment of tour
-        u, v = walk[0], walk[-1]
+        u, v, = walk[0], walk[-1]
 
         # better lr ri finding
         for i in range(len(tour)-2):
-            if tour[i] == u and tour[i+2] == v:
+            if walk == tour[i:][:3]:
                 li = i
                 ri = i+2
                 break
-        else:
-            ValueError('walk not found in graph')
         
-        return ((0,) if tour[0] != 0 else ())+tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
+        return tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]
     
-    def _ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
+    def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         newtour = [0]  # depot node
 
         while edgeset:
@@ -738,29 +664,27 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                 stop = True
                 for edge in edgeset:
                     if newtour[-1] in edge:
-                        edge.remove(newtour[-1])
+                        edge.remove(walk[-1])
                         walk.append(edge.pop())
                         edgeset.remove(edge)
                         stop = False
                 if stop: break
             newtour = list(MergeWalkWithTour(tuple(newtour), tuple(walk)))
 
-        if newtour[-1] != 0:
-            raise ValueError(f'something went wrong! newtour was {newtour}')
-        
         return tuple(newtour)
 
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
         edgeset = list(edges(tour))
-        for edge in set(map(frozenset, edgeset)):
-            edge = frozenset(edge)  # 🥶
+        for edge in map(frozenset, edgeset):
             ects = edgecount_tours(tours)[edge]
             ect = edgecount_tour(tour)[edge]
             if ects > ect and ect % 2 == 0:
-                # check if tour remains connected to node 0 when removing edge
+                # check if tour remains connected to node 0 when removing edge 2x
                 nodes = set((0,))
                 remaining = set(map(frozenset, edges(tour)))
                 remaining.discard(edge)
+                if ect > 2:
+                    remaining.clear()  # skip to else if no connection is in danger
                 while remaining:
                     stop = True
                     to_remove = None
@@ -775,15 +699,27 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                     if stop:
                         break
                 else:
-                    # remove edges
-                    edgeset = list(filter(lambda x: x != edge, edgeset))
-        return _ReorderToClosedWalk(edgeset)
+                    # remove 2 edges
+                    edgeset.remove(edge)
+                    edgeset.remove(edge)
+        return ReorderToClosedWalk(edgeset)
 
-    bestSolution = tours
-    currentSolution = tours
+    # first make a starting solution
+    # all edges in graph + dijkstra between odd connections
+    edges_ = list(map(set, list(set(frozenset((start, end)) for start in G for end in G[start]))))
+    odd = [k for k, v in G.items() if len(v) % 2]
+    for _ in range(0, len(odd), 2):
+        odd1 = odd.pop()
+        odd2 = odd.pop()
+        edges_ += list(map(set, edges((odd1,)+dijkstra[odd1][odd2][1]+(odd2,))))
 
-    bestSolutionValue = w_max_tours(tours)
-    currentSolutionValue = w_max_tours(tours)
+    singlePath = ReorderToClosedWalk(edges_)
+
+    bestSolution = [singlePath]+[(0,)]*(k-1)
+    currentSolution = bestSolution
+
+    bestSolutionValue = w_max_tours(bestSolution)
+    currentSolutionValue = w_max_tours(bestSolution)
 
     nOfItsWithoutImprovement = 0
 
@@ -811,7 +747,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             semilocal_tours[current_max_tour_idx] = SeparateWalkFromTour(current_max_tour, walk)
             semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(semilocal_tours[current_max_tour_idx], semilocal_tours)
 
-            for other_tour_idx in range(len(tours)):
+            for other_tour_idx in range(k):
                 if other_tour_idx == current_max_tour_idx:
                     continue
                 local_tours = semilocal_tours.copy()
@@ -822,12 +758,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
                 neighborhood.append(tuple(local_tours))
 
-        if any(len(set.union(*(set(map(frozenset, edges(path))) for path in paths))) < allEdgesCnt for paths in neighborhood):
-            raise ValueError('neighborhood contains missing edge')
 
         # filter tabu, reduce max length
         try:
-            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: w_max_tours(x))
+            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: (w_max_tours(x), random()))
         except ValueError:  # no non-tabu neighbors, were done
             return bestSolution
         tabuList.add(currentSolution)
@@ -835,10 +769,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
         currentSolutionValue = w_max_tours(currentSolution)
 
         if currentSolutionValue < bestSolutionValue:
-            bestSolutionValue = currentSolutionValue
-            bestSolution = currentSolution
             print('.', end='')
             nOfItsWithoutImprovement = 0
+            bestSolutionValue = currentSolutionValue
+            bestSolution = currentSolution
 
     print()
     return bestSolution
