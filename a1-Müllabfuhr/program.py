@@ -121,7 +121,7 @@ while True:
     n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
     maxlen = 0
     iterable = zip(range(1, n_days+1), cg.get_paths(n_days))
-    print('done.\n\n----------------------------------------------\n')
+    print('done.\n----------------------------------------------')
     for i, (len_, p) in iterable:
         print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
         maxlen = max(maxlen, len_)
