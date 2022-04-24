@@ -53,7 +53,7 @@ class CityGraph:
         return True
     
 
-    def w_tour(tour: Tuple[int, ...]) -> float:
+    def w_tour(self, tour: Tuple[int, ...]) -> float:
         return sum(self.vertices[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
