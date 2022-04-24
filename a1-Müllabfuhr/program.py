@@ -56,6 +56,18 @@ class CityGraph:
     def w_tour(self, tour: Tuple[int, ...]) -> float:
         return sum(self.vertices[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
+    def is_connected(self) -> bool:
+        unseen = set(self.vertices.keys())
+        q = deque((0,))
+        while q:
+            current = q.popleft()
+            if current not in unseen:
+                continue
+            unseen.remove(current)
+            for next_ in self.vertices[current]:
+                q.append(next_)
+        return not unseen
+
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
         # get paths using bfs-type algorithm
         visited: Mapping[int, Tuple[float, List[int]]] = {}  # {visited_node_id: (length, path)}
@@ -117,6 +129,7 @@ while True:
                         f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
         cg = CityGraph._from_bwinf_file(pth)
         n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
+        print(f'cityGraph is {"strongly" if cg.is_connected else "not"} connected!')
         maxlen = 0
         iterable = zip(range(1, n_days+1), cg.get_paths(n_days))
         for i, (len_, p) in iterable:

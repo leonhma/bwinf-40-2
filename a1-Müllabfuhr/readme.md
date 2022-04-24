@@ -158,11 +158,11 @@ Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes 
 Ausgabe zu `muellabfuhr0.txt`
 
 ```
-Tag 1: 0 -> 8 -> 9 -> 8 -> 0, Gesamtlaenge: 4.0
-Tag 2: 0 -> 6 -> 7 -> 8 -> 0, Gesamtlaenge: 4.0
-Tag 3: 0 -> 4 -> 5 -> 6 -> 0, Gesamtlaenge: 4.0
-Tag 4: 0 -> 2 -> 3 -> 4 -> 0, Gesamtlaenge: 4.0
-Tag 5: 0 -> 2 -> 1 -> 8 -> 0, Gesamtlaenge: 4.0
+Tag 1: 0 -> 2 -> 3 -> 4 -> 0, Gesamtlaenge: 4.0
+Tag 2: 0 -> 4 -> 5 -> 6 -> 0, Gesamtlaenge: 4.0
+Tag 3: 0 -> 2 -> 1 -> 8 -> 0, Gesamtlaenge: 4.0
+Tag 4: 0 -> 6 -> 7 -> 8 -> 0, Gesamtlaenge: 4.0
+Tag 5: 0 -> 8 -> 9 -> 8 -> 0, Gesamtlaenge: 4.0
 Maximale Lange einer Tagestour: 4.0
 ```
 
@@ -216,12 +216,12 @@ Maximale Lange einer Tagestour: 19.0
 Ausgabe zu `muellabfuhr2.txt`
 
 ```
-Tag 1: 0 -> 9 -> 13 -> 14 -> 5 -> 0 -> 5 -> 11 -> 3 -> 4 -> 6 -> 0 -> 5 -> 11 -> 8 -> 14 -> 5 -> 0 -> 5 -> 14 -> 2 -> 10 -> 9 -> 0, Gesamtlaenge: 23.0
-Tag 2: 0 -> 5 -> 14 -> 7 -> 1 -> 6 -> 0 -> 5 -> 14 -> 8 -> 7 -> 9 -> 0, Gesamtlaenge: 12.0
-Tag 3: 0 -> 5 -> 14 -> 10 -> 4 -> 6 -> 0 -> 6 -> 1 -> 13 -> 4 -> 6 -> 0, Gesamtlaenge: 12.0
-Tag 4: 0 -> 6 -> 4 -> 3 -> 13 -> 9 -> 0 -> 9 -> 12 -> 8 -> 2 -> 11 -> 5 -> 0, Gesamtlaenge: 13.0
-Tag 5: 0 -> 5 -> 9 -> 6 -> 0 -> 5 -> 14 -> 6 -> 0 -> 9 -> 7 -> 11 -> 5 -> 0 -> 9 -> 12 -> 1 -> 6 -> 0, Gesamtlaenge: 18.0
-Maximale Lange einer Tagestour: 23.0
+Tag 1: 0 -> 6 -> 1 -> 13 -> 3 -> 4 -> 13 -> 9 -> 10 -> 2 -> 14 -> 5 -> 0 -> 6 -> 0, Gesamtlaenge: 14.0
+Tag 2: 0 -> 9 -> 0 -> 6 -> 4 -> 3 -> 11 -> 3 -> 4 -> 10 -> 14 -> 10 -> 4 -> 6 -> 0, Gesamtlaenge: 14.0
+Tag 3: 0 -> 5 -> 11 -> 8 -> 14 -> 7 -> 1 -> 7 -> 1 -> 12 -> 9 -> 6 -> 0 -> 5 -> 0, Gesamtlaenge: 14.0
+Tag 4: 0 -> 9 -> 7 -> 11 -> 2 -> 8 -> 12 -> 9 -> 6 -> 14 -> 5 -> 0 -> 5 -> 0, Gesamtlaenge: 13.0
+Tag 5: 0 -> 9 -> 5 -> 9 -> 0 -> 9 -> 13 -> 14 -> 7 -> 8 -> 12 -> 1 -> 6 -> 0, Gesamtlaenge: 13.0
+Maximale Lange einer Tagestour: 14.0
 ```
 
 ---
@@ -245,12 +245,12 @@ Maximale Lange einer Tagestour: 23.0
 Ausgabe zu `muellabfuhr3.txt`
 
 ```
-Tag 1: 0 -> 6 -> 1 -> 0 -> 8 -> 1 -> 0 -> 10 -> 1 -> 0 -> 12 -> 1 -> 0 -> 14 -> 1 -> 0 -> 1 -> 3 -> 2 -> 0 -> 1 -> 5 -> 2 -> 0 -> 1 -> 7 -> 2 -> 0 -> 1 -> 9 -> 2 -> 0 -> 1 -> 11 -> 2 -> 0 -> 1 -> 13 -> 2 -> 0 -> 2 -> 4 -> 3 -> 0 -> 2 -> 6 -> 3 -> 0 -> 2 -> 8 -> 3 -> 0 -> 2 -> 10 -> 3 -> 0 -> 2 -> 12 -> 3 -> 0, Gesamtlaenge: 59.0
-Tag 2: 0 -> 2 -> 14 -> 3 -> 0 -> 3 -> 5 -> 4 -> 0 -> 3 -> 7 -> 4 -> 0 -> 3 -> 9 -> 4 -> 0 -> 3 -> 11 -> 4 -> 0 -> 3 -> 13 -> 4 -> 0 -> 4 -> 6 -> 5 -> 0 -> 4 -> 8 -> 5 -> 0, Gesamtlaenge: 32.0
-Tag 3: 0 -> 4 -> 10 -> 5 -> 0 -> 4 -> 12 -> 5 -> 0 -> 4 -> 14 -> 5 -> 0 -> 5 -> 7 -> 6 -> 0 -> 5 -> 9 -> 6 -> 0 -> 5 -> 11 -> 6 -> 0 -> 5 -> 13 -> 6 -> 0 -> 6 -> 8 -> 7 -> 0, Gesamtlaenge: 32.0
-Tag 4: 0 -> 6 -> 10 -> 7 -> 0 -> 6 -> 12 -> 7 -> 0 -> 6 -> 14 -> 7 -> 0 -> 7 -> 9 -> 8 -> 0 -> 7 -> 11 -> 8 -> 0 -> 7 -> 13 -> 8 -> 0 -> 8 -> 10 -> 9 -> 0 -> 8 -> 12 -> 9 -> 0, Gesamtlaenge: 32.0
-Tag 5: 0 -> 8 -> 14 -> 9 -> 0 -> 9 -> 11 -> 10 -> 0 -> 9 -> 13 -> 10 -> 0 -> 10 -> 12 -> 11 -> 0 -> 10 -> 14 -> 11 -> 0 -> 11 -> 13 -> 12 -> 0 -> 12 -> 14 -> 13 -> 0 -> 2 -> 1 -> 0 -> 4 -> 1 -> 0, Gesamtlaenge: 34.0
-Maximale Lange einer Tagestour: 59.0
+Tag 1: 0 -> 14 -> 7 -> 10 -> 8 -> 1 -> 14 -> 11 -> 13 -> 12 -> 0 -> 1 -> 6 -> 14 -> 10 -> 6 -> 12 -> 9 -> 8 -> 13 -> 7 -> 11 -> 8 -> 12 -> 7 -> 9 -> 10 -> 0, Gesamtlaenge: 27.0
+Tag 2: 0 -> 4 -> 12 -> 5 -> 10 -> 4 -> 3 -> 0 -> 5 -> 7 -> 8 -> 6 -> 13 -> 5 -> 0 -> 5 -> 14 -> 5 -> 9 -> 0 -> 7 -> 6 -> 11 -> 5 -> 0 -> 5 -> 0, Gesamtlaenge: 26.0
+Tag 3: 0 -> 6 -> 4 -> 13 -> 3 -> 7 -> 4 -> 9 -> 6 -> 5 -> 8 -> 4 -> 11 -> 3 -> 5 -> 4 -> 1 -> 2 -> 0 -> 3 -> 14 -> 2 -> 1 -> 3 -> 9 -> 0, Gesamtlaenge: 25.0
+Tag 4: 0 -> 1 -> 0 -> 11 -> 1 -> 0 -> 14 -> 4 -> 2 -> 12 -> 3 -> 6 -> 2 -> 8 -> 3 -> 10 -> 2 -> 9 -> 1 -> 13 -> 2 -> 0, Gesamtlaenge: 21.0
+Tag 5: 0 -> 3 -> 2 -> 7 -> 1 -> 12 -> 11 -> 12 -> 14 -> 13 -> 9 -> 11 -> 2 -> 5 -> 1 -> 10 -> 12 -> 10 -> 11 -> 10 -> 13 -> 0 -> 9 -> 14 -> 8 -> 0 -> 9 -> 0, Gesamtlaenge: 27.0
+Maximale Lange einer Tagestour: 27.0
 ```
 
 ---
@@ -275,10 +275,10 @@ Ausgabe zu `muellabfuhr4.txt`
 
 ```
 Tag 1: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 0, Gesamtlaenge: 10.0
-Tag 2: 0, Gesamtlaenge: 0.0
-Tag 3: 0, Gesamtlaenge: 0.0
-Tag 4: 0, Gesamtlaenge: 0.0
-Tag 5: 0, Gesamtlaenge: 0.0
+Tag 2: 0, Gesamtlaenge: 0
+Tag 3: 0, Gesamtlaenge: 0
+Tag 4: 0, Gesamtlaenge: 0
+Tag 5: 0, Gesamtlaenge: 0
 Maximale Lange einer Tagestour: 10.0
 ```
 
@@ -304,7 +304,6 @@ Ausgabe zu `muellabfuhr5.txt`
 
 ```
 Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). (pop from empty list)
-Maximale Lange einer Tagestour: 0
 ```
 
 ---
@@ -329,7 +328,6 @@ Ausgabe zu `muellabfuhr6.txt`
 
 ```
 Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). (pop from empty list)
-Maximale Lange einer Tagestour: 0
 ```
 
 ---
@@ -354,7 +352,6 @@ Ausgabe zu `muellabfuhr7.txt`
 
 ```
 Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). (pop from empty list)
-Maximale Lange einer Tagestour: 0
 ```
 
 ---
@@ -379,7 +376,6 @@ Ausgabe zu `muellabfuhr8.txt`
 
 ```
 Keine Pfade gefunden! (Mehrere unverbundene Straßennetze). (pop from empty list)
-Maximale Lange einer Tagestour: 0
 ```
 
 ---
@@ -419,7 +415,7 @@ class TabuList:
     default_tenure: int
     cleanup_freq: int
 
-    def __init__(self, default_tenure: int, /, cleanup_freq: int = 20):
+    def __init__(self, default_tenure: int, cleanup_freq: int = 20):
         self.tabu = {}
         self.offset = 0
         self.default_tenure = default_tenure
@@ -610,7 +606,7 @@ from typing import Dict, List, Tuple, Iterable
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]], /,
+def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]],
                           maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0,
                           tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """

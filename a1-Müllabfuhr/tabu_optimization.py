@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Iterable
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]], /,
+def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int, ...]],
                           maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0,
                           tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
