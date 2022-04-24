@@ -113,7 +113,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
         # better lr ri finding
         for i in range(len(tour)-2):
-            if tour[i] = u and tour[i+2] == v:
+            if tour[i] == u and tour[i+2] == v:
                 li = i
                 ri = i+2
                 break
