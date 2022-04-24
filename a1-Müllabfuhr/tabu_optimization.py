@@ -136,7 +136,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
                         edgeset.remove(edge)
                         stop = False
                 if stop: break
-            newtour = MergeWalkWithTour(newtour, walk)
+            newtour = MergeWalkWithTour(newtour, tuple(walk))
 
         if newtour[-1] != 0:
             raise ValueError(f'something went wrong! newtour was {newtour}')
