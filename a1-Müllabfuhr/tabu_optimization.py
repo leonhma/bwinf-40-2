@@ -48,20 +48,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
-    def w_avg_tours(tours: Iterable[Tuple[int, ...]]) -> float:
-        return sum(w_tour(tour) for tour in tours) / k
-
     def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
-
-    def cost(tours: Iterable[Tuple[int, ...]]) -> Tuple[float, float]:
-        w_avg = w_avg_tours(tours)
-        w_above_avg = 0.0
-        for tour in tours:
-            w = w_tour(tour)
-            if w > w_avg:
-                w_above_avg += w_tour(tour)
-        return (w_max_tours(tours), w_above_avg)
 
     def edgecount_tour(tour: Tuple[int, ...]) -> Counter: #
         return Counter(frozenset(x) for x in edges(tour))
@@ -267,14 +255,14 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
 
         # filter tabu, reduce max length
         try:
-            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=cost)
+            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: (w_max_tours(x), ))
         except ValueError:  # no non-tabu neighbors, were done
             return bestSolution
         tabuList.add(currentSolution)
         currentSolution = list(currentSolution)
         currentSolutionValue = w_max_tours(currentSolution)
 
-        if currentSolutionValue < bestSolutionValue:
+        if currentSolutionValue <= bestSolutionValue:
             print('.', end='')
             bestSolutionValue = currentSolutionValue
             bestSolution = currentSolution
