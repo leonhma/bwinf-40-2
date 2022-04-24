@@ -42,8 +42,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
             for next_, weight in G[current].items():
                 q.append((length+weight, next_, currentpath+[current]))
         
-    def edges(tour: Tuple[int, ...]) -> Iterable[set]:
-        return (set(tour[i:][:2]) for i in range(len(tour)-1) if None not in tour[i:][:2])
+    def edges(tour: Tuple[int, ...]) -> Iterable[set]: #
+        return (set(tour[i:][:2]) for i in range(len(tour)-1))
 
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
@@ -52,14 +52,14 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
     def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
 
-    def edgecount_tour(tour: Tuple[int, ...]) -> Counter:
+    def edgecount_tour(tour: Tuple[int, ...]) -> Counter: #
         return Counter(frozenset(x) for x in edges(tour))
 
-    def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter:
+    def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter: #
         return reduce(add, (edgecount_tour(tour) for tour in tours))
     
-    def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
-        print(f'merging {walk=} into {tour=}')
+    def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]: #
+        # print(f'merging {walk=} into {tour=}')
         # remove edges from walk that are already in tour
         if len(walk) == 1:
             return tour
@@ -70,15 +70,17 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         if not tour_edges:
             return ((0,) if walk[0] != 0 else ())+dijkstra[0][walk[0]][1]+tuple(walk)+dijkstra[walk[-1]][0][1]+((0,) if walk[-1] != 0 else ())
 
-        while frozenset((walk[0], walk[1])) in tour_edges:
-            del walk[0]
-            if len(walk) == 1:
-                return tour
+        while tour_edges:
+            if frozenset((walk[0], walk[1])) in tour_edges:
+                del walk[0]
+                if len(walk) == 1:
+                    return tour
 
-        while frozenset((walk[-1], walk[-2])) in tour_edges:
-            del walk[-1]
-            if len(walk) == 1:
-                return tour
+        while tour_edges:
+            if frozenset((walk[-1], walk[-2])) in tour_edges:
+                del walk[-1]
+                if len(walk) == 1:
+                    return tour
         
         walk = tuple(walk)
         
@@ -97,17 +99,17 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 min_sp_v = sp_v[1]
 
         # splice
-        tour_ =  tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
+        tour_ = tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
         if set(map(frozenset, edges(tour_))).issuperset(set.union(set(map(frozenset, edges(walk))), set(map(frozenset, edges(tour))))):
-            print(f'returning {tour_=}')
+            # print(f'returning {tour_=}')
             return tour_
         else:
             raise ValueError(f'merge failed to include all edges: {tour=}, {walk=}, {tour_=}')
 
         
-    # basically  shortenPath
+    # basically shortenPath
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
-        print(f'seperating {walk=} from {tour=}')
+        # print(f'seperating {walk=} from {tour=}')
         # assuming walk is a subsegment of tour
         u, v, = walk[0], walk[-1]
 
@@ -121,11 +123,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
             raise ValueError(f'walk not found in tour {walk=}, {tour=}')
         
         ret = tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]
-        print(f'returning {ret=}')
+        # print(f'returning {ret=}')
         return ret
     
     def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
-        print(f'reordering {edgeset=}')
+        # print(f'reordering {edgeset=}')
         newtour = [0]  # depot node
 
         while edgeset:
@@ -144,7 +146,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 stop = True
                 for edge in edgeset:
                     if newtour[-1] in edge:
-                        edge.remove(newtour[-1])
+                        edge.remove(walk[-1])
                         walk.append(edge.pop())
                         edgeset.remove(edge)
                         stop = False
@@ -154,11 +156,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         if newtour[-1] != 0:
             raise ValueError(f'something went wrong! newtour was {newtour}')
         
-        print(f'returning {tuple(newtour)=}')
+        # print(f'returning {tuple(newtour)=}')
         return tuple(newtour)
 
     def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
-        print(f'optimizing {tour=}')
+        # print(f'optimizing {tour=}')
         edgeset = list(edges(tour))
         for edge in map(frozenset, edgeset):
             ects = edgecount_tours(tours)[edge]
@@ -243,10 +245,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 local_tours[other_tour_idx] = MergeWalkWithTour(other_tour, walk)
                 local_tours[other_tour_idx] = RemoveEvenRedundantEdges(local_tours[other_tour_idx], local_tours)
 
-                print(f'> {local_tours}')
+                # print(f'> {local_tours}')
                 neighborhood.append(tuple(local_tours))
 
-        print(f'{neighborhood=}')
+        # print(f'{neighborhood=}')
         if any(len(set.union(*(set(map(frozenset, edges(path))) for path in paths))) < allEdgesCnt for paths in neighborhood):
             raise ValueError('neighborhood contains missing edge')
 
