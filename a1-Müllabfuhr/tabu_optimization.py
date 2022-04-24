@@ -183,7 +183,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
     # all edges in graph + dijkstra between odd connections
     edges = list(set(frozenset((start, end)) for start in G for end in G[start]))
     odd = [k for k, v in G.items() if len(v) % 2]
-    for _ in range(0, odd, 2):
+    for _ in range(0, len(odd), 2):
         edges.append(list(map(frozenset, edges(dijkstra[odd.pop()][odd.pop()][1]))))
 
     singlePath = ReorderToClosedWalk(edges)
