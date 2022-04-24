@@ -32,7 +32,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
     """
     # precompute shortest paths O(|V|²)
-    # print('computing dijkstra')
     dijkstra = {k: {} for k in G}  # shallowcopy doesnt work
     for start in dijkstra:
         q = deque(((0, start, []),))
@@ -255,9 +254,10 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             # print(f'choosing new best. old: {bestSolution}@{bestSolutionValue}')
             bestSolutionValue = currentSolutionValue
             bestSolution = currentSolution
-            print(f'choosing new best {bestSolution}@{bestSolutionValue}')
+            print('.', newline='')
             nOfItsWithoutImprovement = 0
 
+    print()
     return bestSolution
 
         

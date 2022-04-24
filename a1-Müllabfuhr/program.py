@@ -57,6 +57,7 @@ class CityGraph:
         return sum(self.vertices[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
+        print('\ngeneriere Startlösung...')
         # get paths using bfs-type algorithm
         visited: Mapping[int, Tuple[float, List[int]]] = {}  # {visited_node_id: (length, path)}
         paths: List[Tuple[int, ...]] = []  # [(path), ...]
@@ -108,6 +109,7 @@ class CityGraph:
         while len(paths) < days:
             paths.append((0,))
         
+        print('optimiere... (maximale Laufzeit: 10sek)')
         return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, paths, maxRunningTime=10))
 
 
@@ -118,7 +120,9 @@ while True:
     cg = CityGraph._from_bwinf_file(pth)
     n_days = int(input('Für wieviele Tage soll geplant werden? (5):') or 5)
     maxlen = 0
-    for i, (len_, p) in zip(range(1, n_days+1), cg.get_paths(n_days)):
+    iterable = zip(range(1, n_days+1), cg.get_paths(n_days))
+    print('done.\n\n----------------------------------------------\n')
+    for i, (len_, p) in iterable:
         print(f'Tag {i}: {" -> ".join(map(str, p))}, Gesamtlaenge: {len_}')
         maxlen = max(maxlen, len_)
     print(f'Maximale Lange einer Tagestour: {maxlen}')
