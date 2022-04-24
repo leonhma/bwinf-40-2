@@ -105,7 +105,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
             raise ValueError(f'merge failed to include all edges: {tour=}, {walk=}, {tour_=}')
 
         
-    # basicall shortenPath
+    # basically  shortenPath
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         print(f'seperating {walk=} from {tour=}')
         u, v = walk[0], walk[-1]
@@ -187,6 +187,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     nOfItsWithoutImprovement = 0
 
     tabuList = TabuList(tabuTenure)
+    allEdgesCnt = len(set.union(set(map(frozenset(edges(bestSolution))))))
 
     if maxRunningTime:
         startTime = time()
@@ -228,7 +229,12 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
 
                 neighborhood.append(tuple(local_tours))
 
+
         print(f'{neighborhood=}')
+
+        if any(len(set.union(set(map(frozenset, edges(path)))) < allEdgesCnt for path in paths) for paths in neighborhood):
+            raise ValueError('neighborhood contains missing edge')
+
         # filter tabu, reduce max length
         try:
             currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: w_max_tours(x))
