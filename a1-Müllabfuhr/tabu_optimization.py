@@ -113,7 +113,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
 
         # better lr ri finding
         for i in range(len(tour)-2):
-            if list(walk) == tour[i:][:3]:
+            if walk == tour[i:][:3]:
                 li = i
                 ri = i+2
                 break
