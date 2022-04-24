@@ -46,7 +46,7 @@ class CityGraph:
         return sum(self.vertices[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
-        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, maxNOfItsWithoutImprovement=100, maxRunningTime=300)
+        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, maxNOfItsWithoutImprovement=100, maxRunningTime=300))
 
 
 # repl
