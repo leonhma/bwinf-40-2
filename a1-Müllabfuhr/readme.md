@@ -31,6 +31,10 @@ Eine Funktionalität des Verbesserungs-algorithmus, die im Aufsatz nicht beschri
 
 Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. So kann zum Beipiel ein Fahrplan für zwei Wochen erstellt werden. Dazu werden einfach die merging- und padding-Schritte am Ende der `get_paths` Funktion angepasst. Diese Veränderung and `k` wird auch in der Optimisierungsphase berücksichtigt.
 
+#### Dropout
+
+Das erste was die Optimierung macht ist, die Pfade gerecht aufzuteilen. Hierfür reicht es, nicht jede Möglichkeit zu betrachten. Dafür gibt es den dropout-Wert. Am Anfang werden z.B. 10% aller Möglichkeiten ignoriert. Mit `dropout_fn` verändert sich dieser Wert über die Laufzeit des Algorithmus und somit wird die Auswahl am Ende der Optimierung 'feiner'.
+
 ### Aufbau
 
 *utility.py*
@@ -79,7 +83,7 @@ Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. 
 
 *tabu_optimization.py*
 
-**def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0, tabuTenure: int = 20) -> List[Tuple[int, ...]]**
+**def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0, dropout: float = 0.1, dropout_fn: Callable = lambda x: x**1.2, tabuTenure: int = 20) -> List[Tuple[int, ...]]**
 > Min-Max K-Chinese Postman Problem - Two Edge Exchange. Findet und verbessert `k` Touren, die alle Kanten im Graph abdecken.
 > `G` ist eine adjacency-List in der auch die Gewichte der Kanten gespeichert sind.
 > `maxNOfItsWithoutImprovement` ist die Maximalzahl der Iterationen ohne das Finden einer besseren Lösung, dass der Algorithmus abgebrochen wird.
@@ -134,6 +138,8 @@ Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes 
 
 `muellabfuhr0.txt`
 
+*dropout 0.1*
+
 ```
 10 13
 0 2 1
@@ -162,7 +168,7 @@ Maximale Lange einer Tagestour: 4.0
 
 ---
 
-`muellabfuhr1.txt`
+`muellabfuhr1.txt` - *dropout 0.1*
 
 ```
 8 13
@@ -192,7 +198,7 @@ Maximale Lange einer Tagestour: 18.0
 
 ---
 
-`muellabfuhr2.txt`
+`muellabfuhr2.txt` - *dropout 0.1*
 
 ```
 15 34
@@ -222,7 +228,8 @@ Maximale Lange einer Tagestour: 11.0
 
 ---
 
-`muellabfuhr3.txt`
+`muellabfuhr3.txt` - *dropout 0.1*
+
 
 ```
 15 105
@@ -252,7 +259,7 @@ Maximale Lange einer Tagestour: 21.0
 
 ---
 
-`muellabfuhr4.txt`
+`muellabfuhr4.txt` - *dropout 0.1*
 
 ```
 10 10
