@@ -109,11 +109,11 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         print(f'seperating {walk=} from {tour=}')
         # assuming walk is a subsegment of tour
-        u, v = walk[0], walk[-1]
+        u, w, v, = walk[0], walk[-1]
 
         # better lr ri finding
         for i in range(len(tour)-2):
-            if tour[i] == u and tour[i+2] == v:
+            if tour[i] == u and tour[i+1] == w and tour[i+2] == v:
                 li = i
                 ri = i+2
                 break
