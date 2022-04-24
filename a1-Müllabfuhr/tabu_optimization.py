@@ -67,7 +67,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
 
         tour_edges = edges(tour)
         if not tour_edges:
-            return walk
+            return ((0,) if walk[0] != 0 else ())+dijkstra[0][walk[0]][1]+tuple(walk)+dijkstra[walk[-1]][0][1]+((0,) if walk[-1] != 0 else ())
 
         while frozenset((walk[0], walk[1])) in tour_edges:
             del walk[0]
