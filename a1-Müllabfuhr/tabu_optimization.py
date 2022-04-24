@@ -187,7 +187,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], tours: List[Tuple[int,
     nOfItsWithoutImprovement = 0
 
     tabuList = TabuList(tabuTenure)
-    allEdgesCnt = len(set.union(set(map(frozenset(edges(bestSolution))))))
+    allEdgesCnt = len(set.union(set(map(frozenset, edges(bestSolution)))))
 
     if maxRunningTime:
         startTime = time()
