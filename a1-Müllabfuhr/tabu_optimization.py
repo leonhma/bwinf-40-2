@@ -55,6 +55,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
         return max(w_tour(tour) for tour in tours)
 
     def cost(tours: Iterable[Tuple[int, ...]]) -> Tuple[float, float]:
+        print(f'calling cost with {tours=}')
         w_avg = w_avg_tours(tours)
         return (w_max_tours(tours), sum(abs(w_tour(tour)-w_avg) for tour in tours))
 
