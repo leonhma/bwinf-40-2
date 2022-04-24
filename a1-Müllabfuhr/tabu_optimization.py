@@ -118,7 +118,7 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
                 ri = i+2
                 break
         else:
-            ValueError('walk not found in graph')
+            raise ValueError('walk not found in graph')
         
         ret = ((0,) if tour[0] != 0 else ())+tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]+((0,) if tour[-1] != 0 else ())
         print(f'returning {ret=}')
