@@ -186,7 +186,8 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5,
     for _ in range(0, len(odd), 2):
         odd1 = odd.pop()
         odd2 = odd.pop()
-        edges += list(map(frozenset, edges(dijkstra[odd1][odd2][1])))
+        odd_edges = list(map(frozenset, edges(dijkstra[odd1][odd2][1])))
+        edges += odd_edges
 
     singlePath = ReorderToClosedWalk(edges)
 
