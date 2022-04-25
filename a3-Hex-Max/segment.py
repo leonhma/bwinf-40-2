@@ -1,4 +1,4 @@
-from typing import Callable, Generator, List, Mapping, Tuple, Union
+from typing import List, Tuple, Union
 
 
 class Segment:
@@ -90,5 +90,3 @@ class Segment:
             takes = sum(1 if self.panels[x] < seg.panels[x] else 0 for x in range(7))
             gives = sum(1 if self.panels[x] > seg.panels[x] else 0 for x in range(7))
             return takes, gives
-
-

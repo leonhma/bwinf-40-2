@@ -1,3 +1,5 @@
+<!--- 252cm --->
+
 # Hex-Max
 
 ❔ A3 👤 61015 🧑 Leonhard Masche 📆 13.04.2022
@@ -24,7 +26,7 @@ Die Hauptidee ist, für jede Stelle der Zahl, alle 15+1 Möglichkeiten sie zu ve
 
 #### Recursion-Limit
 
-Um den Fehler ``MaxRecursionDepth exceeded`` zu vermeiden, wurde der dfs-Algorithmus mit einer while Schleife und einem Iterator implementiert.
+Um den `RecursionError` zu vermeiden, wurde der dfs-Algorithmus mit einer while Schleife und einem Iterator implementiert.
 
 ### Aufbau
 

@@ -14,7 +14,7 @@
 
 ## Lösungsidee
 
-Zuerst ist bei dieser Problemstellung eine gewisse Ähnlichkeit zum `min-max k-Chinese Postman problem` festzustellen. Da dieses Problem NP-Schwer ist, wird hier ein meta-heuristischer Algorithmus zur Annäherung an eine möglichst optimale Lösung verwendet, wie in dieser [Arbeit](https://www.sciencedirect.com/science/article/abs/pii/S0305054805000663) beschrieben. Als Startpunkt wird ein einziger Pfad durch den Graph verlegt (vgl. [Hierholzer's algorithm](https://en.wikipedia.org/wiki/Eulerian_path#Hierholzer.27s_algorithm)) und die restlichen Tage mit Nullen aufgefüllt. Nun wird optimiert: Kurzgesagt wird iterativ eine 'Nachbarschaft', also leichte Veränderungen zweier Touren durch das Verschieben von zwei Kanten berechnet, und der beste Kandidat, der nicht in der tabu-Liste enthalten ist, wird weiterverbessert. Wenn zwei Möglichkeiten zur Weiterverbesserung gleich 'gut' sind, wird die, deren Längen dem Durchschnitt näher sind, ausgewählt. Sollte es dann immernoch mehrere Möglichkeiten geben, wir zufällig eine ausgewählt. Somit ist der Algorithmus zwar nicht deterministisch, mit ausreichender Laufzeit wir die Menge der möglichen Ergebnisse jedoch immer enger. Diese Auswahl wird nun der tabu-Liste hinzugefügt. Die tabu-Liste hat eine bestimmte Zeit, für die Elemente nicht noch einmal ausgewählt werden dürfen. Diese Zeit hat mit einem Wert von `20` (20 Iterationen) gute Ergebnisse geliefert. Zusätzlich wird der Algorithmus durch ein Limit von `100` Iterationen ohne Verbesserung, und eine maximale Laufzeit von `600` Sekunden beschränkt.
+Zuerst ist bei dieser Problemstellung eine gewisse Ähnlichkeit zum `min-max k-Chinese Postman problem` festzustellen. Da dieses Problem NP-Schwer ist, wird hier ein meta-heuristischer Algorithmus zur Annäherung an eine möglichst optimale Lösung verwendet, wie in dieser [Arbeit](https://www.sciencedirect.com/science/article/abs/pii/S0305054805000663) beschrieben. Als Startpunkt wird ein einziger Pfad durch den Graph verlegt (vgl. [Hierholzer's algorithm](https://en.wikipedia.org/wiki/Eulerian_path#Hierholzer.27s_algorithm)) und die restlichen Tage mit Nullen aufgefüllt. Nun wird optimiert: Kurzgesagt wird iterativ eine 'Nachbarschaft', also leichte Veränderungen zweier Touren durch das Verschieben von zwei Kanten berechnet, und der beste Kandidat, der nicht in der tabu-Liste enthalten ist, wird weiterverbessert. Wenn zwei Möglichkeiten zur Weiterverbesserung gleich 'gut' sind, wird die, deren Längen dem Durchschnitt näher sind, ausgewählt. Sollte es dann immernoch mehrere Möglichkeiten geben, wir zufällig eine ausgewählt. Somit ist der Algorithmus zwar nicht deterministisch, mit ausreichender Laufzeit wir die Menge der möglichen Ergebnisse jedoch immer enger. Diese Auswahl wird nun der tabu-Liste hinzugefügt. Die tabu-Liste hat eine bestimmte Zeit, für die Elemente nicht noch einmal ausgewählt werden dürfen. Diese Zeit hat mit einem Wert von `20` (20 Iterationen) gute Ergebnisse geliefert. Zusätzlich wird der Algorithmus durch ein Limit von `100` Iterationen ohne Verbesserung, und eine maximale Iterationszeit von `600` Sekunden beschränkt.
 
 ### Verbesserungen
 
@@ -30,7 +30,7 @@ Eine Funktionalität des Verbesserungs-algorithmus, die im Aufsatz nicht beschri
 
 #### Arbiträre Anzahl Tage
 
-Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. So kann zum Beipiel ein Fahrplan für zwei Wochen erstellt werden. Dazu werden einfach die merging- und padding-Schritte am Ende der `get_paths` Funktion angepasst. Diese Veränderung and `k` wird auch in der Optimisierungsphase berücksichtigt.
+Auch kann eine Anzahl an Tagen eingegeben werden, für die geplant werden soll. So kann zum Beipiel ein Fahrplan für zwei Wochen erstellt werden. Dazu wird einfach `k` in der Optimierungsfunktion angepasst.
 
 #### Dropout
 
@@ -114,7 +114,7 @@ tabu_optimization.py
 
 #### def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float
 
-> Gibt die Länge aller Pfade in `tours` zurück. Dies ist auch die cost-Funktion, die es zu minimieren gilt.
+> Gibt die Länge aller Pfade in `tours` zurück.
 
 #### def edgecount_tour(tour: Tuple[int, ...]) -> collections.Counter
 
