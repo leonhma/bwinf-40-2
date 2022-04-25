@@ -146,7 +146,7 @@ Das Programm ist in der Sprache Python umgesetzt. Der Aufgabenordner enthält ne
 Wird das Programm gestartet, wird zuerst eine Eingabe in Form einer einstelligen Zahl erwartet, um ein bestimmtes Beispiel auszuwählen. *(Das heißt: `0` für Beispiel `muellabfuhr0.txt`)*.
 Dann wird nach der Anzahl der zu planenden Tage gefragt (default ist 5).
 
-Nun wird die Logik des Programms angewandt und die Ausgabe erscheint in der Kommandozeile (kann bis zu 10 Minuten dauern!).
+Nun wird die Logik des Programms angewandt und die Ausgabe erscheint in der Kommandozeile (kann bis zu 12 Minuten dauern!).
 
 ## Beispiele
 
