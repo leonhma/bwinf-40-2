@@ -1,10 +1,9 @@
-from collections import Counter
+from collections import deque
 from os.path import dirname, join
-from typing import (FrozenSet, Iterable, List, Mapping, Set,
+from typing import (FrozenSet, List, Mapping, Set,
                     Tuple)
 
 from tabu_optimization import MMKCPP_TEE_TabuSearch
-from utility import remove_by_exp
 
 
 class CityGraph:
@@ -58,7 +57,7 @@ class CityGraph:
         return not unseen
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
-        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, 100, 600, 0.99, lambda x: x**1.2))
+        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, 100, 600, 0))
 
 
 # repl

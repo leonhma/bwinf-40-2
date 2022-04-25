@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Dict, Hashable
+from typing import Dict, Hashable
 
 
 class TabuList:
@@ -14,10 +14,7 @@ class TabuList:
         self.cleanup_freq = cleanup_freq
 
     def _cleanup(self):
-        to_delete = []
-        for k, v in self.tabu.items():
-            if v+self.offset <= 0:
-                to_delete.append(k)
+        to_delete = [k for k, v in self.tabu.items() if v+self.offset <= 0]
         for k in to_delete:
             del self.tabu[k]
 
@@ -27,20 +24,10 @@ class TabuList:
     def get(self, item: Hashable) -> int:
         if item in self.tabu:
             val = self.tabu[item]+self.offset
-            return 0 if val < 0 else val
+            return max(val, 0)
         return 0
 
     def tick(self):
         self.offset -= 1
         if self.offset % self.cleanup_freq == 0:
             self._cleanup()
-
-
-def remove_by_exp(exp: Callable[[Any], bool], lst: List):
-    for i in lst:
-        try:
-            if exp(i):
-                lst.remove(i)
-                break
-        except Exception:
-            pass
