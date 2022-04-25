@@ -1,15 +1,16 @@
 from collections import deque
 from os.path import dirname, join
-from typing import (FrozenSet, List, Mapping, Set,
-                    Tuple)
+from typing import FrozenSet, List, Mapping, Set, Tuple
 
 from tabu_optimization import MMKCPP_TEE_TabuSearch
 
 
 class CityGraph:
     """A class representing the city graph."""
-    vertices: Mapping[int, Mapping[int, float]]     # {vertex_id: {connected_vertex_id: distance}, ...}
-    edgeset: Set[FrozenSet[int]]                    # {{vertex_id, vertex_id}, {vertex_id, vertex_id}, ...}
+    vertices: Mapping[int, Mapping[int, float]
+                      ]     # {vertex_id: {connected_vertex_id: distance}, ...}
+    # {{vertex_id, vertex_id}, {vertex_id, vertex_id}, ...}
+    edgeset: Set[FrozenSet[int]]
 
     @classmethod
     def _from_bwinf_file(cls, path: str) -> 'CityGraph':
@@ -57,13 +58,16 @@ class CityGraph:
         return not unseen
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
-        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, 100, 600, 0))
+        if not self.is_connected():
+            raise ValueError('Graph is not connected.')
+        return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, 100, 600))
 
 
 # repl
 while True:
-    pth = join(dirname(__file__),
-                    f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
+    pth = join(
+        dirname(__file__),
+        f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
     cg = CityGraph._from_bwinf_file(pth)
     n_days = int(input('Für wieviele Tage soll geplant werden? (5): ') or 5)
     maxlen = 0

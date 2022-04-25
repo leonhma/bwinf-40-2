@@ -1,8 +1,7 @@
-from os.path import join, dirname
-from typing import List, Union, Tuple, Generator
+from os.path import dirname, join
+from typing import Generator, List, Tuple
 
 from segment import Segment
-
 
 costmap: List[List[Tuple[int, int]]] = []
 
@@ -13,24 +12,38 @@ for x, from_ in enumerate('0123456789ABCDEF'):
     for y, to in enumerate('FEDCBA9876543210'):
         costmap[x][y] = Segment(from_).get_takes_gives(Segment(to))
 
+
 def get_max_swappable(segments: List[Segment], m: int) -> str:
+    if len(segments) > 500:
+        print('warning: this might take a while...')
+    iterator = [0]*len(segments)
     result: List[str] = []  # list of char
 
-    def dfs(max_takes, max_gives, index = 0):
-        if index == len(segments):
-            if max_takes == max_gives:
-                return ''.join(result)  # return result if at the end of string and number of swaps match
-            return  # return None if number of swaps dont match (one match is guaranteed)
-        for hex_, (takes, gives) in zip('FEDCBA9876543210', costmap[int(segments[index].char, base=16)]):
-            if takes > max_takes or gives > max_gives:  # skip possibility if either is exceeded
-                continue
-            result.append(hex_)
-            res = dfs(max_takes-takes, max_gives-gives, index+1)
-            if res:  # propagate match upwards
-                return res
-            del result[-1]
+    def step(index: int):
+        for i in range(index, -1, -1):
+            carry = False
+            if iterator[i] == 15:
+                carry = True
+            iterator[i] = (iterator[i]+1) % 16
+            if not carry:
+                break
 
-    return dfs(m, m)
+    while True:
+        current_takes, current_gives = 0, 0
+        result = []
+        for i in range(len(segments)):
+            takes, gives = costmap[int(segments[i].char, base=16)][iterator[i]]
+            if (takes + current_takes > m) or (gives + current_gives > m):
+                step(i)
+                break
+            current_takes += takes
+            current_gives += gives
+            result.append(hex(15-iterator[i])[2].upper())
+            if i == len(segments)-1:
+                if current_takes == current_gives:
+                    return ''.join(result)
+                else:
+                    step(i)
 
 
 def _animate(from_: str, to: str) -> Generator[List[Segment], None, None]:
@@ -38,7 +51,7 @@ def _animate(from_: str, to: str) -> Generator[List[Segment], None, None]:
     to = [Segment(char) for char in to]
     while from_ != to:
         for i in range(7*len(to)):
-            seg, i = i//7, i%7
+            seg, i = i//7, i % 7
             if from_[seg].panels[i] and not to[seg].panels[i]:
                 from_[seg].panels[i] = 0
                 from_[seg].__dict__.pop('char', None)
@@ -46,7 +59,7 @@ def _animate(from_: str, to: str) -> Generator[List[Segment], None, None]:
         else:
             raise ValueError('Not the same number of sticks!')
         for i in range(7*len(to)):
-            seg, i = i//7, i%7
+            seg, i = i//7, i % 7
             if not from_[seg].panels[i] and to[seg].panels[i]:
                 from_[seg].panels[i] = 1
                 from_[seg].__dict__.pop('char', None)
@@ -66,13 +79,11 @@ def _print_asciiart(display: List[Segment]):
     for line in out:
         print(''.join(line))
 
-while True:
-    try:
-        choice = int(input("Bitte die Nummer des Beispiels eingeben [0-5]: "))
-        with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
-            display = [Segment(char) for char in f.readline().strip()]
-            m = int(f.readline().strip())
 
-        print(get_max_swappable(display, m))
-    except Exception as e:
-        print(e)
+while True:
+    choice = int(input("Bitte die Nummer des Beispiels eingeben [0-5]: "))
+    with open(join(dirname(__file__), f'beispieldaten/hexmax{choice}.txt')) as f:
+        display = [Segment(char) for char in f.readline().strip()]
+        m = int(f.readline().strip())
+
+    print(get_max_swappable(display, m))

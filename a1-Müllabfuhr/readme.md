@@ -13,14 +13,14 @@
 
 ## Lösungsidee
 
-Zuerst ist bei dieser Problemstellung eine gewisse Ähnlichkeit zum `min-max k-Chinese Postman problem` festzustellen. Da dieses Problem NP-Schwer ist, wird hier ein meta-heuristischer Algorithmus zur Annäherung an eine möglichst optimale Lösung verwendet, wie in dieser [Arbeit](https://www.sciencedirect.com/science/article/abs/pii/S0305054805000663) beschrieben. Als Startpunkt wird ein einziger Pfad durch den Graph verlegt (vgl. [Hierholzer's algorithm](https://en.wikipedia.org/wiki/Eulerian_path#Hierholzer.27s_algorithm)) und die restlichen Tage mit Nullen aufgefüllt. <br> Nun wird optimiert: Kurzgesagt wird iterativ eine 'Nachbarschaft', also leichte Veränderungen zweier Touren durch das Verschieben von zwei Kanten berechnet, und der beste Kandidat, der nicht in der tabu-Liste enthalten ist, wird weiterverbessert. Wenn zwei Möglichkeiten zur Weiterverbesserung gleich 'gut' sind, wird zufällig eine der beiden ausgewählt. Somit ist der Algorithmus zwar nicht deterministisch, mit ausreichender Laufzeit wir die Menge der möglichen Ergebnisse jedoch immer enger. Diese Auswahl wird nun der tabu-Liste hinzugefügt. Die tabu-Liste hat eine bestimmte Zeit, für die Elemente nicht noch einmal ausgewählt werden dürfen. Diese Zeit hat mit einem Wert von `20` (20 Iterationen) gute Ergebnisse geliefert. Zusätzlich wird der Algorithmus durch ein Limit von `100` Iterationen ohne Verbesserung, und eine maximale Laufzeit von `600` Sekunden beschränkt.
+Zuerst ist bei dieser Problemstellung eine gewisse Ähnlichkeit zum `min-max k-Chinese Postman problem` festzustellen. Da dieses Problem NP-Schwer ist, wird hier ein meta-heuristischer Algorithmus zur Annäherung an eine möglichst optimale Lösung verwendet, wie in dieser [Arbeit](https://www.sciencedirect.com/science/article/abs/pii/S0305054805000663) beschrieben. Als Startpunkt wird ein einziger Pfad durch den Graph verlegt (vgl. [Hierholzer's algorithm](https://en.wikipedia.org/wiki/Eulerian_path#Hierholzer.27s_algorithm)) und die restlichen Tage mit Nullen aufgefüllt. Nun wird optimiert: Kurzgesagt wird iterativ eine 'Nachbarschaft', also leichte Veränderungen zweier Touren durch das Verschieben von zwei Kanten berechnet, und der beste Kandidat, der nicht in der tabu-Liste enthalten ist, wird weiterverbessert. Wenn zwei Möglichkeiten zur Weiterverbesserung gleich 'gut' sind, wird die, deren Längen dem Durchschnitt näher sind, ausgewählt. Sollte es dann immernoch mehrere Möglichkeiten geben, wir zufällig eine ausgewählt. Somit ist der Algorithmus zwar nicht deterministisch, mit ausreichender Laufzeit wir die Menge der möglichen Ergebnisse jedoch immer enger. Diese Auswahl wird nun der tabu-Liste hinzugefügt. Die tabu-Liste hat eine bestimmte Zeit, für die Elemente nicht noch einmal ausgewählt werden dürfen. Diese Zeit hat mit einem Wert von `20` (20 Iterationen) gute Ergebnisse geliefert. Zusätzlich wird der Algorithmus durch ein Limit von `100` Iterationen ohne Verbesserung, und eine maximale Laufzeit von `600` Sekunden beschränkt.
 
 ### Verbesserungen
 
 #### Nicht-Integer Gewichte
 
 Eine vorgenommene Verbesserung ist das Einlesen von Fließkommazahl-Gewichtungen der Straßen. Es ist unrealistisch dass in einem echten Szenario Straßen eine Länge von z.B. genau 480m haben. Um das zu implementieren wird der dritte Wert aus den Beispieldateien als
-<i style="color:orange">float</i>
+*float*
 eingelesen.
 
 #### Home-office
@@ -37,86 +37,106 @@ Das erste was die Optimierung macht ist, die Pfade gerecht aufzuteilen. Hierfür
 
 ### Aufbau
 
-*utility.py*
+utility.py
 
-**class TabuList**
+#### class TabuList
+
 > Eine tabu-Liste, die Elemente für eine Zeit von `tenure` als tabu markiert.
 
-**def TabuList.\_\_init__(default_tenure: int, cleanup_freq: int = 20)**
+#### def TabuList.\_\_init__(default_tenure: int, cleanup_freq: int = 20)
+
 > Initialisiert die tabu-Liste mit einer default_tenure.
 
-**def TabuList._cleanup()**
+#### def TabuList._cleanup()
+
 > Interne Methode. Wird aufgerufen, um abgelaufene Einträge aus der Liste zu löschen.
 
-**def TabuList.add(item: Hashable, tenure: int = None)**
+#### def TabuList.add(item: Hashable, tenure: int = None)
+
 > Setzt ein `item` für eine Zeit von `tenure or default_tenure` auf die tabu-Liste.
 
-**def TabuList.get(item: Hashable) -> int**
+#### def TabuList.get(item: Hashable) -> int
+
 > Gibt die Zeit zurück, bis `item` nicht mehr tabu ist. (Sonst `0`)
 
-**def TabuList.tick()**
+#### def TabuList.tick()
+
 > Inkrementiert die Zeit um eins.
 
-**def remove_by_exp(exp: Callable[[Any], bool], lst: List)**
-> Entfernt das erste Element bei dem `exp` 'True' zurückgibt.
+program.py
 
-<br>
+#### class CityGraph
 
-*program.py*
-
-**class CityGraph**
 > Klasse die ein Straßennetz (ungerichteter gewichteter Graph) repräsentiert.
 
-**def CityGraph.__init\_\_(vertices: List[int], edges: List[Tuple[int, int, float]])**
+#### def CityGraph.__init\_\_(vertices: List[int], edges: List[Tuple[int, int, float]])
+
 > Initialisiert den CityGraph mit einer Liste der Vertices und der adjacency-list.
 
-**@classmethod <br> def CityGraph._from_bwinf_file(path: str) -> 'CityGraph'**
+#### @classmethod def CityGraph._from_bwinf_file(path: str) -> 'CityGraph'
+
 > Liest eine Beispieldatei ein, und gibt einen CityGraph zurück.
 
-**def is_connected(self) -> bool**
+#### def is_connected(self) -> bool
+
 > Gibt als Wahrheitswert zurück, ob der Graph verbunden ist, d. h. es gibt nur ein verbundenes Straßennetz.
 
-**def get_paths(days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]**
+#### def get_paths(days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]
+
 > Gibt eine Liste zurück, die Tuples mit dem Pfad, und der Länge dessen an erster Stelle, enthält.
 
-<br>
+tabu_optimization.py
 
-*tabu_optimization.py*
+#### def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0, dropout: float = 0.2, dropout_fn: Callable = lambda x: x**1.2, tabuTenure: int = 20) -> List[Tuple[int, ...]]
 
-**def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsWithoutImprovement: int = 100, maxRunningTime: float = 0, dropout: float = 0.1, dropout_fn: Callable = lambda x: x**1.2, tabuTenure: int = 20) -> List[Tuple[int, ...]]**
 > Min-Max K-Chinese Postman Problem - Two Edge Exchange. Findet und verbessert `k` Touren, die alle Kanten im Graph abdecken.
 > `G` ist eine adjacency-List in der auch die Gewichte der Kanten gespeichert sind.
 > `maxNOfItsWithoutImprovement` ist die Maximalzahl der Iterationen ohne das Finden einer besseren Lösung, dass der Algorithmus abgebrochen wird.
 > `maxRunningTime` ist die maximale Laufzeit des Algorithmus, bevor dieser abgebrochen wird.
 > `tabuTenure` ist die Anzahl an Iterationen, die ein schon besuchtes Element als tabu markiert wird.
 
-*die folgenden Funktionen befinden sich innerhalb der Funktion MMKCPP_TEE_TabuSearch*
+#### def edges(tour: Tuple[int, ...]) -> Iterable[set]
 
-**def edges(tour: Tuple[int, ...]) -> Iterable[set]**
 > Gibt alle im Pfad `tour` enthaltenen Kanten in der Form `[{0, 1}, {1, 2}, ...]` zurück.
 
-**def w_tour(tour: Tuple[int, ...]) -> float**
+#### def w_tour(tour: Tuple[int, ...]) -> float
+
 > Gibt die Länge eines Pfades `tour` zurück.
 
-**def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float**
+#### def w_avg_tours(tours: Iterable[Tuple[int, ...]]) -> float
+
+> Gibt die durchschnittliche Länge aller Pfade `tours` zurück.
+
+#### def cost(tours: Iterable[Tuple[int, ...]], w_avg: float) -> Tuple[float, float, float]
+
+> Gibt die Kosten der Touren `tours` zurück. Diese gilt es zu minimieren.
+
+#### def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float
+
 > Gibt die Länge aller Pfade in `tours` zurück. Dies ist auch die cost-Funktion, die es zu minimieren gilt.
 
-**def edgecount_tour(tour: Tuple[int, ...]) -> collections.Counter**
+#### def edgecount_tour(tour: Tuple[int, ...]) -> collections.Counter
+
 > Zählt alle Kanten im Pfad `tour`.
 
-**def edgecount_tours(tours: List[Tuple[int, ...]]) -> collections.Counter**
+#### def edgecount_tours(tours: List[Tuple[int, ...]]) -> collections.Counter
+
 > Zahlt alle Kanten in den Pfaden `tours`.
 
-**def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]**
+#### def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]
+
 > Verbindet `walk` (2 Kanten) mit dem jetzigen Pfad `tour`.
 
-**def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]**
+#### def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]
+
 > Entfernt die Kanten `walk` im Pfad `tour`, während aufgepasst wird, dass der Pfad verbunden bleibt.
 
-**def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]**
+#### def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]
+
 > Ordnet die Kanten `edges` so, dass ein geschlossener Pfad, der bei Kreuzung 0 anfängt und endet, entsteht.
 
-**def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]**
+#### def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]
+
 > Entfernt Kanten im Pfad `tour`, die zu gerader Zahl vorkommen, immernoch in anderen Touren vorkommen, und den Pfad verbunden lassen.
 
 ## Umsetzung
@@ -130,17 +150,15 @@ Nun wird die Logik des Programms angewandt und die Ausgabe erscheint in der Komm
 
 ## Beispiele
 
-Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes angewendet (jeweils mit einem Ziel von `5` Tagen):
+Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes angewendet (jeweils mit einem Ziel von `5` Tagen und einem dropout-Wert von `0.2`):
 
-*(die Anzahl der Punkte ist die Anzahl der vorgenommenen Verbesserungen)*
+(die Anzahl der Punkte ist die Anzahl der vorgenommenen Verbesserungen)
 
 ---
 
 `muellabfuhr0.txt`
 
-*dropout 0.1*
-
-```
+```text
 10 13
 0 2 1
 0 4 1
@@ -156,21 +174,21 @@ Hier wird das Programm auf die neun Beispiele aus dem Git-Repo, und ein eigenes 
 
 Ausgabe zu `muellabfuhr0.txt`
 
-```
+```text
 .......
-Tag 1: 0 -> 8 -> 7 -> 6 -> 0, Gesamtlaenge: 4.0
-Tag 2: 0 -> 6 -> 5 -> 4 -> 0, Gesamtlaenge: 4.0
-Tag 3: 0 -> 4 -> 3 -> 2 -> 0, Gesamtlaenge: 4.0
-Tag 4: 0 -> 8 -> 9 -> 8 -> 0, Gesamtlaenge: 4.0
-Tag 5: 0 -> 8 -> 1 -> 2 -> 0, Gesamtlaenge: 4.0
+Tag 1: 0 -> 8 -> 1 -> 2 -> 0, Gesamtlaenge: 4.0
+Tag 2: 0 -> 6 -> 7 -> 8 -> 0, Gesamtlaenge: 4.0
+Tag 3: 0 -> 6 -> 5 -> 4 -> 0, Gesamtlaenge: 4.0
+Tag 4: 0 -> 4 -> 3 -> 2 -> 0, Gesamtlaenge: 4.0
+Tag 5: 0 -> 8 -> 9 -> 8 -> 0, Gesamtlaenge: 4.0
 Maximale Lange einer Tagestour: 4.0
 ```
 
 ---
 
-`muellabfuhr1.txt` - *dropout 0.1*
+`muellabfuhr1.txt`
 
-```
+```text
 8 13
 0 4 6
 0 5 6
@@ -186,21 +204,21 @@ Maximale Lange einer Tagestour: 4.0
 
 Ausgabe zu `muellabfuhr1.txt`
 
-```
-...........
-Tag 1: 0 -> 6 -> 3 -> 2 -> 3 -> 6 -> 0, Gesamtlaenge: 18.0
-Tag 2: 0 -> 6 -> 7 -> 4 -> 0 -> 6 -> 0, Gesamtlaenge: 18.0
-Tag 3: 0 -> 6 -> 1 -> 3 -> 6 -> 0, Gesamtlaenge: 13.0
-Tag 4: 0 -> 5 -> 3 -> 6 -> 0, Gesamtlaenge: 11.0
-Tag 5: 0 -> 6 -> 7 -> 5 -> 4 -> 3 -> 6 -> 0, Gesamtlaenge: 18.0
-Maximale Lange einer Tagestour: 18.0
+```text
+........
+Tag 1: 0 -> 6 -> 3 -> 4 -> 7 -> 6 -> 0, Gesamtlaenge: 19.0
+Tag 2: 0 -> 5 -> 3 -> 1 -> 6 -> 0, Gesamtlaenge: 20.0
+Tag 3: 0 -> 6 -> 3 -> 2 -> 3 -> 6 -> 0, Gesamtlaenge: 18.0
+Tag 4: 0 -> 5 -> 4 -> 0, Gesamtlaenge: 17.0
+Tag 5: 0 -> 5 -> 7 -> 5 -> 0, Gesamtlaenge: 16.0
+Maximale Lange einer Tagestour: 20.0
 ```
 
 ---
 
-`muellabfuhr2.txt` - *dropout 0.1*
+`muellabfuhr2.txt`
 
-```
+```text
 15 34
 0 5 1
 0 6 1
@@ -216,22 +234,21 @@ Maximale Lange einer Tagestour: 18.0
 
 Ausgabe zu `muellabfuhr2.txt`
 
-```
-..............
-Tag 1: 0 -> 9 -> 10 -> 2 -> 8 -> 11 -> 3 -> 4 -> 3 -> 13 -> 9 -> 0, Gesamtlaenge: 11.0
-Tag 2: 0 -> 9 -> 13 -> 14 -> 10 -> 14 -> 7 -> 8 -> 12 -> 9 -> 6 -> 0, Gesamtlaenge: 11.0
-Tag 3: 0 -> 6 -> 14 -> 13 -> 9 -> 5 -> 14 -> 6 -> 1 -> 7 -> 9 -> 0, Gesamtlaenge: 11.0
-Tag 4: 0 -> 5 -> 11 -> 2 -> 14 -> 8 -> 12 -> 1 -> 7 -> 9 -> 0, Gesamtlaenge: 10.0
-Tag 5: 0 -> 5 -> 11 -> 7 -> 1 -> 13 -> 4 -> 10 -> 4 -> 6 -> 0, Gesamtlaenge: 10.0
+```text
+..........
+Tag 1: 0 -> 5 -> 11 -> 2 -> 11 -> 3 -> 4 -> 3 -> 13 -> 9 -> 5 -> 0, Gesamtlaenge: 11.0
+Tag 2: 0 -> 9 -> 10 -> 2 -> 8 -> 2 -> 14 -> 7 -> 8 -> 11 -> 5 -> 0, Gesamtlaenge: 11.0
+Tag 3: 0 -> 5 -> 11 -> 7 -> 1 -> 13 -> 4 -> 6 -> 14 -> 6 -> 0, Gesamtlaenge: 10.0
+Tag 4: 0 -> 9 -> 13 -> 14 -> 10 -> 9 -> 12 -> 1 -> 7 -> 9 -> 0, Gesamtlaenge: 10.0
+Tag 5: 0 -> 5 -> 14 -> 8 -> 12 -> 1 -> 6 -> 4 -> 10 -> 9 -> 6 -> 0, Gesamtlaenge: 11.0
 Maximale Lange einer Tagestour: 11.0
 ```
 
 ---
 
-`muellabfuhr3.txt` - *dropout 0.1*
+`muellabfuhr3.txt`
 
-
-```
+```text
 15 105
 0 1 1
 0 2 1
@@ -247,21 +264,21 @@ Maximale Lange einer Tagestour: 11.0
 
 Ausgabe zu `muellabfuhr3.txt`
 
-```
-.............................................
-Tag 1: 0 -> 11 -> 6 -> 10 -> 3 -> 12 -> 9 -> 11 -> 1 -> 10 -> 9 -> 6 -> 1 -> 3 -> 8 -> 14 -> 4 -> 10 -> 5 -> 2 -> 14 -> 0, Gesamtlaenge: 21.0
-Tag 2: 0 -> 13 -> 5 -> 6 -> 3 -> 0 -> 2 -> 12 -> 14 -> 11 -> 3 -> 13 -> 4 -> 1 -> 12 -> 13 -> 10 -> 11 -> 13 -> 9 -> 7 -> 0, Gesamtlaenge: 21.0
-Tag 3: 0 -> 6 -> 14 -> 3 -> 7 -> 5 -> 9 -> 0 -> 8 -> 2 -> 10 -> 14 -> 5 -> 11 -> 2 -> 4 -> 7 -> 10 -> 12 -> 5 -> 4 -> 0, Gesamtlaenge: 21.0
-Tag 4: 0 -> 12 -> 6 -> 13 -> 7 -> 11 -> 4 -> 9 -> 3 -> 4 -> 8 -> 1 -> 9 -> 14 -> 7 -> 8 -> 9 -> 2 -> 13 -> 14 -> 1 -> 0, Gesamtlaenge: 21.0
-Tag 5: 0 -> 10 -> 8 -> 13 -> 1 -> 2 -> 6 -> 8 -> 11 -> 12 -> 8 -> 5 -> 1 -> 7 -> 6 -> 4 -> 12 -> 7 -> 2 -> 3 -> 5 -> 0, Gesamtlaenge: 21.0
-Maximale Lange einer Tagestour: 21.0
+```text
+......................................
+Tag 1: 0 -> 10 -> 14 -> 6 -> 5 -> 11 -> 3 -> 12 -> 11 -> 13 -> 1 -> 2 -> 12 -> 1 -> 9 -> 2 -> 6 -> 3 -> 9 -> 0 -> 12 -> 4 -> 6 -> 0, Gesamtlaenge: 23.0
+Tag 2: 0 -> 8 -> 9 -> 5 -> 2 -> 10 -> 4 -> 10 -> 13 -> 10 -> 6 -> 1 -> 5 -> 14 -> 13 -> 2 -> 4 -> 3 -> 5 -> 8 -> 1 -> 14 -> 13 -> 0, Gesamtlaenge: 23.0
+Tag 3: 0 -> 7 -> 1 -> 10 -> 3 -> 1 -> 11 -> 10 -> 5 -> 13 -> 9 -> 8 -> 2 -> 3 -> 8 -> 13 -> 6 -> 7 -> 8 -> 11 -> 9 -> 14 -> 4 -> 0, Gesamtlaenge: 23.0
+Tag 4: 0 -> 2 -> 11 -> 14 -> 10 -> 12 -> 9 -> 7 -> 2 -> 14 -> 3 -> 7 -> 4 -> 11 -> 7 -> 5 -> 4 -> 13 -> 0 -> 3 -> 13 -> 7 -> 14 -> 0, Gesamtlaenge: 23.0
+Tag 5: 0 -> 1 -> 4 -> 8 -> 12 -> 14 -> 8 -> 10 -> 7 -> 12 -> 13 -> 11 -> 9 -> 6 -> 11 -> 0 -> 5 -> 12 -> 6 -> 8 -> 10 -> 9 -> 4 -> 0, Gesamtlaenge: 23.0
+Maximale Lange einer Tagestour: 23.0
 ```
 
 ---
 
-`muellabfuhr4.txt` - *dropout 0.1*
+`muellabfuhr4.txt`
 
-```
+```text
 10 10
 0 1 1
 0 9 1
@@ -277,7 +294,7 @@ Maximale Lange einer Tagestour: 21.0
 
 Ausgabe zu `muellabfuhr4.txt`
 
-```
+```text
 
 Tag 1: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 0, Gesamtlaenge: 10.0
 Tag 2: 0, Gesamtlaenge: 0
@@ -291,7 +308,7 @@ Maximale Lange einer Tagestour: 10.0
 
 `muellabfuhr5.txt`
 
-```
+```text
 50 989
 0 2 8
 0 3 12
@@ -305,13 +322,23 @@ Maximale Lange einer Tagestour: 10.0
 48 49 9
 ```
 
-Keine Ausgabe. (Iteration dauert zu lange)
+Ausgabe zu `muellabfuhr5.txt`
+
+```text
+.
+Tag 1: 0 -> 44 -> 26 -> 38 -> 29 -> 16 -> 46 -> 18 -> 2 -> 26 -> 12 -> 37 -> 41 -> 13 -> 43 -> 12 -> 14 -> 40 -> 39 -> 44 -> 34 -> 41 -> 18 -> 7 -> 42 -> 14 -> 24 -> 49 -> 15 -> 19 -> 27 -> 19 -> 43 -> 32 -> 20 -> 34 -> 13 -> 31 -> 19 -> 39 -> 10 -> 3 -> 0 -> 30 -> 46 -> 25 -> 17 -> 20 -> 4 -> 39 -> 23 -> 22 -> 11 -> 29 -> 43 -> 42 -> 41 -> 24 -> 23 -> 30 -> 32 -> 15 -> 35 -> 33 -> 4 -> 3 -> 19 -> 49 -> 42 -> 40 -> 47 -> 21 -> 41 -> 2 -> 44 -> 36 -> 4 -> 47 -> 29 -> 22 -> 43 -> 4 -> 26 -> 16 -> 38 -> 42 -> 18 -> 39 -> 9 -> 20 -> 3 -> 9 -> 46 -> 11 -> 25 -> 2 -> 9 -> 12 -> 23 -> 17 -> 41 -> 29 -> 37 -> 13 -> 33 -> 11 -> 15 -> 21 -> 40 -> 41 -> 26 -> 49 -> 3 -> 15 -> 16 -> 17 -> 26 -> 6 -> 29 -> 34 -> 47 -> 39 -> 12 -> 19 -> 1 -> 8 -> 48 -> 45 -> 40 -> 23 -> 31 -> 3 -> 13 -> 23 -> 2 -> 38 -> 35 -> 24 -> 25 -> 23 -> 27 -> 25 -> 45 -> 33 -> 9 -> 1 -> 21 -> 12 -> 48 -> 0 -> 15 -> 14 -> 13 -> 25 -> 4 -> 23 -> 19 -> 25 -> 22 -> 4 -> 35 -> 17 -> 19 -> 41 -> 45 -> 37 -> 7 -> 21 -> 43 -> 18 -> 10 -> 8 -> 32 -> 6 -> 24 -> 48 -> 23 -> 38 -> 44 -> 30 -> 12 -> 4 -> 8 -> 29 -> 46 -> 28 -> 39 -> 49 -> 45 -> 7 -> 49 -> 12 -> 38 -> 6 -> 25 -> 18 -> 5 -> 28 -> 0 -> 5 -> 29 -> 10 -> 31 -> 5 -> 41 -> 42 -> 2 -> 13 -> 39 -> 21 -> 17 -> 40 -> 30 -> 29 -> 45 -> 47 -> 12 -> 14 -> 5 -> 17 -> 44 -> 29 -> 14 -> 48 -> 46 -> 7 -> 3 -> 1 -> 2 -> 31 -> 45 -> 17 -> 37 -> 46 -> 49 -> 16 -> 14 -> 6 -> 19 -> 26 -> 34 -> 30 -> 45 -> 27 -> 25 -> 1 -> 13 -> 11 -> 42 -> 36 -> 34 -> 24 -> 44 -> 23 -> 29 -> 0 -> 7 -> 10 -> 34 -> 32 -> 11 -> 23 -> 32 -> 26 -> 39 -> 31 -> 15 -> 6 -> 8 -> 31 -> 36 -> 8 -> 34 -> 3 -> 12 -> 24 -> 29 -> 19 -> 37 -> 22 -> 5 -> 19 -> 0 -> 35 -> 8 -> 23 -> 15 -> 18 -> 14 -> 36 -> 25 -> 33 -> 21 -> 3 -> 24 -> 13 -> 48 -> 3 -> 42 -> 5 -> 3 -> 26 -> 48 -> 17 -> 3 -> 25 -> 37 -> 44 -> 6 -> 16 -> 10 -> 32 -> 48 -> 36 -> 27 -> 44 -> 32 -> 37 -> 35 -> 21 -> 26 -> 36 -> 13 -> 17 -> 47 -> 10 -> 5 -> 6 -> 36 -> 21 -> 15 -> 46 -> 34 -> 16 -> 19 -> 33 -> 29 -> 36 -> 1 -> 39 -> 17 -> 34 -> 42 -> 13 -> 0 -> 32 -> 33 -> 37 -> 23 -> 1 -> 46 -> 27 -> 34 -> 45 -> 12 -> 40 -> 35 -> 25 -> 41 -> 33 -> 18 -> 30 -> 38 -> 19 -> 36 -> 18 -> 21 -> 48 -> 29 -> 7 -> 11 -> 0 -> 25 -> 32 -> 4 -> 49 -> 21 -> 13 -> 19 -> 18 -> 13 -> 46 -> 10 -> 44 -> 22 -> 40 -> 4 -> 37 -> 49 -> 5 -> 26 -> 9 -> 8 -> 41 -> 15 -> 22 -> 19 -> 21 -> 49 -> 27 -> 24 -> 47 -> 18 -> 44 -> 46 -> 22 -> 14 -> 26 -> 18 -> 32 -> 47 -> 48 -> 10 -> 4 -> 15 -> 13 -> 9 -> 47 -> 13 -> 20 -> 35 -> 43 -> 45 -> 19 -> 2 -> 6 -> 12 -> 33 -> 3 -> 35 -> 48 -> 5 -> 36 -> 7 -> 31 -> 14 -> 46 -> 20 -> 0 -> 43 -> 31 -> 6 -> 13 -> 27 -> 0 -> 33 -> 43 -> 6 -> 33 -> 47 -> 41 -> 31 -> 29 -> 35 -> 5 -> 40 -> 49 -> 34 -> 25 -> 44 -> 21 -> 45 -> 10 -> 25 -> 9 -> 48 -> 33 -> 44 -> 35 -> 46 -> 32 -> 2 -> 37 -> 26 -> 0 -> 45 -> 14 -> 41 -> 46 -> 6 -> 49 -> 32 -> 9 -> 7 -> 19 -> 9 -> 14 -> 3 -> 44 -> 11 -> 48 -> 43 -> 23 -> 14 -> 19 -> 21 -> 22 -> 18 -> 40 -> 8 -> 7 -> 38 -> 40 -> 0 -> 38 -> 14 -> 4 -> 34 -> 35 -> 31 -> 18 -> 49 -> 30 -> 37 -> 15 -> 39 -> 22 -> 49 -> 29 -> 27 -> 15 -> 34 -> 0 -> 6 -> 23 -> 47 -> 42 -> 8 -> 14 -> 11 -> 26 -> 8 -> 18 -> 29 -> 20 -> 14 -> 43 -> 44 -> 45 -> 43 -> 46 -> 39 -> 27 -> 16 -> 21 -> 14 -> 10 -> 19 -> 4 -> 2 -> 43 -> 7 -> 32 -> 45 -> 38 -> 17 -> 24 -> 33 -> 34 -> 9 -> 41 -> 49 -> 28 -> 45 -> 36 -> 28 -> 24 -> 26 -> 45 -> 22 -> 10 -> 21 -> 28 -> 30 -> 43 -> 5 -> 37 -> 31 -> 32 -> 40 -> 7 -> 15 -> 40 -> 28 -> 6 -> 30 -> 15 -> 43 -> 16 -> 37 -> 11 -> 36 -> 12 -> 17 -> 22 -> 32 -> 1 -> 42 -> 27 -> 40 -> 31 -> 24 -> 15 -> 36 -> 9 -> 31 -> 22 -> 42 -> 46 -> 17 -> 2 -> 5 -> 24 -> 9 -> 10 -> 49 -> 20 -> 38 -> 8 -> 2 -> 28 -> 31 -> 46 -> 47 -> 30 -> 8 -> 12 -> 28 -> 18 -> 20 -> 30 -> 24 -> 1 -> 4 -> 30 -> 19 -> 48 -> 6 -> 27 -> 38 -> 5 -> 1 -> 7 -> 23 -> 46 -> 26 -> 7 -> 22 -> 27 -> 2 -> 39 -> 43 -> 9 -> 17 -> 0 -> 8 -> 28 -> 17 -> 7 -> 13 -> 21 -> 8 -> 3 -> 23 -> 9 -> 10 -> 17 -> 18 -> 38 -> 10 -> 12 -> 27 -> 7 -> 30 -> 9 -> 22 -> 30 -> 26 -> 25 -> 38 -> 4 -> 42 -> 48 -> 1 -> 43 -> 49 -> 48 -> 18 -> 12 -> 41 -> 27 -> 37 -> 20 -> 47 -> 37 -> 24 -> 16 -> 41 -> 32 -> 24 -> 18 -> 27 -> 3 -> 18 -> 0 -> 46 -> 19 -> 40 -> 3 -> 22 -> 41 -> 23 -> 26 -> 31 -> 38 -> 39 -> 24 -> 20 -> 33 -> 8 -> 24 -> 4 -> 11 -> 38 -> 34 -> 37 -> 42 -> 39 -> 33 -> 42 -> 9 -> 16 -> 7 -> 2 -> 36 -> 0 -> 39 -> 41 -> 1 -> 28 -> 15 -> 12 -> 2 -> 22 -> 26 -> 27 -> 11 -> 30 -> 41 -> 43 -> 24 -> 10 -> 2 -> 49 -> 1 -> 29 -> 32 -> 5 -> 25 -> 7 -> 44 -> 4 -> 2 -> 24 -> 23 -> 35 -> 22 -> 33 -> 38 -> 37 -> 14 -> 32 -> 27 -> 48 -> 20 -> 15 -> 42 -> 19 -> 28 -> 4 -> 27 -> 28 -> 43 -> 20 -> 40 -> 26 -> 42 -> 21 -> 27 -> 9 -> 15 -> 29 -> 28 -> 48 -> 49 -> 35 -> 27 -> 5 -> 23 -> 42 -> 44 -> 9 -> 38 -> 37 -> 9 -> 6 -> 45 -> 23 -> 28 -> 34 -> 11 -> 49 -> 36 -> 16 -> 23 -> 0 -> 2 -> 3 -> 47 -> 43 -> 10 -> 28 -> 7 -> 35 -> 6 -> 34 -> 39 -> 5 -> 20 -> 16 -> 8 -> 47 -> 14 -> 35 -> 26 -> 20 -> 19 -> 32 -> 13 -> 22 -> 12 -> 32 -> 35 -> 18 -> 16 -> 47 -> 6 -> 4 -> 16 -> 2 -> 45 -> 5 -> 8 -> 25 -> 20 -> 11 -> 41 -> 6 -> 17 -> 14 -> 30 -> 17 -> 32 -> 28 -> 25 -> 40 -> 29 -> 2 -> 21 -> 9 -> 4 -> 46 -> 8 -> 45 -> 35 -> 19 -> 47 -> 31 -> 1 -> 12 -> 46 -> 45 -> 42 -> 12 -> 13 -> 35 -> 12 -> 5 -> 47 -> 11 -> 1 -> 10 -> 37 -> 21 -> 13 -> 16 -> 22 -> 38 -> 48 -> 40 -> 34 -> 7 -> 48 -> 44 -> 1 -> 27 -> 31 -> 33 -> 2 -> 20 -> 22 -> 36 -> 3 -> 37 -> 0 -> 10 -> 13 -> 49 -> 25 -> 21 -> 30 -> 10 -> 6 -> 37 -> 43 -> 26 -> 28 -> 3 -> 43 -> 38 -> 1 -> 33 -> 40 -> 16 -> 0 -> 9 -> 11 -> 10 -> 36 -> 35 -> 41 -> 20 -> 10 -> 35 -> 1 -> 45 -> 11 -> 24 -> 0 -> 41 -> 44 -> 8 -> 6 -> 7 -> 5 -> 13 -> 30 -> 31 -> 49 -> 38 -> 3 -> 39 -> 20 -> 1 -> 30 -> 42 -> 32 -> 12 -> 7 -> 20 -> 8 -> 49 -> 14 -> 1 -> 16 -> 31 -> 11 -> 39 -> 16 -> 25 -> 30 -> 27 -> 17 -> 29 -> 42 -> 25 -> 47 -> 36 -> 30 -> 33 -> 5 -> 4 -> 48 -> 15 -> 47 -> 49 -> 27 -> 10 -> 23 -> 20 -> 31 -> 34 -> 1 -> 17 -> 33 -> 49 -> 0, Gesamtlaenge: 7407.0
+Tag 2: 0 -> 2 -> 12 -> 31 -> 32 -> 0, Gesamtlaenge: 59.0
+Tag 3: 0, Gesamtlaenge: 0
+Tag 4: 0, Gesamtlaenge: 0
+Tag 5: 0, Gesamtlaenge: 0
+Maximale Lange einer Tagestour: 7407.0
+```
 
 ---
 
-`muellabfuhr6.txt` - *dropout 0.9*
+`muellabfuhr6.txt`
 
-```
+```text
 100 204
 0 4 7782
 0 44 5495
@@ -327,20 +354,21 @@ Keine Ausgabe. (Iteration dauert zu lange)
 
 Ausgabe zu `muellabfuhr6.txt`
 
-```
-......
-Tag 1: 0 -> 93 -> 35 -> 93 -> 4 -> 0 -> 58 -> 98 -> 45 -> 98 -> 10 -> 45 -> 93 -> 35 -> 98 -> 93 -> 58 -> 45 -> 42 -> 67 -> 42 -> 5 -> 86 -> 41 -> 86 -> 77 -> 67 -> 41 -> 90 -> 41 -> 42 -> 86 -> 72 -> 13 -> 77 -> 84 -> 2 -> 72 -> 2 -> 84 -> 13 -> 5 -> 2 -> 5 -> 67 -> 77 -> 84 -> 19 -> 39 -> 60 -> 39 -> 83 -> 28 -> 30 -> 28 -> 31 -> 28 -> 82 -> 31 -> 82 -> 28 -> 83 -> 33 -> 83 -> 39 -> 30 -> 33 -> 60 -> 33 -> 30 -> 25 -> 30 -> 83 -> 25 -> 39 -> 19 -> 2 -> 13 -> 2 -> 19 -> 48 -> 25 -> 48 -> 10 -> 4 -> 44 -> 60 -> 61 -> 60 -> 59 -> 62 -> 54 -> 17 -> 9 -> 56 -> 9 -> 17 -> 56 -> 17 -> 22 -> 24 -> 61 -> 24 -> 82 -> 70 -> 82 -> 24 -> 22 -> 47 -> 56 -> 26 -> 47 -> 9 -> 22 -> 54 -> 9 -> 26 -> 29 -> 53 -> 29 -> 26 -> 29 -> 57 -> 92 -> 79 -> 57 -> 79 -> 57 -> 53 -> 95 -> 53 -> 80 -> 65 -> 51 -> 81 -> 65 -> 80 -> 64 -> 63 -> 80 -> 76 -> 63 -> 80 -> 53 -> 80 -> 64 -> 51 -> 65 -> 76 -> 65 -> 81 -> 76 -> 80 -> 16 -> 92 -> 74 -> 16 -> 89 -> 96 -> 89 -> 40 -> 89 -> 99 -> 96 -> 99 -> 43 -> 99 -> 27 -> 99 -> 40 -> 66 -> 43 -> 27 -> 87 -> 27 -> 94 -> 15 -> 50 -> 7 -> 15 -> 12 -> 50 -> 85 -> 15 -> 7 -> 12 -> 85 -> 87 -> 8 -> 34 -> 20 -> 8 -> 87 -> 85 -> 12 -> 21 -> 49 -> 91 -> 49 -> 68 -> 49 -> 21 -> 50 -> 91 -> 68 -> 14 -> 36 -> 55 -> 97 -> 69 -> 75 -> 78 -> 75 -> 55 -> 97 -> 69 -> 23 -> 78 -> 37 -> 11 -> 3 -> 11 -> 1 -> 49 -> 3 -> 14 -> 36 -> 34 -> 36 -> 11 -> 1 -> 3 -> 68 -> 37 -> 78 -> 23 -> 75 -> 38 -> 75 -> 55 -> 52 -> 20 -> 73 -> 88 -> 32 -> 90 -> 88 -> 32 -> 35 -> 46 -> 71 -> 0 -> 93 -> 0, Gesamtlaenge: 2621481.0
-Tag 2: 0 -> 4 -> 98 -> 45 -> 10 -> 98 -> 32 -> 81 -> 88 -> 90 -> 32 -> 46 -> 71 -> 0, Gesamtlaenge: 116670.0
-Tag 3: 0, Gesamtlaenge: 0
-Tag 4: 0 -> 44 -> 59 -> 62 -> 6 -> 26 -> 57 -> 79 -> 57 -> 92 -> 79 -> 92 -> 57 -> 26 -> 6 -> 62 -> 59 -> 24 -> 31 -> 70 -> 28 -> 70 -> 31 -> 24 -> 59 -> 44 -> 0, Gesamtlaenge: 345102.0
-Tag 5: 0 -> 58 -> 45 -> 41 -> 5 -> 77 -> 18 -> 23 -> 97 -> 23 -> 38 -> 97 -> 38 -> 69 -> 78 -> 55 -> 52 -> 73 -> 88 -> 35 -> 93 -> 0, Gesamtlaenge: 240431.0
+```text
+.....
+Tag 1: 0 -> 93 -> 98 -> 45 -> 10 -> 4 -> 93 -> 0 -> 93 -> 58 -> 0 -> 71 -> 46 -> 35 -> 98 -> 10 -> 4 -> 44 -> 59 -> 62 -> 6 -> 62 -> 54 -> 62 -> 59 -> 24 -> 61 -> 60 -> 33 -> 60 -> 59 -> 24 -> 82 -> 28 -> 30 -> 25 -> 30 -> 33 -> 30 -> 28 -> 83 -> 33 -> 83 -> 28 -> 31 -> 82 -> 70 -> 28 -> 82 -> 31 -> 24 -> 82 -> 70 -> 31 -> 24 -> 22 -> 17 -> 22 -> 47 -> 9 -> 56 -> 17 -> 54 -> 17 -> 9 -> 22 -> 54 -> 9 -> 26 -> 6 -> 26 -> 57 -> 53 -> 95 -> 53 -> 57 -> 92 -> 74 -> 16 -> 74 -> 92 -> 16 -> 92 -> 57 -> 79 -> 92 -> 79 -> 57 -> 29 -> 57 -> 26 -> 56 -> 47 -> 26 -> 29 -> 53 -> 80 -> 64 -> 80 -> 76 -> 65 -> 76 -> 81 -> 32 -> 88 -> 32 -> 90 -> 41 -> 90 -> 88 -> 90 -> 32 -> 35 -> 93 -> 45 -> 41 -> 42 -> 86 -> 42 -> 41 -> 67 -> 41 -> 45 -> 10 -> 48 -> 25 -> 83 -> 39 -> 83 -> 30 -> 39 -> 30 -> 83 -> 25 -> 39 -> 25 -> 48 -> 10 -> 48 -> 19 -> 84 -> 13 -> 2 -> 5 -> 2 -> 72 -> 86 -> 41 -> 5 -> 13 -> 77 -> 84 -> 13 -> 5 -> 86 -> 77 -> 18 -> 23 -> 69 -> 38 -> 23 -> 75 -> 55 -> 36 -> 11 -> 1 -> 11 -> 37 -> 11 -> 3 -> 1 -> 49 -> 1 -> 3 -> 11 -> 36 -> 55 -> 52 -> 73 -> 88 -> 81 -> 51 -> 64 -> 63 -> 80 -> 53 -> 80 -> 65 -> 51 -> 81 -> 76 -> 63 -> 80 -> 16 -> 89 -> 40 -> 66 -> 43 -> 99 -> 89 -> 99 -> 27 -> 94 -> 27 -> 99 -> 89 -> 96 -> 99 -> 89 -> 40 -> 99 -> 27 -> 43 -> 27 -> 87 -> 85 -> 87 -> 8 -> 34 -> 8 -> 87 -> 8 -> 20 -> 34 -> 36 -> 14 -> 68 -> 14 -> 3 -> 49 -> 91 -> 49 -> 3 -> 68 -> 49 -> 21 -> 12 -> 85 -> 12 -> 50 -> 12 -> 7 -> 12 -> 15 -> 94 -> 15 -> 85 -> 15 -> 12 -> 21 -> 50 -> 85 -> 50 -> 15 -> 7 -> 50 -> 91 -> 68 -> 37 -> 78 -> 55 -> 97 -> 55 -> 78 -> 75 -> 69 -> 97 -> 23 -> 75 -> 69 -> 38 -> 23 -> 78 -> 69 -> 78 -> 75 -> 38 -> 97 -> 23 -> 18 -> 77 -> 5 -> 67 -> 42 -> 67 -> 77 -> 5 -> 42 -> 45 -> 58 -> 98 -> 4 -> 0, Gesamtlaenge: 3034786.0
+Tag 2: 0 -> 4 -> 98 -> 32 -> 81 -> 65 -> 80 -> 16 -> 80 -> 65 -> 81 -> 32 -> 46 -> 71 -> 0, Gesamtlaenge: 161455.0
+Tag 3: 0 -> 93 -> 35 -> 88 -> 73 -> 20 -> 73 -> 52 -> 20 -> 52 -> 73 -> 88 -> 35 -> 93 -> 0, Gesamtlaenge: 148076.0
+Tag 4: 0 -> 44 -> 60 -> 39 -> 19 -> 2 -> 13 -> 2 -> 72 -> 13 -> 72 -> 2 -> 19 -> 39 -> 60 -> 44 -> 0, Gesamtlaenge: 183404.0
+Tag 5: 0 -> 4 -> 10 -> 48 -> 19 -> 84 -> 2 -> 19 -> 39 -> 60 -> 44 -> 0, Gesamtlaenge: 132950.0
+Maximale Lange einer Tagestour: 3034786.0
 ```
 
 ---
 
 `muellabfuhr7.txt`
 
-```
+```text
 500 1636
 0 317 164
 1 0 48298
@@ -354,13 +382,23 @@ Tag 5: 0 -> 58 -> 45 -> 41 -> 5 -> 77 -> 18 -> 23 -> 97 -> 23 -> 38 -> 97 -> 38 
 499 365 55
 ```
 
-Keine Ausgabe. (Iteration dauert zu lange)
+Ausgabe zu `muellabfuhr7.txt`
+
+```text
+.
+Tag 1: 0 -> 409 -> 169 -> 409 -> 317 -> 409 -> 484 -> 409 -> 0 -> 495 -> 72 -> 169 -> 317 -> 358 -> 317 -> 0 -> 12 -> 317 -> 5 -> 167 -> 354 -> 484 -> 352 -> 484 -> 354 -> 464 -> 354 -> 167 -> 352 -> 167 -> 484 -> 464 -> 484 -> 467 -> 409 -> 495 -> 401 -> 0 -> 317 -> 0 -> 409 -> 0 -> 127 -> 0 -> 12 -> 194 -> 169 -> 401 -> 72 -> 358 -> 194 -> 72 -> 249 -> 409 -> 467 -> 464 -> 66 -> 464 -> 409 -> 352 -> 66 -> 354 -> 66 -> 5 -> 52 -> 12 -> 52 -> 127 -> 12 -> 354 -> 12 -> 0 -> 30 -> 0 -> 1 -> 427 -> 1 -> 4 -> 215 -> 36 -> 260 -> 36 -> 215 -> 4 -> 1 -> 4 -> 17 -> 33 -> 71 -> 303 -> 71 -> 33 -> 34 -> 345 -> 34 -> 39 -> 430 -> 39 -> 253 -> 490 -> 44 -> 182 -> 44 -> 93 -> 291 -> 181 -> 444 -> 380 -> 345 -> 270 -> 430 -> 270 -> 345 -> 182 -> 345 -> 380 -> 444 -> 292 -> 444 -> 181 -> 291 -> 93 -> 44 -> 490 -> 253 -> 186 -> 422 -> 253 -> 186 -> 253 -> 39 -> 44 -> 39 -> 186 -> 490 -> 186 -> 93 -> 490 -> 93 -> 422 -> 93 -> 186 -> 39 -> 34 -> 430 -> 490 -> 270 -> 490 -> 473 -> 44 -> 473 -> 490 -> 39 -> 270 -> 39 -> 93 -> 253 -> 93 -> 39 -> 473 -> 230 -> 349 -> 483 -> 444 -> 426 -> 380 -> 133 -> 345 -> 44 -> 345 -> 133 -> 380 -> 426 -> 292 -> 426 -> 444 -> 483 -> 349 -> 222 -> 349 -> 444 -> 424 -> 221 -> 422 -> 221 -> 483 -> 222 -> 483 -> 221 -> 222 -> 221 -> 424 -> 444 -> 349 -> 424 -> 349 -> 292 -> 181 -> 426 -> 291 -> 424 -> 291 -> 426 -> 181 -> 292 -> 349 -> 181 -> 349 -> 182 -> 133 -> 181 -> 133 -> 182 -> 181 -> 182 -> 380 -> 181 -> 380 -> 182 -> 349 -> 230 -> 222 -> 230 -> 291 -> 222 -> 291 -> 114 -> 473 -> 221 -> 114 -> 291 -> 483 -> 114 -> 483 -> 291 -> 230 -> 473 -> 422 -> 253 -> 422 -> 473 -> 404 -> 473 -> 114 -> 230 -> 114 -> 93 -> 221 -> 114 -> 93 -> 270 -> 93 -> 404 -> 270 -> 404 -> 93 -> 473 -> 114 -> 473 -> 39 -> 404 -> 39 -> 345 -> 292 -> 182 -> 404 -> 182 -> 292 -> 345 -> 39 -> 490 -> 430 -> 34 -> 380 -> 34 -> 44 -> 34 -> 270 -> 44 -> 270 -> 34 -> 33 -> 49 -> 322 -> 49 -> 399 -> 231 -> 82 -> 325 -> 82 -> 231 -> 399 -> 223 -> 399 -> 82 -> 451 -> 121 -> 451 -> 303 -> 451 -> 82 -> 376 -> 71 -> 376 -> 446 -> 376 -> 139 -> 384 -> 268 -> 384 -> 357 -> 389 -> 357 -> 384 -> 139 -> 322 -> 325 -> 370 -> 325 -> 357 -> 370 -> 361 -> 451 -> 71 -> 446 -> 223 -> 303 -> 376 -> 33 -> 446 -> 33 -> 17 -> 33 -> 17 -> 4 -> 17 -> 4 -> 225 -> 50 -> 189 -> 50 -> 250 -> 50 -> 35 -> 407 -> 35 -> 280 -> 35 -> 189 -> 35 -> 316 -> 250 -> 316 -> 177 -> 50 -> 225 -> 1 -> 4 -> 1 -> 4 -> 7 -> 4 -> 7 -> 4 -> 1 -> 4 -> 1 -> 10 -> 1 -> 0 -> 1 -> 4 -> 7 -> 4 -> 7 -> 4 -> 1 -> 3 -> 183 -> 128 -> 183 -> 3 -> 1 -> 2 -> 1 -> 2 -> 1 -> 2 -> 1 -> 2 -> 1 -> 2 -> 1 -> 2 -> 1 -> 2 -> 1 -> 3 -> 1 -> 3 -> 1 -> 2 -> 1 -> 2 -> 1 -> 2 -> 1 -> 10 -> 1 -> 4 -> 17 -> 369 -> 143 -> 369 -> 17 -> 33 -> 17 -> 369 -> 119 -> 55 -> 298 -> 143 -> 369 -> 434 -> 119 -> 196 -> 55 -> 158 -> 398 -> 158 -> 160 -> 158 -> 307 -> 398 -> 137 -> 396 -> 137 -> 307 -> 160 -> 408 -> 437 -> 137 -> 158 -> 437 -> 26 -> 408 -> 26 -> 78 -> 160 -> 396 -> 398 -> 437 -> 78 -> 299 -> 17 -> 299 -> 26 -> 38 -> 17 -> 434 -> 143 -> 196 -> 385 -> 78 -> 299 -> 24 -> 26 -> 38 -> 434 -> 196 -> 295 -> 137 -> 295 -> 307 -> 160 -> 437 -> 408 -> 396 -> 437 -> 398 -> 408 -> 385 -> 55 -> 119 -> 143 -> 298 -> 408 -> 158 -> 295 -> 434 -> 17 -> 4 -> 17 -> 4 -> 7 -> 4 -> 225 -> 1 -> 4 -> 1 -> 3 -> 1 -> 0 -> 1 -> 4 -> 1 -> 4 -> 1 -> 260 -> 427 -> 260 -> 1 -> 4 -> 1 -> 10 -> 1 -> 3 -> 6 -> 406 -> 37 -> 285 -> 37 -> 406 -> 285 -> 406 -> 6 -> 131 -> 81 -> 131 -> 6 -> 187 -> 6 -> 3 -> 6 -> 11 -> 488 -> 11 -> 457 -> 76 -> 455 -> 101 -> 455 -> 76 -> 457 -> 208 -> 457 -> 11 -> 6 -> 3 -> 6 -> 3 -> 6 -> 159 -> 285 -> 159 -> 338 -> 463 -> 338 -> 37 -> 81 -> 406 -> 81 -> 37 -> 338 -> 8 -> 341 -> 8 -> 338 -> 115 -> 84 -> 111 -> 84 -> 115 -> 8 -> 53 -> 443 -> 53 -> 233 -> 153 -> 443 -> 265 -> 443 -> 168 -> 443 -> 153 -> 233 -> 415 -> 233 -> 265 -> 415 -> 265 -> 233 -> 166 -> 233 -> 53 -> 263 -> 153 -> 265 -> 153 -> 168 -> 233 -> 168 -> 494 -> 166 -> 494 -> 168 -> 166 -> 168 -> 486 -> 168 -> 265 -> 168 -> 106 -> 494 -> 106 -> 296 -> 314 -> 266 -> 314 -> 117 -> 150 -> 266 -> 150 -> 314 -> 212 -> 117 -> 212 -> 314 -> 296 -> 106 -> 117 -> 296 -> 117 -> 106 -> 212 -> 106 -> 486 -> 432 -> 486 -> 381 -> 393 -> 381 -> 486 -> 106 -> 168 -> 414 -> 168 -> 381 -> 414 -> 486 -> 212 -> 296 -> 212 -> 486 -> 414 -> 150 -> 414 -> 393 -> 150 -> 70 -> 150 -> 314 -> 70 -> 314 -> 150 -> 393 -> 414 -> 381 -> 168 -> 153 -> 415 -> 153 -> 166 -> 393 -> 266 -> 296 -> 266 -> 381 -> 443 -> 415 -> 443 -> 381 -> 266 -> 393 -> 166 -> 443 -> 166 -> 153 -> 486 -> 443 -> 486 -> 153 -> 263 -> 161 -> 263 -> 432 -> 161 -> 432 -> 56 -> 494 -> 56 -> 432 -> 494 -> 212 -> 494 -> 70 -> 296 -> 161 -> 56 -> 161 -> 296 -> 70 -> 212 -> 70 -> 494 -> 381 -> 106 -> 70 -> 117 -> 70 -> 106 -> 381 -> 494 -> 314 -> 494 -> 117 -> 314 -> 117 -> 494 -> 432 -> 263 -> 53 -> 153 -> 53 -> 56 -> 153 -> 56 -> 53 -> 8 -> 463 -> 341 -> 418 -> 388 -> 418 -> 341 -> 274 -> 341 -> 176 -> 37 -> 176 -> 75 -> 37 -> 159 -> 406 -> 412 -> 81 -> 6 -> 251 -> 187 -> 251 -> 448 -> 162 -> 111 -> 162 -> 487 -> 84 -> 487 -> 162 -> 239 -> 271 -> 239 -> 162 -> 448 -> 257 -> 111 -> 171 -> 111 -> 487 -> 171 -> 487 -> 111 -> 388 -> 274 -> 388 -> 84 -> 171 -> 162 -> 271 -> 487 -> 257 -> 239 -> 487 -> 257 -> 187 -> 203 -> 171 -> 257 -> 162 -> 84 -> 463 -> 115 -> 341 -> 388 -> 48 -> 8 -> 48 -> 341 -> 176 -> 75 -> 8 -> 418 -> 48 -> 418 -> 338 -> 418 -> 8 -> 274 -> 333 -> 341 -> 333 -> 8 -> 333 -> 159 -> 6 -> 11 -> 13 -> 125 -> 365 -> 123 -> 99 -> 123 -> 365 -> 125 -> 85 -> 125 -> 129 -> 499 -> 15 -> 499 -> 85 -> 148 -> 85 -> 499 -> 129 -> 15 -> 85 -> 364 -> 85 -> 123 -> 85 -> 15 -> 129 -> 125 -> 13 -> 11 -> 13 -> 11 -> 13 -> 45 -> 179 -> 238 -> 306 -> 238 -> 179 -> 45 -> 179 -> 367 -> 300 -> 355 -> 479 -> 355 -> 45 -> 13 -> 264 -> 259 -> 264 -> 286 -> 264 -> 461 -> 145 -> 461 -> 178 -> 461 -> 264 -> 145 -> 178 -> 145 -> 264 -> 13 -> 226 -> 190 -> 286 -> 190 -> 226 -> 496 -> 275 -> 496 -> 226 -> 286 -> 199 -> 259 -> 461 -> 199 -> 286 -> 226 -> 13 -> 264 -> 281 -> 496 -> 281 -> 146 -> 281 -> 275 -> 453 -> 190 -> 453 -> 281 -> 286 -> 496 -> 286 -> 461 -> 453 -> 226 -> 264 -> 199 -> 178 -> 492 -> 417 -> 148 -> 417 -> 152 -> 145 -> 320 -> 178 -> 152 -> 320 -> 199 -> 461 -> 275 -> 190 -> 496 -> 190 -> 102 -> 462 -> 99 -> 462 -> 129 -> 462 -> 15 -> 148 -> 365 -> 499 -> 365 -> 148 -> 15 -> 365 -> 15 -> 462 -> 123 -> 129 -> 123 -> 472 -> 123 -> 364 -> 339 -> 364 -> 123 -> 462 -> 365 -> 102 -> 99 -> 472 -> 85 -> 417 -> 472 -> 152 -> 201 -> 339 -> 492 -> 259 -> 199 -> 320 -> 461 -> 146 -> 453 -> 275 -> 226 -> 281 -> 190 -> 146 -> 286 -> 320 -> 492 -> 152 -> 339 -> 472 -> 364 -> 129 -> 417 -> 364 -> 201 -> 148 -> 123 -> 148 -> 499 -> 462 -> 13 -> 99 -> 13 -> 45 -> 13 -> 45 -> 13 -> 45 -> 13 -> 45 -> 300 -> 155 -> 157 -> 248 -> 478 -> 362 -> 241 -> 479 -> 88 -> 300 -> 351 -> 236 -> 229 -> 98 -> 306 -> 98 -> 185 -> 229 -> 238 -> 236 -> 306 -> 179 -> 367 -> 351 -> 229 -> 179 -> 236 -> 428 -> 185 -> 478 -> 241 -> 157 -> 428 -> 362 -> 241 -> 351 -> 362 -> 248 -> 155 -> 479 -> 351 -> 238 -> 98 -> 236 -> 300 -> 155 -> 355 -> 45 -> 238 -> 45 -> 77 -> 241 -> 77 -> 88 -> 241 -> 248 -> 428 -> 351 -> 478 -> 428 -> 241 -> 77 -> 45 -> 179 -> 98 -> 185 -> 306 -> 351 -> 98 -> 367 -> 478 -> 241 -> 300 -> 45 -> 77 -> 45 -> 13 -> 11 -> 13 -> 11 -> 13 -> 11 -> 13 -> 11 -> 13 -> 11 -> 91 -> 11 -> 91 -> 208 -> 400 -> 59 -> 400 -> 83 -> 278 -> 83 -> 400 -> 328 -> 51 -> 328 -> 216 -> 288 -> 110 -> 288 -> 156 -> 475 -> 92 -> 475 -> 156 -> 262 -> 156 -> 288 -> 69 -> 476 -> 69 -> 288 -> 216 -> 23 -> 216 -> 69 -> 267 -> 69 -> 425 -> 69 -> 32 -> 288 -> 23 -> 288 -> 32 -> 425 -> 32 -> 69 -> 216 -> 328 -> 208 -> 373 -> 60 -> 101 -> 60 -> 373 -> 101 -> 11 -> 60 -> 488 -> 60 -> 92 -> 262 -> 475 -> 262 -> 76 -> 262 -> 92 -> 76 -> 475 -> 457 -> 488 -> 455 -> 11 -> 455 -> 208 -> 76 -> 110 -> 51 -> 110 -> 92 -> 457 -> 60 -> 156 -> 61 -> 156 -> 425 -> 476 -> 216 -> 32 -> 61 -> 32 -> 216 -> 476 -> 425 -> 51 -> 288 -> 83 -> 288 -> 51 -> 425 -> 216 -> 425 -> 267 -> 51 -> 216 -> 51 -> 267 -> 23 -> 267 -> 61 -> 23 -> 61 -> 267 -> 425 -> 156 -> 60 -> 76 -> 373 -> 488 -> 475 -> 60 -> 156 -> 60 -> 156 -> 83 -> 328 -> 278 -> 59 -> 208 -> 31 -> 59 -> 91 -> 59 -> 91 -> 31 -> 76 -> 11 -> 13 -> 11 -> 6 -> 3 -> 6 -> 159 -> 333 -> 75 -> 285 -> 131 -> 285 -> 470 -> 131 -> 406 -> 187 -> 412 -> 37 -> 159 -> 333 -> 159 -> 333 -> 159 -> 333 -> 159 -> 6 -> 18 -> 276 -> 180 -> 276 -> 18 -> 441 -> 18 -> 6 -> 412 -> 251 -> 271 -> 171 -> 271 -> 187 -> 271 -> 203 -> 257 -> 187 -> 448 -> 6 -> 448 -> 203 -> 448 -> 6 -> 3 -> 1 -> 3 -> 6 -> 11 -> 6 -> 11 -> 6 -> 159 -> 6 -> 3 -> 6 -> 3 -> 1 -> 0 -> 495 -> 169 -> 358 -> 495 -> 249 -> 194 -> 401 -> 358 -> 249 -> 194 -> 0 -> 30 -> 247 -> 30 -> 209 -> 30 -> 0 -> 1 -> 0 -> 1 -> 0 -> 1 -> 0 -> 1 -> 0 -> 1 -> 0 -> 30 -> 0 -> 1 -> 3 -> 1 -> 2 -> 19 -> 2 -> 19 -> 2 -> 19 -> 2 -> 19 -> 27 -> 19 -> 27 -> 19 -> 27 -> 19 -> 2 -> 218 -> 243 -> 386 -> 86 -> 14 -> 324 -> 174 -> 126 -> 217 -> 126 -> 211 -> 217 -> 421 -> 211 -> 68 -> 217 -> 2 -> 421 -> 243 -> 68 -> 126 -> 386 -> 324 -> 64 -> 261 -> 330 -> 324 -> 330 -> 64 -> 334 -> 324 -> 372 -> 2 -> 1 -> 250 -> 1 -> 3 -> 47 -> 466 -> 128 -> 466 -> 255 -> 258 -> 16 -> 459 -> 20 -> 255 -> 116 -> 371 -> 356 -> 3 -> 255 -> 3 -> 255 -> 3 -> 128 -> 116 -> 356 -> 450 -> 368 -> 47 -> 466 -> 312 -> 258 -> 20 -> 258 -> 183 -> 371 -> 214 -> 183 -> 255 -> 183 -> 450 -> 47 -> 3 -> 128 -> 173 -> 450 -> 128 -> 173 -> 255 -> 450 -> 116 -> 214 -> 356 -> 173 -> 214 -> 459 -> 312 -> 16 -> 305 -> 459 -> 197 -> 255 -> 312 -> 46 -> 20 -> 336 -> 368 -> 47 -> 255 -> 312 -> 197 -> 466 -> 197 -> 258 -> 459 -> 46 -> 305 -> 197 -> 258 -> 336 -> 47 -> 3 -> 6 -> 3 -> 6 -> 11 -> 13 -> 11 -> 13 -> 226 -> 99 -> 129 -> 13 -> 264 -> 146 -> 226 -> 129 -> 13 -> 102 -> 226 -> 462 -> 125 -> 499 -> 102 -> 123 -> 15 -> 123 -> 13 -> 11 -> 6 -> 3 -> 6 -> 3 -> 6 -> 3 -> 6 -> 11 -> 13 -> 11 -> 6 -> 18 -> 337 -> 206 -> 276 -> 206 -> 337 -> 73 -> 337 -> 180 -> 337 -> 439 -> 387 -> 439 -> 206 -> 442 -> 206 -> 452 -> 206 -> 180 -> 192 -> 107 -> 480 -> 392 -> 202 -> 332 -> 202 -> 392 -> 440 -> 392 -> 454 -> 332 -> 454 -> 109 -> 454 -> 202 -> 454 -> 392 -> 480 -> 107 -> 192 -> 180 -> 206 -> 439 -> 73 -> 180 -> 442 -> 452 -> 442 -> 180 -> 452 -> 180 -> 73 -> 442 -> 192 -> 469 -> 107 -> 180 -> 469 -> 192 -> 480 -> 192 -> 452 -> 192 -> 442 -> 73 -> 458 -> 439 -> 73 -> 391 -> 276 -> 337 -> 391 -> 276 -> 391 -> 18 -> 442 -> 441 -> 109 -> 441 -> 442 -> 469 -> 180 -> 469 -> 452 -> 107 -> 440 -> 107 -> 332 -> 107 -> 74 -> 392 -> 273 -> 392 -> 74 -> 107 -> 442 -> 454 -> 469 -> 440 -> 180 -> 480 -> 302 -> 480 -> 454 -> 273 -> 202 -> 273 -> 332 -> 392 -> 302 -> 454 -> 107 -> 273 -> 480 -> 332 -> 302 -> 202 -> 107 -> 469 -> 442 -> 439 -> 391 -> 441 -> 458 -> 391 -> 109 -> 458 -> 439 -> 441 -> 387 -> 276 -> 387 -> 18 -> 439 -> 18 -> 73 -> 387 -> 18 -> 6 -> 3 -> 1 -> 3 -> 6 -> 11 -> 6 -> 3 -> 1 -> 25 -> 327 -> 283 -> 327 -> 245 -> 327 -> 219 -> 342 -> 67 -> 219 -> 25 -> 419 -> 200 -> 245 -> 25 -> 219 -> 293 -> 219 -> 419 -> 245 -> 89 -> 342 -> 327 -> 25 -> 327 -> 435 -> 141 -> 350 -> 132 -> 57 -> 350 -> 142 -> 154 -> 435 -> 154 -> 164 -> 340 -> 311 -> 313 -> 29 -> 405 -> 311 -> 132 -> 397 -> 132 -> 57 -> 164 -> 397 -> 142 -> 164 -> 350 -> 405 -> 132 -> 313 -> 67 -> 327 -> 419 -> 28 -> 200 -> 283 -> 245 -> 25 -> 200 -> 313 -> 25 -> 313 -> 25 -> 89 -> 200 -> 327 -> 89 -> 28 -> 342 -> 25 -> 1 -> 4 -> 17 -> 4 -> 17 -> 4 -> 1 -> 4 -> 36 -> 4 -> 1 -> 4 -> 1 -> 4 -> 260 -> 151 -> 375 -> 151 -> 260 -> 375 -> 477 -> 63 -> 477 -> 280 -> 407 -> 280 -> 348 -> 63 -> 348 -> 280 -> 477 -> 193 -> 134 -> 375 -> 348 -> 151 -> 193 -> 63 -> 189 -> 134 -> 35 -> 374 -> 348 -> 477 -> 151 -> 63 -> 151 -> 170 -> 36 -> 304 -> 1 -> 250 -> 304 -> 215 -> 260 -> 170 -> 304 -> 225 -> 316 -> 407 -> 189 -> 280 -> 374 -> 134 -> 35 -> 250 -> 1 -> 3 -> 1 -> 4 -> 427 -> 304 -> 1 -> 260 -> 225 -> 427 -> 215 -> 1 -> 3 -> 6 -> 3 -> 6 -> 3 -> 1 -> 4 -> 17 -> 33 -> 17 -> 33 -> 17 -> 4 -> 17 -> 33 -> 17 -> 33 -> 17 -> 33 -> 49 -> 303 -> 33 -> 303 -> 121 -> 33 -> 370 -> 33 -> 446 -> 303 -> 361 -> 370 -> 121 -> 376 -> 370 -> 33 -> 17 -> 38 -> 369 -> 299 -> 385 -> 307 -> 295 -> 385 -> 24 -> 369 -> 17 -> 4 -> 7 -> 108 -> 235 -> 108 -> 7 -> 9 -> 94 -> 246 -> 94 -> 95 -> 482 -> 95 -> 191 -> 95 -> 94 -> 9 -> 205 -> 319 -> 21 -> 287 -> 21 -> 319 -> 205 -> 9 -> 287 -> 382 -> 287 -> 22 -> 287 -> 456 -> 144 -> 22 -> 456 -> 21 -> 456 -> 287 -> 9 -> 21 -> 9 -> 95 -> 246 -> 310 -> 130 -> 232 -> 175 -> 228 -> 40 -> 21 -> 22 -> 319 -> 22 -> 21 -> 382 -> 21 -> 40 -> 228 -> 175 -> 232 -> 130 -> 382 -> 416 -> 287 -> 416 -> 382 -> 130 -> 40 -> 130 -> 228 -> 382 -> 344 -> 40 -> 344 -> 382 -> 228 -> 130 -> 416 -> 130 -> 411 -> 416 -> 411 -> 130 -> 310 -> 191 -> 310 -> 482 -> 120 -> 482 -> 310 -> 344 -> 310 -> 232 -> 344 -> 411 -> 344 -> 416 -> 40 -> 411 -> 40 -> 416 -> 344 -> 232 -> 310 -> 94 -> 310 -> 175 -> 94 -> 144 -> 319 -> 144 -> 94 -> 175 -> 310 -> 246 -> 120 -> 246 -> 95 -> 329 -> 135 -> 482 -> 246 -> 191 -> 246 -> 175 -> 191 -> 175 -> 246 -> 482 -> 135 -> 329 -> 95 -> 144 -> 456 -> 144 -> 95 -> 9 -> 144 -> 9 -> 329 -> 144 -> 329 -> 94 -> 329 -> 319 -> 287 -> 411 -> 228 -> 232 -> 120 -> 191 -> 94 -> 191 -> 120 -> 232 -> 228 -> 411 -> 287 -> 319 -> 329 -> 22 -> 329 -> 456 -> 22 -> 456 -> 329 -> 9 -> 135 -> 9 -> 22 -> 9 -> 482 -> 94 -> 205 -> 22 -> 205 -> 329 -> 205 -> 21 -> 329 -> 21 -> 205 -> 94 -> 482 -> 9 -> 7 -> 9 -> 7 -> 9 -> 7 -> 294 -> 7 -> 108 -> 471 -> 235 -> 242 -> 42 -> 235 -> 7 -> 294 -> 471 -> 242 -> 210 -> 294 -> 234 -> 97 -> 309 -> 97 -> 147 -> 363 -> 147 -> 97 -> 498 -> 309 -> 323 -> 363 -> 289 -> 498 -> 301 -> 284 -> 188 -> 294 -> 234 -> 323 -> 97 -> 363 -> 309 -> 378 -> 234 -> 210 -> 42 -> 474 -> 289 -> 315 -> 284 -> 474 -> 188 -> 213 -> 301 -> 315 -> 213 -> 284 -> 188 -> 42 -> 294 -> 234 -> 378 -> 147 -> 498 -> 353 -> 147 -> 289 -> 315 -> 284 -> 289 -> 498 -> 315 -> 353 -> 301 -> 289 -> 474 -> 7 -> 188 -> 7 -> 108 -> 289 -> 353 -> 284 -> 353 -> 213 -> 474 -> 108 -> 289 -> 147 -> 309 -> 289 -> 108 -> 294 -> 474 -> 235 -> 294 -> 242 -> 42 -> 108 -> 242 -> 7 -> 108 -> 7 -> 4 -> 17 -> 33 -> 82 -> 326 -> 322 -> 268 -> 139 -> 357 -> 82 -> 399 -> 384 -> 231 -> 139 -> 325 -> 231 -> 384 -> 326 -> 325 -> 376 -> 268 -> 82 -> 384 -> 322 -> 231 -> 139 -> 389 -> 370 -> 33 -> 82 -> 322 -> 399 -> 268 -> 357 -> 376 -> 451 -> 33 -> 17 -> 33 -> 17 -> 4 -> 1 -> 3 -> 6 -> 3 -> 1 -> 3 -> 1 -> 25 -> 313 -> 25 -> 200 -> 327 -> 89 -> 200 -> 366 -> 435 -> 283 -> 141 -> 142 -> 340 -> 154 -> 141 -> 435 -> 245 -> 25 -> 313 -> 311 -> 397 -> 350 -> 132 -> 142 -> 57 -> 340 -> 350 -> 154 -> 57 -> 397 -> 405 -> 313 -> 132 -> 313 -> 342 -> 419 -> 25 -> 1 -> 2 -> 19 -> 481 -> 379 -> 481 -> 272 -> 481 -> 491 -> 481 -> 19 -> 383 -> 272 -> 124 -> 105 -> 252 -> 122 -> 252 -> 485 -> 252 -> 379 -> 252 -> 105 -> 124 -> 485 -> 379 -> 485 -> 124 -> 272 -> 413 -> 383 -> 122 -> 485 -> 122 -> 124 -> 252 -> 481 -> 19 -> 485 -> 491 -> 379 -> 124 -> 220 -> 252 -> 272 -> 19 -> 485 -> 272 -> 19 -> 220 -> 272 -> 413 -> 105 -> 491 -> 383 -> 481 -> 220 -> 19 -> 2 -> 19 -> 2 -> 372 -> 2 -> 1 -> 2 -> 1 -> 25 -> 1 -> 4 -> 7 -> 4 -> 225 -> 316 -> 177 -> 189 -> 477 -> 134 -> 348 -> 193 -> 374 -> 63 -> 375 -> 170 -> 304 -> 1 -> 4 -> 7 -> 4 -> 17 -> 38 -> 24 -> 434 -> 119 -> 369 -> 385 -> 26 -> 38 -> 17 -> 4 -> 17 -> 4 -> 1 -> 2 -> 1 -> 3 -> 1 -> 0 -> 1 -> 25 -> 1 -> 3 -> 1 -> 2 -> 19 -> 124 -> 19 -> 27 -> 240 -> 204 -> 43 -> 204 -> 240 -> 118 -> 198 -> 118 -> 207 -> 79 -> 90 -> 497 -> 90 -> 335 -> 465 -> 346 -> 465 -> 433 -> 465 -> 335 -> 346 -> 438 -> 104 -> 438 -> 346 -> 460 -> 438 -> 87 -> 460 -> 87 -> 460 -> 346 -> 335 -> 165 -> 346 -> 165 -> 335 -> 279 -> 237 -> 359 -> 279 -> 27 -> 204 -> 27 -> 204 -> 79 -> 237 -> 279 -> 359 -> 497 -> 359 -> 90 -> 27 -> 19 -> 2 -> 19 -> 2 -> 218 -> 68 -> 256 -> 217 -> 256 -> 14 -> 256 -> 386 -> 297 -> 261 -> 334 -> 386 -> 96 -> 297 -> 64 -> 297 -> 174 -> 243 -> 256 -> 218 -> 386 -> 126 -> 386 -> 372 -> 2 -> 19 -> 27 -> 240 -> 113 -> 43 -> 118 -> 113 -> 207 -> 240 -> 79 -> 207 -> 43 -> 113 -> 240 -> 207 -> 237 -> 497 -> 279 -> 27 -> 279 -> 79 -> 90 -> 433 -> 87 -> 433 -> 346 -> 359 -> 433 -> 165 -> 87 -> 65 -> 149 -> 65 -> 438 -> 65 -> 104 -> 318 -> 104 -> 65 -> 184 -> 65 -> 87 -> 465 -> 460 -> 149 -> 445 -> 149 -> 460 -> 318 -> 438 -> 460 -> 318 -> 149 -> 318 -> 65 -> 318 -> 198 -> 318 -> 184 -> 149 -> 104 -> 149 -> 198 -> 184 -> 207 -> 198 -> 165 -> 433 -> 198 -> 87 -> 445 -> 104 -> 445 -> 184 -> 118 -> 113 -> 207 -> 204 -> 118 -> 79 -> 237 -> 90 -> 335 -> 279 -> 90 -> 27 -> 90 -> 27 -> 19 -> 2 -> 126 -> 421 -> 372 -> 126 -> 2 -> 126 -> 174 -> 372 -> 2 -> 1 -> 25 -> 327 -> 28 -> 283 -> 366 -> 200 -> 25 -> 1 -> 0 -> 30 -> 209 -> 402 -> 436 -> 420 -> 436 -> 30 -> 436 -> 431 -> 80 -> 431 -> 402 -> 30 -> 402 -> 80 -> 172 -> 436 -> 172 -> 431 -> 247 -> 136 -> 489 -> 394 -> 209 -> 30 -> 244 -> 420 -> 244 -> 308 -> 395 -> 172 -> 395 -> 420 -> 410 -> 420 -> 395 -> 321 -> 54 -> 395 -> 244 -> 140 -> 224 -> 140 -> 308 -> 103 -> 41 -> 54 -> 395 -> 224 -> 420 -> 140 -> 395 -> 41 -> 308 -> 54 -> 321 -> 103 -> 224 -> 395 -> 140 -> 103 -> 172 -> 136 -> 209 -> 247 -> 403 -> 30 -> 0 -> 1 -> 10 -> 449 -> 331 -> 449 -> 282 -> 254 -> 277 -> 10 -> 138 -> 423 -> 254 -> 449 -> 195 -> 58 -> 343 -> 58 -> 195 -> 331 -> 447 -> 331 -> 227 -> 331 -> 112 -> 447 -> 343 -> 112 -> 449 -> 277 -> 282 -> 254 -> 468 -> 449 -> 468 -> 10 -> 282 -> 423 -> 62 -> 449 -> 62 -> 290 -> 138 -> 423 -> 468 -> 138 -> 282 -> 138 -> 290 -> 449 -> 10 -> 447 -> 269 -> 195 -> 343 -> 447 -> 10 -> 360 -> 112 -> 449 -> 277 -> 423 -> 254 -> 290 -> 468 -> 390 -> 343 -> 195 -> 447 -> 112 -> 269 -> 449 -> 58 -> 447 -> 227 -> 360 -> 62 -> 290 -> 100 -> 449 -> 377 -> 62 -> 360 -> 112 -> 227 -> 269 -> 343 -> 331 -> 269 -> 58 -> 331 -> 343 -> 390 -> 468 -> 290 -> 277 -> 254 -> 290 -> 360 -> 269 -> 195 -> 10 -> 62 -> 227 -> 377 -> 360 -> 100 -> 377 -> 10 -> 1 -> 3 -> 1 -> 3 -> 1 -> 3 -> 356 -> 255 -> 371 -> 255 -> 3 -> 1 -> 3 -> 1 -> 3 -> 1 -> 3 -> 1 -> 3 -> 1 -> 4 -> 1 -> 3 -> 1 -> 2 -> 126 -> 68 -> 421 -> 386 -> 64 -> 86 -> 386 -> 96 -> 324 -> 372 -> 297 -> 372 -> 243 -> 211 -> 256 -> 211 -> 2 -> 211 -> 2 -> 372 -> 297 -> 86 -> 261 -> 324 -> 372 -> 324 -> 334 -> 330 -> 297 -> 96 -> 330 -> 86 -> 96 -> 429 -> 96 -> 261 -> 386 -> 218 -> 2 -> 1 -> 25 -> 1 -> 0 -> 30 -> 0 -> 194 -> 409 -> 72 -> 467 -> 66 -> 167 -> 464 -> 163 -> 127 -> 354 -> 163 -> 5 -> 127 -> 163 -> 52 -> 167 -> 52 -> 317 -> 0 -> 1 -> 3 -> 1 -> 0 -> 1 -> 10 -> 1 -> 25 -> 1 -> 0 -> 30 -> 0 -> 30 -> 244 -> 80 -> 436 -> 80 -> 136 -> 394 -> 431 -> 209 -> 172 -> 347 -> 420 -> 308 -> 244 -> 30 -> 244 -> 410 -> 347 -> 172 -> 321 -> 493 -> 209 -> 80 -> 410 -> 436 -> 402 -> 403 -> 136 -> 209 -> 172 -> 136 -> 247 -> 431 -> 403 -> 489 -> 493 -> 54 -> 103 -> 140 -> 308 -> 244 -> 41 -> 395 -> 321 -> 172 -> 431 -> 209 -> 402 -> 403 -> 30 -> 0, Gesamtlaenge: 15605105.0
+Tag 2: 0, Gesamtlaenge: 0
+Tag 3: 0, Gesamtlaenge: 0
+Tag 4: 0 -> 409 -> 66 -> 484 -> 409 -> 0, Gesamtlaenge: 858.0
+Tag 5: 0, Gesamtlaenge: 0
+Maximale Lange einer Tagestour: 15605105.0
+```
 
 ---
 
 `muellabfuhr8.txt`
 
-```
+```text
 1000 3453
 0 294 3093
 0 303 3855
@@ -374,17 +412,27 @@ Keine Ausgabe. (Iteration dauert zu lange)
 999 247 3574
 ```
 
-Keine Ausgabe. (Iteration dauert zu lange)
+Ausgabe zu `muellabfuhr8.txt`
+
+```text
+
+Tag 1: 0 -> 420 -> 952 -> 420 -> 788 -> 281 -> 788 -> 420 -> 310 -> 200 -> 420 -> 1 -> 460 -> 37 -> 889 -> 460 -> 442 -> 745 -> 442 -> 959 -> 451 -> 959 -> 442 -> 889 -> 1 -> 122 -> 708 -> 776 -> 708 -> 122 -> 776 -> 122 -> 889 -> 776 -> 220 -> 122 -> 442 -> 238 -> 37 -> 122 -> 460 -> 238 -> 776 -> 37 -> 708 -> 238 -> 889 -> 959 -> 449 -> 451 -> 582 -> 440 -> 582 -> 451 -> 976 -> 974 -> 853 -> 694 -> 976 -> 79 -> 570 -> 832 -> 563 -> 772 -> 745 -> 457 -> 440 -> 457 -> 745 -> 563 -> 710 -> 491 -> 744 -> 814 -> 518 -> 794 -> 518 -> 572 -> 445 -> 572 -> 518 -> 609 -> 518 -> 767 -> 572 -> 767 -> 518 -> 250 -> 518 -> 814 -> 112 -> 9 -> 112 -> 794 -> 112 -> 572 -> 3 -> 389 -> 3 -> 572 -> 389 -> 572 -> 112 -> 814 -> 3 -> 445 -> 746 -> 818 -> 746 -> 680 -> 746 -> 833 -> 895 -> 833 -> 861 -> 833 -> 680 -> 833 -> 746 -> 445 -> 3 -> 483 -> 573 -> 483 -> 361 -> 374 -> 571 -> 374 -> 361 -> 483 -> 9 -> 483 -> 3 -> 112 -> 609 -> 621 -> 609 -> 814 -> 445 -> 518 -> 621 -> 883 -> 621 -> 518 -> 445 -> 680 -> 895 -> 861 -> 895 -> 746 -> 765 -> 224 -> 448 -> 861 -> 746 -> 985 -> 54 -> 985 -> 432 -> 26 -> 432 -> 54 -> 432 -> 902 -> 818 -> 902 -> 432 -> 985 -> 26 -> 913 -> 26 -> 448 -> 765 -> 680 -> 861 -> 224 -> 454 -> 438 -> 66 -> 131 -> 66 -> 913 -> 66 -> 905 -> 372 -> 187 -> 147 -> 373 -> 328 -> 544 -> 521 -> 436 -> 988 -> 436 -> 521 -> 544 -> 639 -> 382 -> 639 -> 544 -> 327 -> 207 -> 748 -> 207 -> 327 -> 433 -> 327 -> 82 -> 494 -> 23 -> 494 -> 947 -> 494 -> 771 -> 494 -> 82 -> 640 -> 748 -> 640 -> 82 -> 444 -> 82 -> 947 -> 23 -> 947 -> 748 -> 97 -> 94 -> 97 -> 748 -> 968 -> 97 -> 968 -> 748 -> 82 -> 23 -> 505 -> 23 -> 486 -> 23 -> 82 -> 748 -> 82 -> 97 -> 82 -> 929 -> 494 -> 929 -> 23 -> 771 -> 23 -> 929 -> 771 -> 364 -> 837 -> 455 -> 381 -> 458 -> 948 -> 458 -> 381 -> 455 -> 837 -> 364 -> 486 -> 364 -> 771 -> 947 -> 771 -> 879 -> 929 -> 947 -> 94 -> 444 -> 640 -> 444 -> 94 -> 169 -> 640 -> 169 -> 748 -> 444 -> 748 -> 169 -> 968 -> 94 -> 494 -> 364 -> 494 -> 486 -> 94 -> 640 -> 968 -> 486 -> 207 -> 444 -> 968 -> 82 -> 486 -> 947 -> 82 -> 879 -> 947 -> 640 -> 97 -> 444 -> 169 -> 97 -> 455 -> 473 -> 223 -> 319 -> 837 -> 212 -> 455 -> 193 -> 665 -> 237 -> 193 -> 223 -> 84 -> 204 -> 223 -> 665 -> 681 -> 801 -> 46 -> 948 -> 46 -> 798 -> 46 -> 801 -> 681 -> 381 -> 681 -> 337 -> 381 -> 337 -> 681 -> 458 -> 49 -> 948 -> 49 -> 46 -> 49 -> 458 -> 652 -> 948 -> 801 -> 948 -> 652 -> 458 -> 681 -> 282 -> 143 -> 422 -> 204 -> 74 -> 237 -> 337 -> 665 -> 282 -> 381 -> 801 -> 798 -> 950 -> 798 -> 49 -> 798 -> 801 -> 652 -> 965 -> 871 -> 532 -> 871 -> 48 -> 769 -> 48 -> 871 -> 232 -> 867 -> 769 -> 867 -> 456 -> 532 -> 456 -> 867 -> 789 -> 287 -> 984 -> 941 -> 970 -> 936 -> 970 -> 86 -> 512 -> 86 -> 940 -> 564 -> 940 -> 86 -> 936 -> 86 -> 970 -> 126 -> 291 -> 847 -> 252 -> 822 -> 330 -> 822 -> 252 -> 956 -> 955 -> 172 -> 627 -> 102 -> 435 -> 102 -> 735 -> 102 -> 627 -> 172 -> 366 -> 172 -> 955 -> 956 -> 252 -> 468 -> 291 -> 506 -> 695 -> 95 -> 706 -> 151 -> 890 -> 434 -> 577 -> 383 -> 799 -> 997 -> 383 -> 890 -> 782 -> 245 -> 897 -> 271 -> 95 -> 773 -> 648 -> 831 -> 195 -> 887 -> 542 -> 383 -> 151 -> 997 -> 245 -> 542 -> 286 -> 932 -> 887 -> 773 -> 997 -> 979 -> 293 -> 529 -> 177 -> 931 -> 177 -> 459 -> 901 -> 459 -> 2 -> 459 -> 177 -> 901 -> 931 -> 901 -> 606 -> 715 -> 910 -> 715 -> 705 -> 715 -> 606 -> 901 -> 177 -> 529 -> 901 -> 402 -> 901 -> 529 -> 865 -> 982 -> 529 -> 99 -> 901 -> 478 -> 925 -> 288 -> 631 -> 288 -> 297 -> 863 -> 347 -> 594 -> 347 -> 863 -> 594 -> 863 -> 297 -> 266 -> 297 -> 475 -> 347 -> 475 -> 350 -> 475 -> 297 -> 288 -> 925 -> 631 -> 737 -> 411 -> 737 -> 631 -> 791 -> 631 -> 450 -> 335 -> 450 -> 561 -> 450 -> 631 -> 885 -> 631 -> 376 -> 791 -> 376 -> 977 -> 390 -> 977 -> 406 -> 977 -> 477 -> 977 -> 376 -> 631 -> 705 -> 793 -> 690 -> 961 -> 690 -> 793 -> 705 -> 631 -> 925 -> 876 -> 705 -> 876 -> 606 -> 177 -> 606 -> 876 -> 715 -> 459 -> 715 -> 791 -> 705 -> 791 -> 561 -> 651 -> 216 -> 651 -> 561 -> 737 -> 561 -> 469 -> 987 -> 469 -> 921 -> 411 -> 921 -> 469 -> 561 -> 406 -> 450 -> 885 -> 450 -> 406 -> 651 -> 411 -> 651 -> 406 -> 561 -> 791 -> 737 -> 937 -> 663 -> 937 -> 737 -> 469 -> 335 -> 469 -> 651 -> 469 -> 737 -> 651 -> 737 -> 450 -> 937 -> 514 -> 885 -> 514 -> 937 -> 450 -> 651 -> 885 -> 216 -> 885 -> 561 -> 921 -> 33 -> 401 -> 33 -> 921 -> 705 -> 921 -> 600 -> 910 -> 70 -> 58 -> 70 -> 910 -> 315 -> 910 -> 793 -> 910 -> 690 -> 317 -> 690 -> 910 -> 600 -> 58 -> 401 -> 793 -> 401 -> 58 -> 793 -> 58 -> 600 -> 921 -> 216 -> 921 -> 673 -> 203 -> 673 -> 33 -> 673 -> 216 -> 987 -> 981 -> 300 -> 981 -> 218 -> 981 -> 987 -> 39 -> 47 -> 127 -> 47 -> 300 -> 47 -> 557 -> 803 -> 557 -> 495 -> 838 -> 495 -> 557 -> 838 -> 557 -> 202 -> 218 -> 202 -> 557 -> 740 -> 742 -> 740 -> 557 -> 47 -> 39 -> 981 -> 835 -> 300 -> 835 -> 981 -> 39 -> 987 -> 835 -> 127 -> 835 -> 987 -> 127 -> 202 -> 127 -> 39 -> 127 -> 987 -> 216 -> 203 -> 411 -> 203 -> 987 -> 411 -> 469 -> 514 -> 737 -> 406 -> 663 -> 877 -> 663 -> 136 -> 983 -> 136 -> 899 -> 136 -> 663 -> 16 -> 206 -> 16 -> 663 -> 206 -> 663 -> 899 -> 663 -> 270 -> 75 -> 752 -> 537 -> 752 -> 877 -> 752 -> 75 -> 124 -> 75 -> 270 -> 935 -> 618 -> 935 -> 918 -> 537 -> 720 -> 537 -> 57 -> 537 -> 918 -> 935 -> 270 -> 899 -> 918 -> 720 -> 850 -> 720 -> 541 -> 57 -> 472 -> 57 -> 541 -> 720 -> 918 -> 642 -> 537 -> 850 -> 533 -> 850 -> 537 -> 717 -> 537 -> 642 -> 474 -> 342 -> 474 -> 642 -> 717 -> 533 -> 407 -> 352 -> 407 -> 472 -> 407 -> 255 -> 407 -> 533 -> 995 -> 452 -> 995 -> 850 -> 995 -> 53 -> 352 -> 53 -> 995 -> 533 -> 717 -> 642 -> 918 -> 124 -> 537 -> 124 -> 57 -> 539 -> 643 -> 539 -> 57 -> 823 -> 904 -> 942 -> 904 -> 823 -> 57 -> 720 -> 717 -> 431 -> 231 -> 407 -> 850 -> 407 -> 231 -> 431 -> 995 -> 431 -> 533 -> 431 -> 717 -> 720 -> 57 -> 231 -> 850 -> 828 -> 908 -> 828 -> 850 -> 231 -> 255 -> 231 -> 995 -> 407 -> 995 -> 255 -> 995 -> 472 -> 995 -> 231 -> 643 -> 823 -> 643 -> 256 -> 834 -> 761 -> 834 -> 403 -> 834 -> 36 -> 923 -> 36 -> 666 -> 36 -> 834 -> 256 -> 643 -> 284 -> 942 -> 284 -> 539 -> 284 -> 904 -> 284 -> 36 -> 284 -> 643 -> 834 -> 923 -> 834 -> 643 -> 231 -> 57 -> 124 -> 541 -> 717 -> 541 -> 124 -> 642 -> 75 -> 877 -> 75 -> 618 -> 877 -> 618 -> 270 -> 206 -> 977 -> 288 -> 977 -> 206 -> 390 -> 257 -> 390 -> 376 -> 390 -> 206 -> 618 -> 16 -> 270 -> 877 -> 565 -> 342 -> 565 -> 191 -> 150 -> 613 -> 150 -> 393 -> 150 -> 196 -> 482 -> 197 -> 482 -> 100 -> 482 -> 196 -> 150 -> 191 -> 565 -> 75 -> 935 -> 136 -> 777 -> 351 -> 777 -> 136 -> 589 -> 198 -> 589 -> 939 -> 301 -> 939 -> 62 -> 785 -> 62 -> 939 -> 983 -> 301 -> 983 -> 939 -> 589 -> 62 -> 589 -> 136 -> 935 -> 541 -> 918 -> 75 -> 899 -> 877 -> 342 -> 752 -> 100 -> 304 -> 197 -> 591 -> 622 -> 591 -> 197 -> 304 -> 100 -> 805 -> 516 -> 805 -> 164 -> 842 -> 164 -> 873 -> 164 -> 613 -> 842 -> 613 -> 164 -> 540 -> 966 -> 775 -> 966 -> 540 -> 164 -> 805 -> 842 -> 482 -> 622 -> 153 -> 622 -> 908 -> 622 -> 482 -> 842 -> 805 -> 196 -> 516 -> 393 -> 540 -> 613 -> 540 -> 393 -> 973 -> 326 -> 973 -> 393 -> 775 -> 298 -> 775 -> 393 -> 516 -> 613 -> 516 -> 196 -> 164 -> 196 -> 805 -> 150 -> 805 -> 100 -> 197 -> 873 -> 197 -> 100 -> 752 -> 474 -> 805 -> 613 -> 196 -> 613 -> 482 -> 164 -> 150 -> 164 -> 482 -> 805 -> 191 -> 474 -> 100 -> 43 -> 178 -> 675 -> 178 -> 453 -> 178 -> 240 -> 891 -> 240 -> 546 -> 953 -> 365 -> 953 -> 546 -> 675 -> 546 -> 240 -> 635 -> 891 -> 635 -> 240 -> 178 -> 403 -> 178 -> 225 -> 132 -> 225 -> 453 -> 225 -> 178 -> 635 -> 178 -> 546 -> 178 -> 891 -> 953 -> 214 -> 605 -> 214 -> 446 -> 466 -> 446 -> 626 -> 446 -> 214 -> 953 -> 891 -> 178 -> 43 -> 240 -> 603 -> 761 -> 857 -> 761 -> 603 -> 240 -> 675 -> 603 -> 675 -> 240 -> 43 -> 546 -> 43 -> 403 -> 923 -> 666 -> 923 -> 403 -> 857 -> 403 -> 256 -> 403 -> 225 -> 626 -> 523 -> 471 -> 523 -> 626 -> 132 -> 523 -> 132 -> 626 -> 225 -> 675 -> 225 -> 403 -> 675 -> 891 -> 675 -> 43 -> 635 -> 953 -> 635 -> 603 -> 891 -> 603 -> 178 -> 603 -> 857 -> 834 -> 857 -> 256 -> 761 -> 452 -> 352 -> 452 -> 761 -> 923 -> 256 -> 36 -> 823 -> 942 -> 732 -> 942 -> 823 -> 36 -> 539 -> 301 -> 539 -> 942 -> 539 -> 36 -> 255 -> 36 -> 256 -> 666 -> 284 -> 666 -> 834 -> 666 -> 643 -> 255 -> 666 -> 857 -> 603 -> 43 -> 100 -> 908 -> 829 -> 908 -> 304 -> 828 -> 304 -> 622 -> 304 -> 829 -> 304 -> 873 -> 304 -> 153 -> 304 -> 908 -> 591 -> 829 -> 828 -> 431 -> 850 -> 431 -> 452 -> 407 -> 452 -> 431 -> 828 -> 717 -> 850 -> 717 -> 828 -> 829 -> 153 -> 829 -> 471 -> 995 -> 471 -> 431 -> 471 -> 605 -> 365 -> 446 -> 365 -> 53 -> 365 -> 605 -> 352 -> 523 -> 352 -> 132 -> 352 -> 605 -> 523 -> 214 -> 132 -> 214 -> 523 -> 466 -> 290 -> 30 -> 253 -> 898 -> 168 -> 898 -> 253 -> 30 -> 355 -> 415 -> 355 -> 30 -> 290 -> 496 -> 415 -> 30 -> 415 -> 496 -> 290 -> 355 -> 911 -> 355 -> 290 -> 415 -> 465 -> 69 -> 228 -> 72 -> 228 -> 69 -> 465 -> 415 -> 290 -> 466 -> 496 -> 911 -> 496 -> 355 -> 496 -> 30 -> 496 -> 466 -> 911 -> 466 -> 30 -> 466 -> 235 -> 30 -> 911 -> 30 -> 235 -> 466 -> 523 -> 53 -> 132 -> 53 -> 605 -> 471 -> 452 -> 231 -> 533 -> 231 -> 472 -> 850 -> 472 -> 533 -> 452 -> 471 -> 829 -> 591 -> 290 -> 158 -> 535 -> 168 -> 69 -> 168 -> 535 -> 158 -> 496 -> 535 -> 72 -> 535 -> 496 -> 158 -> 898 -> 596 -> 954 -> 596 -> 527 -> 596 -> 898 -> 69 -> 898 -> 892 -> 898 -> 158 -> 253 -> 415 -> 253 -> 228 -> 596 -> 770 -> 839 -> 770 -> 156 -> 770 -> 596 -> 228 -> 253 -> 892 -> 156 -> 596 -> 156 -> 954 -> 156 -> 892 -> 954 -> 770 -> 954 -> 263 -> 954 -> 892 -> 253 -> 158 -> 465 -> 355 -> 465 -> 158 -> 290 -> 235 -> 365 -> 626 -> 214 -> 626 -> 365 -> 214 -> 466 -> 214 -> 365 -> 453 -> 953 -> 240 -> 953 -> 626 -> 453 -> 546 -> 453 -> 365 -> 235 -> 290 -> 591 -> 153 -> 197 -> 153 -> 908 -> 482 -> 516 -> 540 -> 775 -> 475 -> 326 -> 475 -> 973 -> 350 -> 477 -> 350 -> 973 -> 475 -> 257 -> 475 -> 775 -> 540 -> 298 -> 103 -> 4 -> 210 -> 4 -> 103 -> 298 -> 560 -> 298 -> 540 -> 326 -> 350 -> 347 -> 350 -> 326 -> 393 -> 326 -> 594 -> 257 -> 594 -> 350 -> 594 -> 266 -> 863 -> 266 -> 475 -> 266 -> 560 -> 266 -> 257 -> 266 -> 347 -> 973 -> 347 -> 266 -> 477 -> 342 -> 191 -> 785 -> 198 -> 77 -> 198 -> 134 -> 198 -> 785 -> 777 -> 198 -> 942 -> 301 -> 942 -> 198 -> 732 -> 399 -> 732 -> 198 -> 983 -> 351 -> 983 -> 198 -> 777 -> 785 -> 399 -> 785 -> 716 -> 77 -> 134 -> 77 -> 399 -> 77 -> 62 -> 983 -> 732 -> 983 -> 777 -> 983 -> 62 -> 198 -> 301 -> 904 -> 939 -> 942 -> 939 -> 904 -> 351 -> 589 -> 301 -> 823 -> 301 -> 198 -> 62 -> 77 -> 785 -> 230 -> 76 -> 346 -> 76 -> 575 -> 76 -> 848 -> 462 -> 848 -> 248 -> 130 -> 219 -> 130 -> 248 -> 848 -> 510 -> 749 -> 510 -> 25 -> 262 -> 25 -> 510 -> 848 -> 815 -> 248 -> 815 -> 495 -> 816 -> 838 -> 816 -> 495 -> 815 -> 848 -> 130 -> 462 -> 130 -> 176 -> 218 -> 176 -> 47 -> 981 -> 47 -> 176 -> 130 -> 848 -> 76 -> 176 -> 76 -> 462 -> 575 -> 462 -> 248 -> 462 -> 815 -> 346 -> 219 -> 346 -> 495 -> 346 -> 815 -> 742 -> 816 -> 742 -> 630 -> 764 -> 470 -> 764 -> 630 -> 61 -> 296 -> 61 -> 517 -> 61 -> 630 -> 808 -> 262 -> 808 -> 630 -> 742 -> 495 -> 740 -> 495 -> 742 -> 575 -> 740 -> 816 -> 964 -> 838 -> 964 -> 145 -> 964 -> 816 -> 61 -> 704 -> 517 -> 704 -> 61 -> 816 -> 597 -> 816 -> 517 -> 262 -> 517 -> 816 -> 740 -> 575 -> 495 -> 575 -> 219 -> 838 -> 219 -> 575 -> 130 -> 575 -> 346 -> 176 -> 219 -> 230 -> 716 -> 34 -> 405 -> 34 -> 566 -> 424 -> 566 -> 34 -> 424 -> 118 -> 424 -> 405 -> 424 -> 32 -> 566 -> 32 -> 424 -> 786 -> 98 -> 392 -> 98 -> 786 -> 312 -> 786 -> 543 -> 497 -> 312 -> 315 -> 317 -> 315 -> 690 -> 70 -> 690 -> 315 -> 312 -> 135 -> 98 -> 258 -> 98 -> 135 -> 118 -> 566 -> 118 -> 278 -> 32 -> 278 -> 562 -> 278 -> 405 -> 909 -> 371 -> 12 -> 371 -> 862 -> 371 -> 909 -> 730 -> 811 -> 730 -> 909 -> 32 -> 520 -> 32 -> 909 -> 405 -> 278 -> 118 -> 32 -> 118 -> 562 -> 401 -> 562 -> 118 -> 135 -> 943 -> 377 -> 467 -> 556 -> 467 -> 377 -> 826 -> 40 -> 826 -> 222 -> 826 -> 377 -> 98 -> 568 -> 826 -> 120 -> 602 -> 120 -> 392 -> 120 -> 826 -> 380 -> 649 -> 958 -> 602 -> 426 -> 556 -> 426 -> 602 -> 598 -> 784 -> 992 -> 784 -> 664 -> 428 -> 664 -> 784 -> 922 -> 784 -> 768 -> 784 -> 856 -> 958 -> 490 -> 419 -> 362 -> 419 -> 154 -> 125 -> 154 -> 349 -> 859 -> 349 -> 419 -> 166 -> 6 -> 166 -> 160 -> 991 -> 160 -> 166 -> 419 -> 859 -> 731 -> 149 -> 731 -> 859 -> 660 -> 530 -> 846 -> 530 -> 660 -> 967 -> 846 -> 749 -> 430 -> 14 -> 430 -> 749 -> 213 -> 749 -> 846 -> 967 -> 660 -> 859 -> 423 -> 14 -> 423 -> 530 -> 423 -> 213 -> 423 -> 731 -> 423 -> 859 -> 419 -> 349 -> 419 -> 6 -> 419 -> 160 -> 490 -> 120 -> 222 -> 120 -> 783 -> 602 -> 934 -> 703 -> 628 -> 31 -> 647 -> 146 -> 916 -> 633 -> 916 -> 146 -> 633 -> 146 -> 810 -> 556 -> 647 -> 628 -> 359 -> 916 -> 628 -> 556 -> 826 -> 467 -> 647 -> 810 -> 960 -> 426 -> 31 -> 359 -> 647 -> 426 -> 783 -> 40 -> 85 -> 125 -> 85 -> 40 -> 380 -> 392 -> 85 -> 120 -> 380 -> 783 -> 222 -> 392 -> 40 -> 467 -> 943 -> 439 -> 497 -> 712 -> 421 -> 538 -> 60 -> 221 -> 875 -> 60 -> 421 -> 637 -> 221 -> 619 -> 782 -> 144 -> 577 -> 706 -> 271 -> 881 -> 957 -> 271 -> 972 -> 648 -> 969 -> 105 -> 972 -> 695 -> 648 -> 506 -> 105 -> 612 -> 506 -> 693 -> 184 -> 763 -> 936 -> 753 -> 512 -> 940 -> 893 -> 869 -> 384 -> 869 -> 893 -> 564 -> 893 -> 940 -> 512 -> 50 -> 585 -> 753 -> 341 -> 524 -> 512 -> 763 -> 128 -> 579 -> 233 -> 800 -> 233 -> 864 -> 851 -> 864 -> 714 -> 864 -> 233 -> 709 -> 851 -> 709 -> 714 -> 709 -> 233 -> 590 -> 813 -> 590 -> 233 -> 812 -> 513 -> 812 -> 334 -> 812 -> 734 -> 657 -> 734 -> 812 -> 295 -> 687 -> 797 -> 687 -> 199 -> 687 -> 78 -> 687 -> 295 -> 797 -> 295 -> 739 -> 513 -> 739 -> 295 -> 513 -> 199 -> 513 -> 295 -> 78 -> 295 -> 199 -> 295 -> 812 -> 199 -> 78 -> 265 -> 64 -> 265 -> 78 -> 797 -> 78 -> 696 -> 998 -> 38 -> 998 -> 813 -> 657 -> 38 -> 657 -> 813 -> 998 -> 696 -> 813 -> 38 -> 813 -> 696 -> 78 -> 199 -> 739 -> 260 -> 739 -> 687 -> 260 -> 687 -> 739 -> 797 -> 265 -> 797 -> 199 -> 696 -> 199 -> 334 -> 657 -> 334 -> 590 -> 657 -> 590 -> 334 -> 813 -> 334 -> 199 -> 734 -> 344 -> 260 -> 513 -> 687 -> 513 -> 260 -> 344 -> 734 -> 590 -> 800 -> 864 -> 996 -> 15 -> 636 -> 15 -> 996 -> 500 -> 413 -> 500 -> 996 -> 553 -> 674 -> 553 -> 996 -> 864 -> 15 -> 851 -> 500 -> 851 -> 714 -> 996 -> 714 -> 851 -> 996 -> 851 -> 15 -> 864 -> 800 -> 709 -> 15 -> 413 -> 89 -> 659 -> 89 -> 413 -> 285 -> 175 -> 234 -> 641 -> 234 -> 175 -> 285 -> 234 -> 96 -> 234 -> 285 -> 508 -> 650 -> 508 -> 283 -> 508 -> 93 -> 65 -> 650 -> 65 -> 93 -> 283 -> 93 -> 386 -> 93 -> 641 -> 93 -> 508 -> 285 -> 289 -> 133 -> 667 -> 754 -> 667 -> 774 -> 667 -> 133 -> 289 -> 285 -> 413 -> 674 -> 175 -> 650 -> 175 -> 674 -> 96 -> 65 -> 331 -> 65 -> 96 -> 331 -> 96 -> 674 -> 413 -> 15 -> 709 -> 800 -> 590 -> 709 -> 590 -> 714 -> 15 -> 553 -> 636 -> 416 -> 636 -> 500 -> 636 -> 553 -> 413 -> 96 -> 175 -> 96 -> 774 -> 96 -> 285 -> 96 -> 413 -> 996 -> 674 -> 996 -> 413 -> 418 -> 721 -> 140 -> 659 -> 140 -> 721 -> 418 -> 65 -> 418 -> 650 -> 93 -> 650 -> 418 -> 331 -> 175 -> 331 -> 89 -> 721 -> 551 -> 721 -> 89 -> 331 -> 508 -> 234 -> 283 -> 234 -> 93 -> 551 -> 659 -> 116 -> 155 -> 116 -> 659 -> 677 -> 659 -> 551 -> 139 -> 576 -> 139 -> 778 -> 5 -> 504 -> 576 -> 536 -> 576 -> 504 -> 5 -> 576 -> 5 -> 778 -> 854 -> 10 -> 536 -> 10 -> 854 -> 778 -> 139 -> 5 -> 140 -> 5 -> 139 -> 551 -> 93 -> 234 -> 650 -> 234 -> 508 -> 331 -> 418 -> 175 -> 721 -> 677 -> 721 -> 175 -> 65 -> 175 -> 413 -> 553 -> 500 -> 714 -> 813 -> 734 -> 998 -> 795 -> 581 -> 313 -> 581 -> 22 -> 689 -> 22 -> 581 -> 795 -> 998 -> 657 -> 998 -> 334 -> 78 -> 64 -> 22 -> 313 -> 22 -> 64 -> 78 -> 334 -> 295 -> 334 -> 998 -> 64 -> 998 -> 734 -> 696 -> 334 -> 734 -> 295 -> 819 -> 723 -> 920 -> 63 -> 871 -> 287 -> 867 -> 63 -> 789 -> 441 -> 867 -> 871 -> 456 -> 63 -> 984 -> 81 -> 738 -> 316 -> 738 -> 375 -> 738 -> 81 -> 501 -> 738 -> 501 -> 81 -> 920 -> 796 -> 723 -> 984 -> 920 -> 287 -> 532 -> 63 -> 441 -> 344 -> 796 -> 984 -> 532 -> 441 -> 687 -> 265 -> 687 -> 789 -> 963 -> 480 -> 48 -> 661 -> 17 -> 769 -> 480 -> 17 -> 325 -> 232 -> 769 -> 661 -> 963 -> 17 -> 232 -> 456 -> 661 -> 325 -> 963 -> 48 -> 456 -> 287 -> 232 -> 480 -> 325 -> 769 -> 456 -> 441 -> 260 -> 789 -> 344 -> 819 -> 796 -> 941 -> 763 -> 970 -> 105 -> 693 -> 612 -> 969 -> 252 -> 612 -> 695 -> 105 -> 184 -> 893 -> 108 -> 391 -> 316 -> 391 -> 375 -> 391 -> 950 -> 948 -> 950 -> 391 -> 108 -> 893 -> 972 -> 881 -> 95 -> 972 -> 184 -> 86 -> 564 -> 184 -> 524 -> 86 -> 50 -> 341 -> 946 -> 849 -> 858 -> 927 -> 616 -> 849 -> 585 -> 391 -> 849 -> 927 -> 741 -> 858 -> 989 -> 874 -> 74 -> 152 -> 340 -> 249 -> 259 -> 384 -> 259 -> 498 -> 724 -> 569 -> 724 -> 498 -> 259 -> 807 -> 92 -> 840 -> 67 -> 340 -> 669 -> 946 -> 50 -> 753 -> 946 -> 585 -> 375 -> 272 -> 984 -> 344 -> 723 -> 941 -> 128 -> 468 -> 126 -> 579 -> 819 -> 128 -> 970 -> 468 -> 579 -> 933 -> 468 -> 416 -> 580 -> 416 -> 113 -> 416 -> 674 -> 416 -> 938 -> 356 -> 938 -> 330 -> 735 -> 608 -> 102 -> 608 -> 735 -> 330 -> 646 -> 567 -> 646 -> 330 -> 938 -> 113 -> 356 -> 822 -> 356 -> 113 -> 133 -> 580 -> 289 -> 580 -> 133 -> 113 -> 580 -> 113 -> 330 -> 13 -> 971 -> 956 -> 773 -> 195 -> 286 -> 338 -> 339 -> 802 -> 400 -> 932 -> 59 -> 990 -> 347 -> 257 -> 297 -> 390 -> 477 -> 257 -> 369 -> 117 -> 623 -> 117 -> 369 -> 322 -> 210 -> 322 -> 333 -> 870 -> 333 -> 322 -> 870 -> 210 -> 870 -> 322 -> 412 -> 322 -> 117 -> 210 -> 117 -> 903 -> 115 -> 903 -> 623 -> 903 -> 870 -> 115 -> 870 -> 903 -> 117 -> 322 -> 369 -> 115 -> 623 -> 115 -> 770 -> 928 -> 357 -> 928 -> 770 -> 263 -> 770 -> 623 -> 770 -> 115 -> 839 -> 115 -> 333 -> 903 -> 333 -> 115 -> 117 -> 870 -> 117 -> 333 -> 369 -> 903 -> 263 -> 596 -> 892 -> 596 -> 263 -> 156 -> 898 -> 535 -> 355 -> 69 -> 355 -> 535 -> 760 -> 527 -> 72 -> 168 -> 72 -> 527 -> 168 -> 873 -> 622 -> 873 -> 527 -> 69 -> 535 -> 69 -> 156 -> 228 -> 892 -> 228 -> 954 -> 228 -> 263 -> 903 -> 839 -> 623 -> 369 -> 870 -> 412 -> 841 -> 617 -> 726 -> 617 -> 841 -> 412 -> 394 -> 617 -> 167 -> 201 -> 588 -> 308 -> 11 -> 308 -> 615 -> 275 -> 615 -> 308 -> 246 -> 299 -> 246 -> 308 -> 672 -> 264 -> 672 -> 353 -> 672 -> 615 -> 672 -> 194 -> 299 -> 264 -> 299 -> 194 -> 246 -> 194 -> 672 -> 267 -> 919 -> 267 -> 672 -> 919 -> 275 -> 919 -> 11 -> 919 -> 672 -> 308 -> 264 -> 267 -> 299 -> 267 -> 264 -> 919 -> 246 -> 353 -> 246 -> 919 -> 264 -> 275 -> 274 -> 608 -> 615 -> 608 -> 274 -> 275 -> 672 -> 11 -> 267 -> 11 -> 299 -> 353 -> 299 -> 11 -> 672 -> 311 -> 171 -> 311 -> 809 -> 311 -> 194 -> 171 -> 679 -> 171 -> 386 -> 679 -> 866 -> 679 -> 386 -> 171 -> 641 -> 866 -> 114 -> 866 -> 641 -> 171 -> 194 -> 353 -> 194 -> 311 -> 672 -> 275 -> 308 -> 915 -> 357 -> 915 -> 267 -> 915 -> 484 -> 357 -> 277 -> 71 -> 307 -> 595 -> 104 -> 484 -> 307 -> 277 -> 766 -> 141 -> 394 -> 841 -> 410 -> 41 -> 137 -> 41 -> 410 -> 435 -> 488 -> 35 -> 488 -> 435 -> 208 -> 172 -> 208 -> 435 -> 410 -> 759 -> 726 -> 137 -> 726 -> 410 -> 627 -> 790 -> 35 -> 790 -> 627 -> 435 -> 35 -> 735 -> 35 -> 435 -> 627 -> 35 -> 274 -> 242 -> 236 -> 366 -> 955 -> 822 -> 955 -> 366 -> 55 -> 971 -> 955 -> 55 -> 822 -> 956 -> 646 -> 55 -> 956 -> 648 -> 612 -> 972 -> 706 -> 957 -> 972 -> 831 -> 95 -> 957 -> 897 -> 944 -> 890 -> 979 -> 383 -> 944 -> 577 -> 151 -> 245 -> 383 -> 173 -> 619 -> 961 -> 70 -> 961 -> 2 -> 690 -> 2 -> 619 -> 637 -> 538 -> 912 -> 163 -> 188 -> 949 -> 538 -> 757 -> 949 -> 888 -> 757 -> 601 -> 83 -> 912 -> 476 -> 306 -> 165 -> 221 -> 961 -> 165 -> 619 -> 875 -> 637 -> 60 -> 27 -> 712 -> 398 -> 476 -> 439 -> 601 -> 398 -> 27 -> 912 -> 601 -> 543 -> 398 -> 497 -> 601 -> 943 -> 568 -> 467 -> 368 -> 439 -> 83 -> 368 -> 568 -> 377 -> 368 -> 601 -> 476 -> 83 -> 757 -> 439 -> 398 -> 306 -> 961 -> 315 -> 543 -> 135 -> 786 -> 34 -> 258 -> 811 -> 729 -> 868 -> 729 -> 18 -> 986 -> 18 -> 729 -> 371 -> 751 -> 868 -> 751 -> 18 -> 862 -> 986 -> 862 -> 18 -> 751 -> 371 -> 868 -> 371 -> 729 -> 811 -> 520 -> 811 -> 258 -> 125 -> 371 -> 781 -> 371 -> 125 -> 781 -> 125 -> 811 -> 781 -> 258 -> 566 -> 670 -> 811 -> 12 -> 154 -> 868 -> 154 -> 751 -> 217 -> 747 -> 186 -> 747 -> 148 -> 747 -> 109 -> 747 -> 217 -> 18 -> 217 -> 186 -> 296 -> 507 -> 296 -> 186 -> 217 -> 751 -> 862 -> 751 -> 154 -> 12 -> 868 -> 862 -> 729 -> 751 -> 12 -> 862 -> 730 -> 405 -> 566 -> 520 -> 670 -> 34 -> 32 -> 562 -> 58 -> 690 -> 58 -> 910 -> 317 -> 910 -> 58 -> 317 -> 58 -> 562 -> 880 -> 278 -> 401 -> 600 -> 793 -> 600 -> 70 -> 793 -> 317 -> 70 -> 315 -> 306 -> 712 -> 476 -> 27 -> 421 -> 757 -> 27 -> 538 -> 163 -> 888 -> 83 -> 949 -> 163 -> 83 -> 2 -> 606 -> 982 -> 177 -> 402 -> 177 -> 478 -> 2 -> 173 -> 931 -> 979 -> 799 -> 542 -> 979 -> 286 -> 887 -> 802 -> 261 -> 189 -> 759 -> 367 -> 88 -> 137 -> 926 -> 321 -> 103 -> 733 -> 321 -> 736 -> 966 -> 560 -> 733 -> 966 -> 298 -> 736 -> 733 -> 926 -> 560 -> 775 -> 973 -> 775 -> 733 -> 990 -> 926 -> 966 -> 321 -> 4 -> 137 -> 189 -> 700 -> 410 -> 102 -> 488 -> 172 -> 367 -> 208 -> 488 -> 236 -> 435 -> 790 -> 274 -> 735 -> 567 -> 356 -> 567 -> 274 -> 102 -> 35 -> 242 -> 735 -> 435 -> 759 -> 208 -> 627 -> 488 -> 790 -> 208 -> 700 -> 759 -> 41 -> 367 -> 726 -> 700 -> 88 -> 339 -> 59 -> 338 -> 529 -> 402 -> 578 -> 962 -> 865 -> 99 -> 578 -> 982 -> 338 -> 99 -> 962 -> 402 -> 982 -> 99 -> 459 -> 931 -> 782 -> 799 -> 245 -> 890 -> 144 -> 388 -> 481 -> 90 -> 408 -> 607 -> 417 -> 144 -> 408 -> 417 -> 999 -> 247 -> 549 -> 247 -> 547 -> 247 -> 843 -> 999 -> 123 -> 481 -> 434 -> 388 -> 90 -> 417 -> 123 -> 180 -> 388 -> 417 -> 180 -> 90 -> 607 -> 944 -> 434 -> 607 -> 388 -> 123 -> 51 -> 68 -> 51 -> 409 -> 51 -> 498 -> 51 -> 724 -> 68 -> 378 -> 993 -> 378 -> 68 -> 724 -> 51 -> 157 -> 498 -> 384 -> 569 -> 993 -> 68 -> 993 -> 73 -> 559 -> 73 -> 409 -> 73 -> 993 -> 569 -> 384 -> 498 -> 569 -> 68 -> 73 -> 68 -> 569 -> 378 -> 142 -> 559 -> 685 -> 549 -> 685 -> 559 -> 587 -> 924 -> 587 -> 559 -> 227 -> 900 -> 924 -> 900 -> 227 -> 559 -> 654 -> 924 -> 332 -> 699 -> 583 -> 545 -> 119 -> 975 -> 19 -> 886 -> 975 -> 702 -> 464 -> 975 -> 951 -> 20 -> 485 -> 119 -> 886 -> 395 -> 951 -> 19 -> 906 -> 464 -> 656 -> 192 -> 825 -> 924 -> 930 -> 719 -> 699 -> 930 -> 825 -> 836 -> 587 -> 654 -> 142 -> 993 -> 534 -> 685 -> 653 -> 534 -> 378 -> 559 -> 159 -> 107 -> 54 -> 26 -> 454 -> 302 -> 913 -> 985 -> 902 -> 302 -> 224 -> 438 -> 913 -> 224 -> 833 -> 818 -> 432 -> 107 -> 902 -> 545 -> 515 -> 825 -> 336 -> 699 -> 515 -> 719 -> 336 -> 924 -> 719 -> 332 -> 515 -> 432 -> 913 -> 448 -> 66 -> 320 -> 905 -> 485 -> 372 -> 147 -> 447 -> 882 -> 599 -> 852 -> 599 -> 131 -> 599 -> 447 -> 320 -> 425 -> 131 -> 320 -> 599 -> 147 -> 852 -> 629 -> 978 -> 8 -> 978 -> 629 -> 397 -> 629 -> 852 -> 8 -> 629 -> 8 -> 372 -> 978 -> 852 -> 187 -> 750 -> 988 -> 397 -> 988 -> 328 -> 487 -> 373 -> 750 -> 624 -> 550 -> 988 -> 373 -> 436 -> 487 -> 324 -> 443 -> 427 -> 42 -> 324 -> 309 -> 804 -> 817 -> 461 -> 324 -> 427 -> 110 -> 804 -> 183 -> 639 -> 487 -> 429 -> 382 -> 505 -> 382 -> 487 -> 309 -> 548 -> 45 -> 110 -> 548 -> 804 -> 461 -> 110 -> 443 -> 779 -> 427 -> 309 -> 42 -> 817 -> 80 -> 183 -> 433 -> 23 -> 433 -> 639 -> 521 -> 80 -> 42 -> 625 -> 443 -> 511 -> 244 -> 436 -> 429 -> 624 -> 683 -> 8 -> 750 -> 328 -> 429 -> 373 -> 629 -> 550 -> 697 -> 886 -> 702 -> 387 -> 192 -> 699 -> 924 -> 836 -> 900 -> 825 -> 688 -> 699 -> 656 -> 336 -> 688 -> 387 -> 719 -> 656 -> 387 -> 682 -> 844 -> 319 -> 74 -> 701 -> 84 -> 143 -> 701 -> 874 -> 741 -> 989 -> 849 -> 138 -> 950 -> 46 -> 950 -> 108 -> 849 -> 121 -> 138 -> 989 -> 616 -> 121 -> 989 -> 927 -> 138 -> 108 -> 316 -> 272 -> 81 -> 375 -> 501 -> 108 -> 585 -> 316 -> 81 -> 532 -> 272 -> 738 -> 108 -> 375 -> 50 -> 564 -> 753 -> 940 -> 341 -> 384 -> 524 -> 564 -> 512 -> 936 -> 128 -> 933 -> 938 -> 126 -> 933 -> 291 -> 938 -> 13 -> 567 -> 366 -> 242 -> 567 -> 189 -> 367 -> 379 -> 671 -> 261 -> 379 -> 400 -> 189 -> 379 -> 137 -> 759 -> 627 -> 617 -> 141 -> 201 -> 821 -> 277 -> 201 -> 71 -> 385 -> 595 -> 645 -> 484 -> 277 -> 385 -> 167 -> 766 -> 201 -> 617 -> 766 -> 841 -> 41 -> 726 -> 412 -> 41 -> 700 -> 137 -> 412 -> 4 -> 322 -> 736 -> 4 -> 333 -> 623 -> 595 -> 928 -> 104 -> 645 -> 357 -> 104 -> 385 -> 307 -> 928 -> 645 -> 307 -> 104 -> 277 -> 588 -> 71 -> 141 -> 385 -> 201 -> 484 -> 71 -> 915 -> 11 -> 246 -> 11 -> 264 -> 615 -> 919 -> 608 -> 264 -> 246 -> 311 -> 679 -> 809 -> 679 -> 114 -> 285 -> 774 -> 754 -> 774 -> 133 -> 774 -> 917 -> 667 -> 917 -> 289 -> 917 -> 774 -> 285 -> 114 -> 234 -> 386 -> 283 -> 386 -> 114 -> 641 -> 283 -> 114 -> 171 -> 866 -> 667 -> 866 -> 289 -> 667 -> 289 -> 866 -> 133 -> 754 -> 133 -> 917 -> 754 -> 917 -> 866 -> 809 -> 754 -> 866 -> 171 -> 139 -> 659 -> 5 -> 659 -> 155 -> 536 -> 226 -> 536 -> 668 -> 28 -> 29 -> 28 -> 668 -> 792 -> 358 -> 792 -> 668 -> 226 -> 254 -> 504 -> 254 -> 226 -> 792 -> 226 -> 668 -> 536 -> 155 -> 358 -> 689 -> 358 -> 215 -> 91 -> 215 -> 358 -> 254 -> 358 -> 10 -> 28 -> 215 -> 689 -> 215 -> 28 -> 10 -> 358 -> 155 -> 140 -> 155 -> 677 -> 140 -> 551 -> 677 -> 139 -> 504 -> 668 -> 504 -> 226 -> 10 -> 792 -> 254 -> 668 -> 29 -> 668 -> 254 -> 792 -> 29 -> 313 -> 116 -> 778 -> 116 -> 313 -> 531 -> 689 -> 854 -> 689 -> 38 -> 689 -> 91 -> 689 -> 531 -> 313 -> 854 -> 116 -> 581 -> 116 -> 854 -> 536 -> 854 -> 313 -> 29 -> 689 -> 29 -> 226 -> 28 -> 358 -> 778 -> 504 -> 10 -> 215 -> 581 -> 38 -> 531 -> 215 -> 792 -> 536 -> 254 -> 576 -> 668 -> 576 -> 254 -> 10 -> 29 -> 22 -> 49 -> 965 -> 948 -> 798 -> 965 -> 46 -> 458 -> 46 -> 727 -> 422 -> 701 -> 282 -> 84 -> 844 -> 223 -> 237 -> 844 -> 665 -> 422 -> 84 -> 74 -> 143 -> 204 -> 701 -> 727 -> 801 -> 458 -> 337 -> 282 -> 727 -> 616 -> 741 -> 669 -> 341 -> 564 -> 519 -> 509 -> 67 -> 249 -> 509 -> 807 -> 340 -> 92 -> 249 -> 840 -> 836 -> 336 -> 900 -> 930 -> 836 -> 719 -> 825 -> 656 -> 688 -> 332 -> 583 -> 20 -> 905 -> 119 -> 951 -> 8 -> 697 -> 395 -> 550 -> 397 -> 907 -> 505 -> 544 -> 429 -> 907 -> 988 -> 629 -> 624 -> 397 -> 697 -> 683 -> 550 -> 907 -> 629 -> 683 -> 395 -> 620 -> 360 -> 363 -> 698 -> 882 -> 592 -> 279 -> 698 -> 239 -> 329 -> 698 -> 762 -> 830 -> 361 -> 3 -> 765 -> 861 -> 302 -> 438 -> 448 -> 872 -> 985 -> 818 -> 107 -> 653 -> 159 -> 806 -> 653 -> 818 -> 26 -> 302 -> 432 -> 833 -> 302 -> 872 -> 454 -> 66 -> 485 -> 425 -> 147 -> 780 -> 511 -> 779 -> 625 -> 244 -> 324 -> 45 -> 817 -> 110 -> 324 -> 625 -> 511 -> 427 -> 45 -> 461 -> 80 -> 548 -> 183 -> 382 -> 521 -> 183 -> 309 -> 80 -> 324 -> 511 -> 279 -> 363 -> 620 -> 698 -> 360 -> 279 -> 780 -> 244 -> 779 -> 780 -> 620 -> 239 -> 360 -> 592 -> 329 -> 360 -> 780 -> 239 -> 279 -> 620 -> 329 -> 830 -> 573 -> 755 -> 571 -> 755 -> 573 -> 571 -> 483 -> 743 -> 787 -> 676 -> 56 -> 437 -> 638 -> 604 -> 56 -> 24 -> 106 -> 855 -> 52 -> 106 -> 161 -> 24 -> 638 -> 499 -> 24 -> 52 -> 762 -> 329 -> 52 -> 499 -> 161 -> 638 -> 52 -> 161 -> 363 -> 106 -> 638 -> 56 -> 772 -> 691 -> 676 -> 489 -> 787 -> 860 -> 389 -> 744 -> 396 -> 463 -> 522 -> 396 -> 491 -> 502 -> 582 -> 463 -> 794 -> 491 -> 632 -> 743 -> 755 -> 728 -> 573 -> 374 -> 728 -> 830 -> 131 -> 882 -> 762 -> 592 -> 239 -> 882 -> 830 -> 374 -> 855 -> 329 -> 106 -> 755 -> 483 -> 389 -> 112 -> 744 -> 9 -> 860 -> 571 -> 743 -> 604 -> 24 -> 437 -> 604 -> 787 -> 632 -> 772 -> 440 -> 713 -> 457 -> 658 -> 414 -> 772 -> 713 -> 414 -> 440 -> 745 -> 522 -> 563 -> 713 -> 489 -> 437 -> 743 -> 860 -> 604 -> 489 -> 658 -> 691 -> 414 -> 676 -> 658 -> 440 -> 691 -> 745 -> 832 -> 396 -> 502 -> 570 -> 463 -> 710 -> 744 -> 794 -> 345 -> 574 -> 707 -> 767 -> 345 -> 820 -> 181 -> 655 -> 87 -> 318 -> 354 -> 756 -> 888 -> 354 -> 87 -> 190 -> 318 -> 292 -> 845 -> 250 -> 845 -> 547 -> 845 -> 211 -> 655 -> 190 -> 756 -> 633 -> 810 -> 756 -> 87 -> 211 -> 883 -> 250 -> 883 -> 547 -> 549 -> 276 -> 678 -> 101 -> 547 -> 678 -> 843 -> 758 -> 276 -> 547 -> 758 -> 247 -> 678 -> 999 -> 101 -> 883 -> 276 -> 101 -> 549 -> 758 -> 101 -> 123 -> 878 -> 724 -> 73 -> 378 -> 409 -> 878 -> 157 -> 409 -> 993 -> 685 -> 73 -> 534 -> 806 -> 685 -> 587 -> 159 -> 654 -> 900 -> 587 -> 142 -> 569 -> 157 -> 724 -> 993 -> 559 -> 900 -> 719 -> 583 -> 192 -> 464 -> 886 -> 906 -> 879 -> 212 -> 387 -> 837 -> 682 -> 170 -> 212 -> 473 -> 193 -> 170 -> 319 -> 682 -> 212 -> 319 -> 473 -> 844 -> 204 -> 874 -> 152 -> 67 -> 92 -> 152 -> 509 -> 259 -> 869 -> 519 -> 940 -> 524 -> 893 -> 693 -> 969 -> 506 -> 252 -> 971 -> 646 -> 366 -> 13 -> 356 -> 847 -> 971 -> 822 -> 13 -> 646 -> 955 -> 195 -> 932 -> 339 -> 671 -> 802 -> 932 -> 671 -> 400 -> 339 -> 261 -> 400 -> 59 -> 261 -> 88 -> 379 -> 926 -> 103 -> 210 -> 736 -> 103 -> 560 -> 973 -> 266 -> 350 -> 863 -> 865 -> 578 -> 338 -> 962 -> 982 -> 459 -> 173 -> 478 -> 459 -> 876 -> 478 -> 715 -> 925 -> 791 -> 876 -> 631 -> 514 -> 651 -> 335 -> 406 -> 937 -> 335 -> 561 -> 514 -> 335 -> 885 -> 411 -> 216 -> 33 -> 148 -> 33 -> 880 -> 673 -> 148 -> 880 -> 909 -> 34 -> 520 -> 258 -> 32 -> 405 -> 520 -> 730 -> 371 -> 811 -> 566 -> 730 -> 12 -> 781 -> 6 -> 85 -> 380 -> 222 -> 85 -> 649 -> 490 -> 598 -> 492 -> 991 -> 370 -> 314 -> 174 -> 314 -> 370 -> 991 -> 314 -> 182 -> 662 -> 241 -> 662 -> 558 -> 662 -> 182 -> 251 -> 229 -> 525 -> 229 -> 251 -> 182 -> 914 -> 722 -> 914 -> 610 -> 914 -> 182 -> 314 -> 992 -> 314 -> 991 -> 174 -> 991 -> 362 -> 174 -> 362 -> 166 -> 362 -> 349 -> 362 -> 370 -> 558 -> 241 -> 558 -> 182 -> 229 -> 241 -> 229 -> 182 -> 111 -> 980 -> 111 -> 526 -> 722 -> 526 -> 111 -> 610 -> 111 -> 662 -> 525 -> 662 -> 111 -> 914 -> 111 -> 182 -> 241 -> 182 -> 558 -> 314 -> 558 -> 967 -> 174 -> 241 -> 174 -> 370 -> 492 -> 768 -> 209 -> 884 -> 209 -> 692 -> 209 -> 768 -> 991 -> 856 -> 768 -> 992 -> 856 -> 664 -> 614 -> 503 -> 493 -> 555 -> 493 -> 280 -> 493 -> 584 -> 593 -> 479 -> 280 -> 268 -> 280 -> 555 -> 692 -> 555 -> 273 -> 305 -> 994 -> 305 -> 269 -> 305 -> 273 -> 884 -> 185 -> 884 -> 273 -> 185 -> 269 -> 185 -> 7 -> 243 -> 7 -> 185 -> 718 -> 611 -> 404 -> 611 -> 718 -> 994 -> 268 -> 994 -> 718 -> 269 -> 268 -> 269 -> 718 -> 185 -> 493 -> 268 -> 243 -> 894 -> 44 -> 894 -> 884 -> 894 -> 251 -> 44 -> 251 -> 343 -> 611 -> 343 -> 251 -> 526 -> 251 -> 980 -> 526 -> 914 -> 526 -> 980 -> 526 -> 251 -> 894 -> 243 -> 268 -> 718 -> 7 -> 994 -> 7 -> 611 -> 7 -> 827 -> 305 -> 827 -> 343 -> 827 -> 611 -> 994 -> 827 -> 718 -> 243 -> 209 -> 243 -> 692 -> 44 -> 827 -> 404 -> 251 -> 111 -> 722 -> 610 -> 980 -> 229 -> 980 -> 610 -> 526 -> 182 -> 525 -> 182 -> 526 -> 525 -> 343 -> 525 -> 914 -> 251 -> 525 -> 241 -> 525 -> 526 -> 610 -> 662 -> 722 -> 229 -> 722 -> 610 -> 722 -> 980 -> 914 -> 980 -> 525 -> 722 -> 662 -> 251 -> 404 -> 343 -> 894 -> 404 -> 44 -> 7 -> 269 -> 552 -> 503 -> 280 -> 584 -> 503 -> 718 -> 305 -> 185 -> 552 -> 493 -> 273 -> 692 -> 614 -> 593 -> 428 -> 281 -> 952 -> 281 -> 922 -> 281 -> 428 -> 555 -> 243 -> 884 -> 555 -> 209 -> 428 -> 479 -> 281 -> 593 -> 503 -> 273 -> 614 -> 209 -> 273 -> 428 -> 768 -> 598 -> 856 -> 160 -> 492 -> 362 -> 160 -> 649 -> 40 -> 490 -> 602 -> 788 -> 824 -> 974 -> 200 -> 1 -> 294 -> 310 -> 824 -> 952 -> 200 -> 853 -> 725 -> 181 -> 21 -> 574 -> 129 -> 707 -> 655 -> 129 -> 21 -> 179 -> 725 -> 554 -> 974 -> 694 -> 554 -> 179 -> 181 -> 190 -> 354 -> 586 -> 621 -> 250 -> 621 -> 292 -> 188 -> 586 -> 318 -> 188 -> 888 -> 318 -> 845 -> 188 -> 354 -> 292 -> 883 -> 586 -> 87 -> 292 -> 211 -> 586 -> 292 -> 190 -> 129 -> 820 -> 21 -> 725 -> 684 -> 181 -> 916 -> 31 -> 146 -> 960 -> 348 -> 916 -> 960 -> 528 -> 348 -> 31 -> 810 -> 628 -> 348 -> 633 -> 960 -> 703 -> 348 -> 810 -> 359 -> 703 -> 528 -> 323 -> 934 -> 528 -> 205 -> 323 -> 554 -> 21 -> 570 -> 396 -> 794 -> 710 -> 522 -> 440 -> 563 -> 582 -> 570 -> 976 -> 634 -> 460 -> 451 -> 442 -> 79 -> 449 -> 634 -> 974 -> 179 -> 694 -> 725 -> 574 -> 820 -> 707 -> 684 -> 574 -> 767 -> 820 -> 684 -> 554 -> 853 -> 205 -> 788 -> 934 -> 628 -> 426 -> 934 -> 205 -> 952 -> 0 -> 205 -> 824 -> 0 -> 310 -> 303 -> 584 -> 555 -> 593 -> 280 -> 552 -> 584 -> 479 -> 220 -> 303 -> 294 -> 708 -> 1 -> 6 -> 868 -> 986 -> 217 -> 711 -> 764 -> 711 -> 149 -> 507 -> 149 -> 711 -> 517 -> 507 -> 470 -> 808 -> 470 -> 517 -> 630 -> 470 -> 704 -> 711 -> 109 -> 61 -> 109 -> 186 -> 18 -> 186 -> 109 -> 296 -> 109 -> 217 -> 149 -> 186 -> 149 -> 109 -> 470 -> 597 -> 838 -> 300 -> 838 -> 597 -> 300 -> 964 -> 803 -> 896 -> 803 -> 202 -> 803 -> 964 -> 557 -> 964 -> 300 -> 557 -> 300 -> 740 -> 838 -> 740 -> 597 -> 803 -> 145 -> 747 -> 145 -> 597 -> 964 -> 896 -> 747 -> 896 -> 981 -> 202 -> 740 -> 964 -> 47 -> 218 -> 399 -> 134 -> 399 -> 218 -> 127 -> 399 -> 127 -> 945 -> 399 -> 777 -> 939 -> 732 -> 777 -> 62 -> 134 -> 62 -> 777 -> 945 -> 39 -> 218 -> 557 -> 597 -> 202 -> 838 -> 145 -> 300 -> 202 -> 964 -> 630 -> 704 -> 262 -> 510 -> 686 -> 213 -> 686 -> 530 -> 213 -> 530 -> 686 -> 731 -> 686 -> 162 -> 423 -> 162 -> 686 -> 660 -> 686 -> 25 -> 686 -> 510 -> 644 -> 530 -> 644 -> 213 -> 14 -> 213 -> 430 -> 213 -> 846 -> 213 -> 644 -> 749 -> 14 -> 749 -> 644 -> 162 -> 430 -> 162 -> 14 -> 162 -> 846 -> 644 -> 660 -> 749 -> 660 -> 423 -> 660 -> 14 -> 530 -> 859 -> 530 -> 14 -> 660 -> 644 -> 686 -> 749 -> 423 -> 749 -> 731 -> 25 -> 731 -> 749 -> 686 -> 423 -> 644 -> 14 -> 644 -> 510 -> 262 -> 764 -> 808 -> 764 -> 704 -> 507 -> 186 -> 986 -> 371 -> 18 -> 868 -> 125 -> 6 -> 154 -> 166 -> 349 -> 492 -> 784 -> 958 -> 768 -> 664 -> 922 -> 788 -> 952 -> 922 -> 0 -> 294 -> 420 -> 708 -> 303 -> 281 -> 0 -> 303 -> 593 -> 0, Gesamtlaenge: 18511406.0
+Tag 2: 0, Gesamtlaenge: 0
+Tag 3: 0, Gesamtlaenge: 0
+Tag 4: 0, Gesamtlaenge: 0
+Tag 5: 0, Gesamtlaenge: 0
+Maximale Lange einer Tagestour: 18511406.0
+```
 
 ---
 
-Wie man in den Beispielen 5-8 sieht, ist dieser Algorithmus selbst mit einem hohen dropout-Wert noch sehr langsam, da in jedem Iterationsschritt `(k-1)*(|Cmax|)` mit Cmax als dem längsten Pfad in C0 bis Ck Möglichkeiten berechnet werden müssen.
+Wie man in den Beispielen 5-8 sieht, ist dieser Algorithmus selbst mit dem droput zu langsam, da in jedem Iterationsschritt `(1-dropout)*(k-1)*(|Cmax|)` mit Cmax als dem längsten Pfad in den jetzigen Touren, Möglichkeiten als 'Nachbaren' berechnet werden müssen. So kann es passieren dass die Optimierung abgebrochen wird, bevor die Strecke gerecht verteilt wurde, oder dass garkeine bessere als die Startlösung gefunden wird.
 
 ---
 
 `muellabfuhr9.txt`
 
-```
+```text
 3 3
 0 1 0.5
 0 2 0.5
@@ -394,7 +442,7 @@ eigenes Beispiel zur Demonstration von float-Gewichten
 
 Ausgabe zu `muellabfuhr9.txt`
 
-```
+```text
 
 Tag 1: 0 -> 1 -> 2 -> 0, Gesamtlaenge: 51.7
 Tag 2: 0, Gesamtlaenge: 0
@@ -406,10 +454,10 @@ Maximale Lange einer Tagestour: 51.7
 
 ## Quellcode
 
-*utility.py*
+### utility.py
 
 ```python
-from typing import Any, Callable, List, Dict, Hashable
+from typing import Dict, Hashable
 
 
 class TabuList:
@@ -425,10 +473,7 @@ class TabuList:
         self.cleanup_freq = cleanup_freq
 
     def _cleanup(self):
-        to_delete = []
-        for k, v in self.tabu.items():
-            if v+self.offset <= 0:
-                to_delete.append(k)
+        to_delete = [k for k, v in self.tabu.items() if v+self.offset <= 0]
         for k in to_delete:
             del self.tabu[k]
 
@@ -438,7 +483,7 @@ class TabuList:
     def get(self, item: Hashable) -> int:
         if item in self.tabu:
             val = self.tabu[item]+self.offset
-            return 0 if val < 0 else val
+            return max(val, 0)
         return 0
 
     def tick(self):
@@ -446,36 +491,25 @@ class TabuList:
         if self.offset % self.cleanup_freq == 0:
             self._cleanup()
 
-
-def remove_by_exp(exp: Callable[[Any], bool], lst: List):
-    for i in lst:
-        try:
-            if exp(i):
-                lst.remove(i)
-                break
-        except Exception:
-            pass
-
 ```
 
-<br>
-
-*program.py*
+### program.py
 
 ```python
-from collections import Counter
+from collections import deque
 from os.path import dirname, join
-from typing import (FrozenSet, Iterable, List, Mapping, Set,
+from typing import (FrozenSet, List, Mapping, Set,
                     Tuple)
 
 from tabu_optimization import MMKCPP_TEE_TabuSearch
-from utility import remove_by_exp
 
 
 class CityGraph:
     """A class representing the city graph."""
-    vertices: Mapping[int, Mapping[int, float]]     # {vertex_id: {connected_vertex_id: distance}, ...}
-    edgeset: Set[FrozenSet[int]]                    # {{vertex_id, vertex_id}, {vertex_id, vertex_id}, ...}
+    vertices: Mapping[int, Mapping[int, float]
+                      ]     # {vertex_id: {connected_vertex_id: distance}, ...}
+    # {{vertex_id, vertex_id}, {vertex_id, vertex_id}, ...}
+    edgeset: Set[FrozenSet[int]]
 
     @classmethod
     def _from_bwinf_file(cls, path: str) -> 'CityGraph':
@@ -523,13 +557,16 @@ class CityGraph:
         return not unseen
 
     def get_paths(self, days: int = 5) -> List[Tuple[float, Tuple[int, ...]]]:
+        if not self.is_connected():
+            raise ValueError('Graph is not connected.')
         return map(lambda x: (self.w_tour(x), x), MMKCPP_TEE_TabuSearch(self.vertices, days, 100, 600))
 
 
 # repl
 while True:
-    pth = join(dirname(__file__),
-                    f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
+    pth = join(
+        dirname(__file__),
+        f'beispieldaten/muellabfuhr{input("Bitte die Nummer des Beispiels eingeben [0-9]: ")}.txt')
     cg = CityGraph._from_bwinf_file(pth)
     n_days = int(input('Für wieviele Tage soll geplant werden? (5): ') or 5)
     maxlen = 0
@@ -541,9 +578,7 @@ while True:
 
 ```
 
-<br>
-
-*tabu_optimization.py*
+### tabu_optimization.py
 
 ```python
 from collections import Counter, deque
@@ -555,8 +590,10 @@ from typing import Dict, List, Tuple, Iterable, Callable
 
 from utility import TabuList
 
-def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsWithoutImprovement: int = 100,
-                          maxRunningTime: float = None, dropout: float = 0.5, dropout_fn: Callable = lambda x: x**1.2,
+
+def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]],
+                          k: int = 5, maxNOfItsWithoutImprovement: int = 100, maxRunningTime:
+                          float = None, dropout: float = 0.2, dropout_fn: Callable = lambda x: x ** 1.2,
                           tabuTenure: int = 20) -> List[Tuple[int, ...]]:
     """
     Generate a starting path and perform a meta-heuristic optimisation.
@@ -586,27 +623,34 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
         q = deque(((0, start, []),))
         while q:
             length, current, currentpath = q.popleft()
-            if current in dijkstra[start]: continue
+            if current in dijkstra[start]:
+                continue
             dijkstra[start][current] = (length, tuple(currentpath[1:]))
             for next_, weight in G[current].items():
                 q.append((length+weight, next_, currentpath+[current]))
-        
-    def edges(tour: Tuple[int, ...]) -> Iterable[set]: #
+
+    def edges(tour: Tuple[int, ...]) -> Iterable[set]:
         return (set(tour[i:][:2]) for i in range(len(tour)-1))
 
     def w_tour(tour: Tuple[int, ...]) -> float:
         return sum(G[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
+    def w_avg_tours(tours: Iterable[Tuple[int, ...]]) -> float:
+        return sum(w_tour(tour) for tour in tours)/k
+
     def w_max_tours(tours: Iterable[Tuple[int, ...]]) -> float:
         return max(w_tour(tour) for tour in tours)
 
-    def edgecount_tour(tour: Tuple[int, ...]) -> Counter: #
+    def cost(tours: Iterable[Tuple[int, ...]], w_avg: float) -> Tuple[float, float, float]:
+        return (w_max_tours(tours), sum(abs(w_tour(tour)-w_avg) for tour in tours), random())
+
+    def edgecount_tour(tour: Tuple[int, ...]) -> Counter:
         return Counter(frozenset(x) for x in edges(tour))
 
-    def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter: #
+    def edgecount_tours(tours: List[Tuple[int, ...]]) -> Counter:
         return reduce(add, (edgecount_tour(tour) for tour in tours))
-    
-    def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]: #
+
+    def MergeWalkWithTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         # remove edges from walk that are already in tour
         if len(walk) == 1:
             return tour
@@ -615,26 +659,20 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
 
         tour_edges = edges(tour)
         if not tour_edges:
-            return ((0,) if walk[0] != 0 else ())+dijkstra[0][walk[0]][1]+tuple(walk)+dijkstra[walk[-1]][0][1]+((0,) if walk[-1] != 0 else ())
+            return (((0,) if walk[0] != 0 else ())
+                    +dijkstra[0][walk[0]][1]+tuple(walk)+dijkstra[walk[-1]][0][1]
+                    +((0,) if walk[-1] != 0 else ()))
 
-        while tour_edges:
-            if frozenset((walk[0], walk[1])) in tour_edges:
-                del walk[0]
-                if len(walk) == 1:
-                    return tour
-            else:
-                break
-
-        while tour_edges:
-            if frozenset((walk[-1], walk[-2])) in tour_edges:
-                del walk[-1]
-                if len(walk) == 1:
-                    return tour
-            else:
-                break
-        
+        while frozenset((walk[0], walk[1])) in tour_edges:
+            del walk[0]
+            if len(walk) == 1:
+                return tour
+        while frozenset((walk[-1], walk[-2])) in tour_edges:
+            del walk[-1]
+            if len(walk) == 1:
+                return tour
         walk = tuple(walk)
-        
+
         # find node `t` closest to `u` and `v`, the end nodes of `walk`
         min_idx = None
         min_distance = 999999
@@ -650,10 +688,12 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
                 min_sp_v = sp_v[1]
 
         # splice
-        return tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]+min_sp_u+walk+min_sp_v+tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):]
+        return (tour[:min_idx+(1 if tour[min_idx] != walk[0] else 0)]
+                +min_sp_u+walk+min_sp_v
+                +tour[min_idx+(1 if tour[min_idx] == walk[-1] else 0):])
 
-        
     # basically shortenPath
+
     def SeparateWalkFromTour(tour: Tuple[int, ...], walk: Tuple[int, ...]) -> Tuple[int, ...]:
         # assuming walk is a subsegment of tour
         u, v, = walk[0], walk[-1]
@@ -664,9 +704,9 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
                 li = i
                 ri = i+2
                 break
-        
+
         return tour[:li+(1 if u != v else 0)]+dijkstra[u][v][1]+tour[ri:]
-    
+
     def ReorderToClosedWalk(edgeset: List[set]) -> Tuple[int, ...]:
         newtour = [0]  # depot node
 
@@ -678,8 +718,9 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
                     newtour.append(edge.pop())
                     edgeset.remove(edge)
                     stop = False
-            if stop: break 
-        
+            if stop:
+                break
+
         while edgeset:  # find walks and append them to the main path
             walk = list(edgeset.pop())
             while True:
@@ -690,19 +731,21 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
                         walk.append(edge.pop())
                         edgeset.remove(edge)
                         stop = False
-                if stop: break
+                if stop:
+                    break
             newtour = list(MergeWalkWithTour(tuple(newtour), tuple(walk)))
 
         return tuple(newtour)
 
-    def RemoveEvenRedundantEdges(tour: Tuple[int, ...], tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
+    def RemoveEvenRedundantEdges(tour: Tuple[int, ...],
+                                 tours: List[Tuple[int, ...]]) -> Tuple[int, ...]:
         edgeset = list(edges(tour))
         for edge in map(frozenset, edgeset):
             ects = edgecount_tours(tours)[edge]
             ect = edgecount_tour(tour)[edge]
             if ects > ect and ect % 2 == 0:
                 # check if tour remains connected to node 0 when removing edge 2x
-                nodes = set((0,))
+                nodes = {0}
                 remaining = set(map(frozenset, edges(tour)))
                 remaining.discard(edge)
                 if ect > 2:
@@ -746,7 +789,6 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
     nOfItsWithoutImprovement = 0
 
     tabuList = TabuList(tabuTenure)
-    allEdgesCnt = len(set.union(set(map(frozenset, edges(bestSolution)))))
 
     if maxRunningTime:
         startTime = time()
@@ -755,34 +797,39 @@ def MMKCPP_TEE_TabuSearch(G: Dict[int, Dict[int, float]], k: int = 5, maxNOfItsW
            (maxRunningTime and time() > startTime + maxRunningTime)):
         nOfItsWithoutImprovement += 1
         tabuList.tick()
-        
+        currentAvgWeight = w_avg_tours(currentSolution)
+
         neighborhood: List[Tuple[Tuple[int]]] = []
 
         # compute neighborhood
         current_max_tour = max(currentSolution, key=w_tour)
         current_max_tour_idx = currentSolution.index(current_max_tour)
-
         for i in range(len(current_max_tour)-2):
             semilocal_tours = currentSolution.copy()
             walk = current_max_tour[i:i+3]  # 3 nodes, 2 edges
             semilocal_tours[current_max_tour_idx] = SeparateWalkFromTour(current_max_tour, walk)
-            semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(semilocal_tours[current_max_tour_idx], semilocal_tours)
-
+            semilocal_tours[current_max_tour_idx] = RemoveEvenRedundantEdges(
+                semilocal_tours[current_max_tour_idx], semilocal_tours)
+            if time() > startTime + maxRunningTime + 120:
+                break  # kill program after max_running_time+120 seconds
             for other_tour_idx in range(k):
-                if other_tour_idx == current_max_tour_idx or random() <= dropout:
+                if (other_tour_idx == current_max_tour_idx) or (random() < dropout):
                     continue
                 local_tours = semilocal_tours.copy()
                 other_tour = local_tours[other_tour_idx]
 
                 local_tours[other_tour_idx] = MergeWalkWithTour(other_tour, walk)
-                local_tours[other_tour_idx] = RemoveEvenRedundantEdges(local_tours[other_tour_idx], local_tours)
+                local_tours[other_tour_idx] = RemoveEvenRedundantEdges(
+                    local_tours[other_tour_idx], local_tours)
 
                 neighborhood.append(tuple(local_tours))
 
-
         # filter tabu, reduce max length
         try:
-            currentSolution = min(filter(lambda x: not tabuList.get(x), neighborhood), key=lambda x: (w_max_tours(x), random()))
+            currentSolution = min(
+                filter(lambda x: not tabuList.get(x),
+                       neighborhood),
+                key=lambda x: cost(x, currentAvgWeight))
         except ValueError:  # no non-tabu neighbors, were done
             return bestSolution
         tabuList.add(currentSolution)
